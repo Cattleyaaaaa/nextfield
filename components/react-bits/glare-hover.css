@@ -1,0 +1,34 @@
+.rb-glare {
+  position: relative;
+  isolation: isolate;
+}
+
+/* 一道斜向高光扫过。只动 background-position，不碰 transform / opacity，
+   所以可以和 Framer Motion 的 whileHover、CSS 的边框过渡共存。 */
+.rb-glare::after {
+  background-image: linear-gradient(
+    var(--rb-glare-angle),
+    transparent 60%,
+    var(--rb-glare-color) 70%,
+    transparent 100%
+  );
+  background-position: -100% -100%;
+  background-repeat: no-repeat;
+  background-size: var(--rb-glare-size) var(--rb-glare-size);
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  transition: background-position var(--rb-glare-duration) ease;
+  z-index: 2;
+}
+
+.rb-glare:hover::after {
+  background-position: 100% 100%;
+}
+
+@media (hover: none) {
+  .rb-glare::after {
+    display: none;
+  }
+}

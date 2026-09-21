@@ -1,0 +1,206 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --paper: 240 245 244;
+  --panel: 248 250 249;
+  --ink: 13 37 44;
+  --muted: 75 104 111;
+  --line: 190 211 213;
+  --accent: 34 119 131;
+  --liquid-deep: 9 59 70;
+  --liquid-mid: 16 103 122;
+  --liquid-foam: 157 229 226;
+  color-scheme: light;
+}
+
+.dark {
+  --paper: 9 25 29;
+  --panel: 15 36 41;
+  --ink: 226 243 242;
+  --muted: 142 178 181;
+  --line: 44 83 91;
+  --accent: 112 195 189;
+  --liquid-deep: 4 43 53;
+  --liquid-mid: 12 87 101;
+  --liquid-foam: 135 224 218;
+  color-scheme: dark;
+}
+
+* {
+  border-color: rgb(var(--line) / 1);
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 7rem;
+}
+
+html[data-fullpage="true"],
+html[data-fullpage="true"] body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  background: rgb(var(--paper));
+  color: rgb(var(--ink));
+  font-family: Inter, ui-sans-serif, system-ui, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  text-rendering: optimizeLegibility;
+  transition: background-color 400ms ease, color 400ms ease;
+}
+
+::selection {
+  background: rgb(var(--accent));
+  color: white;
+}
+
+a,
+button,
+article,
+header,
+footer,
+section {
+  transition-property: color, background-color, border-color, box-shadow;
+  transition-duration: 350ms;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ---- 主题切换动画 ---- */
+
+/* 兜底路径：切主题时临时给所有元素补上颜色过渡。
+   上面那条规则只覆盖 a/button/article/header/footer/section，
+   正文、边框、图标都没有过渡，切主题时会和背景的淡入淡出不同步地跳变。
+   只选元素本身而不选伪元素，避免把 .link-line::after 之类的既有过渡顶掉。 */
+html.theme-transition,
+html.theme-transition * {
+  transition:
+    color 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    fill 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    stroke 420ms cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+/* 主路径：旧主题原地不动，新主题从切换按钮的位置以圆形扩散铺开。
+   --theme-wipe-x / -y / -duration 由 ThemeToggle 在点击时写到 :root 上。 */
+::view-transition-old(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(root) {
+  animation: theme-wipe-reveal var(--theme-wipe-duration, 620ms) cubic-bezier(0.65, 0, 0.25, 1) forwards;
+  clip-path: circle(0% at var(--theme-wipe-x, 50%) var(--theme-wipe-y, 50%));
+  mix-blend-mode: normal;
+}
+
+@keyframes theme-wipe-reveal {
+  to {
+    clip-path: circle(150% at var(--theme-wipe-x, 50%) var(--theme-wipe-y, 50%));
+  }
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+/* ---- 首页关键词跑马灯 ---- */
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  animation: marquee 32s linear infinite;
+}
+
+.editorial-rule {
+  background: linear-gradient(90deg, rgb(var(--accent)) 0 3rem, rgb(var(--line)) 3rem 100%);
+  height: 1px;
+}
+
+.link-line {
+  position: relative;
+}
+
+.link-line::after {
+  background: currentColor;
+  bottom: -0.2rem;
+  content: "";
+  height: 1px;
+  left: 0;
+  position: absolute;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 350ms cubic-bezier(0.22, 1, 0.36, 1);
+  width: 100%;
+}
+
+.link-line:hover::after,
+.link-line:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.liquid-curtain {
+  background:
+    radial-gradient(ellipse 70% 20% at 50% 1%, rgb(var(--liquid-foam) / 0.3), transparent 68%),
+    linear-gradient(155deg, rgb(var(--liquid-mid)), rgb(var(--liquid-deep)) 58%, rgb(var(--ink)));
+  border-radius: 48% 52% 0 0 / 5% 8% 0 0;
+  box-shadow: 0 -24px 70px rgb(var(--liquid-foam) / 0.16), 0 -1px 0 rgb(var(--liquid-foam) / 0.45);
+}
+
+.liquid-curtain::before,
+.liquid-curtain::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.liquid-curtain::before {
+  background: rgb(var(--liquid-deep));
+  border-radius: 48% 52% 0 0 / 45% 55% 0 0;
+  height: 8rem;
+  left: 8%;
+  opacity: 0.75;
+  top: -3.8rem;
+  transform: rotate(-2deg);
+  width: 48%;
+}
+
+.liquid-curtain::after {
+  background: rgb(var(--liquid-mid));
+  border-radius: 55% 45% 0 0 / 65% 55% 0 0;
+  height: 10rem;
+  right: 4%;
+  top: -5rem;
+  transform: rotate(3deg);
+  width: 42%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .marquee-track {
+    animation: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

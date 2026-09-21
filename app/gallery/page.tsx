@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { GalleryGrid, type GalleryItem } from "@/components/gallery/gallery-grid";
 
 export const metadata: Metadata = {
   title: "AI 画廊",
@@ -14,7 +15,7 @@ const galleryItems = [
     title: "占位素材",
     note: "这张图来自用户提供的占位文件，替换成你自己的生成图即可。",
   },
-];
+] satisfies GalleryItem[];
 
 export default function GalleryPage() {
   return (
@@ -33,27 +34,7 @@ export default function GalleryPage() {
         再把上面 <span className="font-mono text-ink">app/gallery/page.tsx</span> 里的数组换成真实条目即可。
       </p>
 
-      <ul className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {galleryItems.map((item) => (
-          <li className="group" key={item.src}>
-            <figure className="overflow-hidden rounded-3xl border border-line bg-panel">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                alt={item.alt}
-                className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                height={800}
-                src={item.src}
-                width={800}
-              />
-              <figcaption className="flex items-baseline justify-between gap-3 px-5 py-4">
-                <span className="font-display text-lg tracking-[-0.03em]">{item.title}</span>
-                <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted">01</span>
-              </figcaption>
-            </figure>
-            <p className="mt-2 text-xs leading-5 text-muted">{item.note}</p>
-          </li>
-        ))}
-      </ul>
+      <GalleryGrid items={galleryItems} />
     </div>
   );
 }

@@ -103,10 +103,22 @@ export function getAllPosts(): PostMeta[] {
     .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : a.title.localeCompare(b.title)));
 }
 
+// Next 传给页面组件的动态段是 URL 编码过的（文件名带空格或中文时会变成 %20 / %E5%A5%B6…），
+// 而磁盘上的文件名是原始字符。不解码就会比对不上，文章页静默 404。
+function safeDecode(value: string) {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
 export function getPostBySlug(slug: string): PostMeta | null {
-  if (!getPostSlugs().includes(slug)) return null;
-  const { data, content } = parseFrontmatter(fs.readFileSync(path.join(POSTS_DIR, slug + POST_EXTENSION), "utf8"));
-  return toMeta(slug, data, content);
+  const decoded = safeDecode(slug);
+  const matched = getPostSlugs().find((candidate) => candidate === slug || candidate === decoded);
+  if (!matched) return null;
+  const { data, content } = parseFrontmatter(fs.readFileSync(path.join(POSTS_DIR, matched + POST_EXTENSION), "utf8"));
+  return toMeta(matched, data, content);
 }
 
 export function getPostCategories(): string[] {

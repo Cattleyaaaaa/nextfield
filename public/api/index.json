@@ -1,0 +1,13 @@
+{
+  "name": "NEXTFIELD Personal API",
+  "version": "1.0",
+  "generated": "2026-09-21",
+  "endpoints": [
+    "/api/status.json",
+    "/api/now.json",
+    "/api/projects.json",
+    "/api/notes.json",
+    "/api/build-log.json"
+  ],
+  "policy": "Static, public, read-only build snapshots. No visitor data is exposed."
+}

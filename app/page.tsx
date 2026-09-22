@@ -1,38 +1,50 @@
-import { ArrowUpRight } from "lucide-react";
-import { TransitionLink } from "@/components/site/transition-link";
-import { KeywordMarquee } from "@/components/home/keyword-marquee";
 import { KineticHero } from "@/components/home/kinetic-hero";
-import { ScrollReveal } from "@/components/home/scroll-reveal";
-import { SectionCards } from "@/components/home/section-cards";
+import { ZentryHome } from "@/components/home/zentry-home";
+import { ProjectConstellation } from "@/components/home/project-constellation";
+import { OpenExperiments } from "@/components/home/open-experiments";
+import { SelectedNotes } from "@/components/home/selected-notes";
+import { CapabilityMap, DailyField, FieldChannels, VisitorTrace } from "@/components/home/field-systems";
+import { TransitionLink } from "@/components/site/transition-link";
+import { ArrowUpRight } from "lucide-react";
+import { IndexThemeInitializer } from "@/components/site/index-theme-initializer";
+import { INDEX_INITIAL_THEME, THEME_STORAGE_KEY, THEME_USER_SELECTION_KEY } from "@/lib/theme-preference";
+import { getPublishedPosts } from "@/lib/posts";
+import { FieldSchoolCallout } from "@/components/home/field-school-callout";
 
-// 首页参考 gsap.com 的结构：巨幅动态字 hero → 滚动逐字点亮 → 板块卡片 → 跑马灯 → CTA。
-// 动效只用 GSAP（ScrollTrigger / 逐字 stagger）与 CSS，不引入 canvas / WebGL。
+// 首页采用大字叙事、滚动舞台与能力卡片；只使用 CSS / GSAP / React Bits 微交互。
+const INDEX_THEME_BOOTSTRAP = `try {
+  if (window.localStorage.getItem("${THEME_USER_SELECTION_KEY}") !== "true") {
+    window.localStorage.setItem("${THEME_STORAGE_KEY}", "${INDEX_INITIAL_THEME}");
+    document.documentElement.classList.remove("dark");
+    document.documentElement.classList.add("${INDEX_INITIAL_THEME}");
+    document.documentElement.style.colorScheme = "${INDEX_INITIAL_THEME}";
+  }
+} catch {}`;
+
 export default function HomePage() {
+  const selectedPosts = getPublishedPosts().slice(0, 3);
+  const dateParts = new Intl.DateTimeFormat("en", { timeZone: "Asia/Hong_Kong", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
+  const part = (type: Intl.DateTimeFormatPartTypes) => dateParts.find((item) => item.type === type)?.value ?? "00";
+  const dayKey = `${part("year")}-${part("month")}-${part("day")}`;
+
   return (
     <div className="relative isolate">
+      <script dangerouslySetInnerHTML={{ __html: INDEX_THEME_BOOTSTRAP }} />
+      <IndexThemeInitializer />
       <KineticHero />
-      <ScrollReveal />
-      <SectionCards />
-      <KeywordMarquee />
-
-      <section className="mx-auto max-w-site px-5 pb-28 pt-24 sm:px-8 lg:px-12">
-        <div className="flex flex-wrap items-end justify-between gap-10 rounded-[2rem] border border-line bg-panel p-8 sm:p-12">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-accent">Contact</p>
-            <h2 className="mt-5 max-w-2xl font-display text-[clamp(2.2rem,4.5vw,3.6rem)] leading-[1.02] tracking-[-0.05em]">
-              下一步，从一个想法开始。
-            </h2>
-            <p className="mt-5 max-w-xl text-sm leading-6 text-muted">
-              想聊 Agent 落地、全栈架构，或者只是看看这个站怎么搭的——都在 about 里。
-            </p>
-          </div>
-          <TransitionLink
-            className="group inline-flex items-center gap-3 rounded-full bg-ink px-6 py-3.5 text-sm font-medium text-paper transition-colors duration-300 hover:bg-accent hover:text-white"
-            href="/about#contact"
-          >
-            联系我
-            <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-          </TransitionLink>
+      <ZentryHome />
+      <FieldSchoolCallout />
+      <ProjectConstellation />
+      <DailyField dayKey={dayKey} />
+      <FieldChannels />
+      <OpenExperiments />
+      <CapabilityMap />
+      <SelectedNotes posts={selectedPosts} />
+      <VisitorTrace />
+      <section className="mx-auto max-w-site px-5 py-24 sm:px-8 lg:px-12">
+        <div className="rounded-[2rem] bg-ink px-7 py-14 text-paper sm:px-12 sm:py-20">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-liquid-foam">Colophon / 07</p>
+          <div className="mt-8 grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end"><h2 className="max-w-4xl font-display text-[clamp(3rem,6vw,6rem)] leading-[0.86] tracking-[-0.06em]">BUILT IN THE OPEN.<br /><span className="text-paper/45">ALWAYS IN PROGRESS.</span></h2><TransitionLink className="inline-flex items-center gap-3 rounded-full bg-paper px-6 py-4 text-sm font-medium text-ink hover:bg-liquid-foam" href="/colophon">阅读制作说明 <ArrowUpRight className="size-4" /></TransitionLink></div>
         </div>
       </section>
     </div>

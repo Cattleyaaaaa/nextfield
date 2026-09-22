@@ -1,40 +1,14 @@
 "use client";
 
-import { useRef, type CSSProperties } from "react";
+import { useRef } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { TransitionLink } from "@/components/site/transition-link";
 import { AmbientGlow } from "@/components/visual/ambient-glow";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { useMotionPreference } from "@/lib/use-motion-preference";
 
-// 大屏构图对照 gsap.com 首页：暗底 + 巨幅两行错位字 + 左上花朵 + 右下弹簧线，
-// 左下大括号副题、右下药丸按钮。文字换成「Create Anything」。
-// 这一屏强制使用暗色调（把主题变量在区块内翻转），亮/暗主题下观感一致。
-type DarkVars = CSSProperties &
-  Record<
-    | "--paper"
-    | "--panel"
-    | "--ink"
-    | "--muted"
-    | "--line"
-    | "--accent"
-    | "--liquid-deep"
-    | "--liquid-mid"
-    | "--liquid-foam",
-    string
-  >;
-
-const DARK_OVERRIDES: DarkVars = {
-  "--paper": "9 25 29",
-  "--panel": "15 36 41",
-  "--ink": "226 243 242",
-  "--muted": "142 178 181",
-  "--line": "44 83 91",
-  "--accent": "112 195 189",
-  "--liquid-deep": "4 43 53",
-  "--liquid-mid": "12 87 101",
-  "--liquid-foam": "135 224 218",
-};
+// 大屏构图对照 gsap.com 首页：巨幅两行错位字、左上花朵与右下弹簧线。
+// 颜色直接继承站点主题，确保首页首次加载的浅色模式不会被这一屏局部覆盖。
 
 const HERO_LINES = ["Create", "Anything"];
 const SPRING_PATH =
@@ -95,7 +69,7 @@ export function KineticHero() {
   }, { scope: rootRef, dependencies: [reducedMotion] });
 
   return (
-    <section className="relative overflow-hidden bg-paper text-ink" ref={rootRef} style={DARK_OVERRIDES}>
+    <section className="relative overflow-hidden bg-paper text-ink" ref={rootRef}>
       <AmbientGlow />
       <div className="relative mx-auto flex min-h-[calc(100svh-4rem)] max-w-site flex-col px-5 pb-12 pt-10 sm:px-8 lg:px-12">
         <div className="relative my-auto">

@@ -36,10 +36,10 @@ export const navSections: NavSection[] = [
   },
   {
     number: "04",
-    label: "AI 画廊",
-    eyebrow: "gallery",
+    label: "实验室",
+    eyebrow: "lab",
     href: "/gallery",
-    description: "提示词与生成图的公开档案。",
+    description: "文字、空间、声音与界面反馈的开放实验。",
   },
   {
     number: "05",
@@ -61,3 +61,17 @@ export const headerSections: NavSection[] = [
   },
   ...navSections.slice(0, 3),
 ];
+
+/** 常驻全站的深层入口，避免它们只在首页底部和页脚出现。 */
+export const fieldSections = [
+  { label: "FIELD SCHOOL", eyebrow: "Learn", href: "/learn", description: "通过交互课程学习 Agent、全栈与产品实践。" },
+  { label: "开放实验室", eyebrow: "Experiments", href: "/gallery", description: "触碰文字、空间、声音与界面反馈的开放实验。" },
+  { label: "画廊", eyebrow: "Gallery", href: "/gallery/visual", description: "以图片为主的视觉档案：插画、配色与现场记录。" },
+  { label: "电台", eyebrow: "Radio", href: "/gallery/radio", description: "少数几首确定的曲目，点开就播；播放器常驻右下角。" },
+  { label: "随笔", eyebrow: "Essays", href: "/essays", description: "关于界面、系统与构建过程的短观察。" },
+  { label: "建站纪事", eyebrow: "Build log", href: "/build-log", description: "查看网站每一版的设计与实现变化。" },
+  { label: "制作说明", eyebrow: "Colophon", href: "/colophon", description: "了解技术栈、设计原则与构建方式。" },
+  { label: "Live Studio", eyebrow: "Now", href: "/live-studio", description: "此刻正在构建、测试和计划的内容。" },
+  { label: "失败博物馆", eyebrow: "Failures", href: "/failures", description: "被放弃的方案，以及它们留下的判断。" },
+  { label: "Systems", eyebrow: "Evidence 13–25", href: "/systems", description: "浏览可操作、可下载、可验证的证据层。" },
+] as const;

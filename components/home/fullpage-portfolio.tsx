@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useMotionPreference } from "@/lib/use-motion-preference";
-import { ArrowDown, ArrowUpRight, ChevronDown, Mail, MousePointer2 } from "lucide-react";
+import { ArrowDown, ArrowUpRight, ChevronDown, Github, MousePointer2 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { type TouchEvent, useCallback, useEffect, useRef, useState } from "react";
 import { Hero } from "@/components/home/hero";
@@ -17,6 +17,7 @@ import { FullStackSlide } from "@/components/home/fullstack-slide";
 import { NowSlide } from "@/components/home/now-slide";
 import { WritingSlide } from "@/components/home/writing-slide";
 import { siteConfig } from "@/site.config";
+import { useLanguage } from "@/components/site/language-provider";
 import { gsap, useGSAP } from "@/lib/gsap";
 import type { PostMeta } from "@/types/post";
 
@@ -304,6 +305,7 @@ function ProfileDetail() {
 
 function ContactSlide() {
   const reducedMotion = useMotionPreference();
+  const { locale } = useLanguage();
   const { resolvedTheme } = useTheme();
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -352,7 +354,7 @@ function ContactSlide() {
             as="h2"
             className="mt-6 max-w-3xl font-display text-[clamp(3rem,6vw,5.5rem)] leading-[0.9] tracking-[-0.055em]"
             delay={CONTACT_TITLE_CONFIG.delay}
-            text={CONTACT_TITLE_CONFIG.text}
+            text={locale === "en" ? "Have a product in mind?\nLet's make it real." : CONTACT_TITLE_CONFIG.text}
           />
         </div>
         <div className="mt-10 flex flex-col items-start justify-end gap-4 lg:col-span-4 lg:mt-0" data-contact-reveal>
@@ -360,17 +362,12 @@ function ContactSlide() {
             {...CONTACT_SPECULAR_CONFIG}
             {...specularColors}
             className="contact-specular-button group"
-            href={`mailto:${siteConfig.email}`}
+            href={siteConfig.socials[0].href}
           >
-            <Mail className="size-4" />
-            发送邮件
+            <Github className="size-4" />
+            访问 GitHub
             <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
           </SpecularButton>
-          <div className="flex gap-4 text-sm text-muted">
-            {siteConfig.socials.slice(0, 2).map((social) => (
-              <a className="link-line transition-colors duration-300 hover:text-ink" href={social.href} key={social.label}>{social.label}</a>
-            ))}
-          </div>
         </div>
       </div>
     </div>

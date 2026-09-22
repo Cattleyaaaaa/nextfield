@@ -2,6 +2,7 @@ import { ArrowUpRight } from "lucide-react";
 import { TransitionLink } from "@/components/site/transition-link";
 import { navSections } from "@/lib/nav";
 import { siteConfig } from "@/site.config";
+import { LanguageToggle } from "@/components/site/language-provider";
 
 export function Footer() {
   return (
@@ -17,6 +18,13 @@ export function Footer() {
               {section.label}
             </TransitionLink>
           ))}
+          <TransitionLink className="hover:text-accent" href="/colophon">制作说明</TransitionLink>
+          <TransitionLink className="hover:text-accent" href="/learn">FIELD SCHOOL</TransitionLink>
+          <TransitionLink className="hover:text-accent" href="/essays">随笔</TransitionLink>
+          <TransitionLink className="hover:text-accent" href="/live-studio">Live Studio</TransitionLink>
+          <TransitionLink className="hover:text-accent" href="/failures">失败博物馆</TransitionLink>
+          <TransitionLink className="hover:text-accent" href="/systems">Systems</TransitionLink>
+          <LanguageToggle footer />
         </nav>
         <div className="flex flex-wrap gap-4 md:justify-end">
           {siteConfig.socials.map((social) => (
@@ -26,7 +34,7 @@ export function Footer() {
             </a>
           ))}
         </div>
-        <p className="text-xs text-muted md:col-span-3">© {new Date().getFullYear()} {siteConfig.name}. 用心设计，静态生成。</p>
+        <p className="text-xs text-muted md:col-span-3">© {new Date().getFullYear()} {siteConfig.name}. A living index, always in progress.</p>
       </div>
     </footer>
   );

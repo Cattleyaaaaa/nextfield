@@ -1,0 +1,14 @@
+"use client";
+
+import { ArrowLeft, ArrowUpRight, CheckCircle2, Circle } from "lucide-react";
+import { TransitionLink } from "@/components/site/transition-link";
+import { useLanguage } from "@/components/site/language-provider";
+import { lessonKey, type LearningTrack } from "@/lib/learn-data";
+import { useLearningProgress } from "@/components/learn/use-learning-progress";
+
+export function TrackOverview({ track }: { track: LearningTrack }) {
+  const { locale } = useLanguage();
+  const { completed } = useLearningProgress();
+  const count = track.lessons.filter((lesson) => completed.includes(lessonKey(track.slug, lesson.slug))).length;
+  return <div className="mx-auto max-w-site px-5 pb-28 pt-16 sm:px-8 sm:pt-24 lg:px-12"><TransitionLink className="inline-flex items-center gap-2 text-xs text-muted hover:text-accent" href="/learn"><ArrowLeft className="size-3.5" />{locale === "zh" ? "返回学习中心" : "Back to Field School"}</TransitionLink><header className="mt-12 grid gap-10 border-b border-line pb-12 lg:grid-cols-[1fr_22rem] lg:items-end"><div><p className="font-mono text-[10px] tracking-[0.18em] text-accent">LEARNING PATH / {track.number}</p><h1 className="mt-5 max-w-5xl font-display text-[clamp(3.5rem,8vw,7rem)] leading-[0.86] tracking-[-0.065em]">{track.title[locale]}</h1><p className="mt-7 max-w-2xl text-lg leading-9 text-muted">{track.summary[locale]}</p></div><div><div className="flex justify-between font-mono text-[9px] text-muted"><span>{locale === "zh" ? "学习进度" : "Progress"}</span><span>{count}/{track.lessons.length}</span></div><div className="mt-3 h-1.5 overflow-hidden rounded-full bg-line"><span className="block h-full bg-accent transition-[width]" style={{ width: `${count / track.lessons.length * 100}%` }} /></div><p className="mt-5 text-sm leading-6 text-muted">{track.outcome[locale]}</p></div></header><ol className="mt-10">{track.lessons.map((lesson) => { const done = completed.includes(lessonKey(track.slug, lesson.slug)); return <li className="border-b border-line" key={lesson.slug}><TransitionLink className="group grid gap-4 py-7 sm:grid-cols-[3rem_1fr_auto] sm:items-start sm:gap-6" href={`/learn/${track.slug}/${lesson.slug}`}><span className="font-mono text-[10px] text-accent">{lesson.number}</span><span><strong className="block font-display text-2xl font-normal tracking-[-0.035em] group-hover:text-accent sm:text-3xl">{lesson.title[locale]}</strong><span className="mt-2 block max-w-2xl text-sm leading-6 text-muted">{lesson.summary[locale]}</span></span><span className="flex items-center gap-3 text-xs text-muted">{lesson.minutes} {locale === "zh" ? "分钟" : "min"}{done ? <CheckCircle2 className="size-4 text-accent" /> : <Circle className="size-4" />}<ArrowUpRight className="size-4 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" /></span></TransitionLink></li>; })}</ol></div>;
+}

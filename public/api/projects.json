@@ -1,0 +1,8 @@
+{
+  "projects": [
+    { "name": "Knowledge Copilot", "focus": "Cited retrieval and tool use", "tags": ["LangGraph", "RAG", "Next.js"] },
+    { "name": "Agent Operations", "focus": "Agent observation, debugging and evaluation", "tags": ["TypeScript", "PostgreSQL", "Streaming"] },
+    { "name": "Semantic Search", "focus": "Intent-aware search over business data", "tags": ["Embeddings", "Vector DB", "API"] },
+    { "name": "NEXTFIELD", "focus": "Living portfolio and evidence system", "tags": ["Next.js", "GSAP", "MDX"] }
+  ]
+}

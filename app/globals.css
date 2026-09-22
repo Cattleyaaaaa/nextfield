@@ -52,6 +52,30 @@ body {
   transition: background-color 400ms ease, color 400ms ease;
 }
 
+.field-atmosphere {
+  inset: 0;
+  pointer-events: none;
+  position: fixed;
+  transition: background 1.2s ease, opacity 1.2s ease;
+  z-index: 0;
+}
+
+.field-atmosphere--morning {
+  background: radial-gradient(circle at 12% 8%, rgb(255 205 132 / 0.12), transparent 32%);
+}
+
+.field-atmosphere--day {
+  background: radial-gradient(circle at 85% 12%, rgb(var(--liquid-foam) / 0.1), transparent 34%);
+}
+
+.field-atmosphere--evening {
+  background: radial-gradient(circle at 88% 8%, rgb(238 137 95 / 0.13), transparent 36%);
+}
+
+.field-atmosphere--night {
+  background: radial-gradient(circle at 72% 4%, rgb(85 122 185 / 0.14), transparent 38%);
+}
+
 ::selection {
   background: rgb(var(--accent));
   color: white;
@@ -150,6 +174,96 @@ html.theme-transition * {
   transform-origin: left;
 }
 
+/* Pointer-driven 3D surfaces. Children opt into depth without affecting layout. */
+.tilt-surface {
+  --tilt-shine-x: 50%;
+  --tilt-shine-y: 50%;
+  position: relative;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.tilt-surface [data-tilt-depth] {
+  transform-style: preserve-3d;
+}
+
+.tilt-surface__shine {
+  background: radial-gradient(circle at var(--tilt-shine-x) var(--tilt-shine-y), rgb(var(--liquid-foam) / 0.2), transparent 34%);
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  transition: opacity 350ms ease;
+  z-index: 5;
+}
+
+.tilt-surface:hover > .tilt-surface__shine {
+  opacity: 1;
+}
+
+@keyframes radio-signal {
+  0%, 100% { transform: scaleY(0.28); opacity: 0.45; }
+  50% { transform: scaleY(1); opacity: 1; }
+}
+
+.radio-bar {
+  animation: radio-signal 1.4s ease-in-out infinite;
+  transform-origin: bottom;
+}
+
+.radio-volume {
+  accent-color: rgb(var(--liquid-foam));
+}
+
+/* 播放进度：做成真的能拖的 range，而不是一条只读的细线。
+   已播放部分用行内渐变画，所以这里只管轨道底色和滑块。 */
+.radio-progress {
+  appearance: none;
+  width: 100%;
+  height: 3px;
+  border-radius: 999px;
+  background: rgb(var(--paper) / 0.15);
+  cursor: pointer;
+  touch-action: none;
+}
+
+.radio-progress::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: rgb(var(--liquid-foam));
+  box-shadow: 0 0 0 5px rgb(var(--liquid-foam) / 0.14);
+}
+
+.radio-progress::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(var(--liquid-foam));
+}
+
+.radio-progress:disabled {
+  cursor: default;
+}
+
+.radio-progress:disabled::-webkit-slider-thumb,
+.radio-progress:disabled::-moz-range-thumb {
+  background: rgb(var(--paper) / 0.4);
+  box-shadow: none;
+}
+
+/* 悬浮歌词：不要滚动条，上下边缘做淡出，看起来像一段流动的歌词 */
+.radio-lyrics-scroll {
+  scrollbar-width: none;
+  mask-image: linear-gradient(to bottom, transparent, black 16%, black 84%, transparent);
+}
+
+.radio-lyrics-scroll::-webkit-scrollbar {
+  display: none;
+}
+
 .liquid-curtain {
   background:
     radial-gradient(ellipse 70% 20% at 50% 1%, rgb(var(--liquid-foam) / 0.3), transparent 68%),
@@ -202,5 +316,16 @@ html.theme-transition * {
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .tilt-surface {
+    transform: none !important;
+    will-change: auto;
+  }
+
+  .tilt-surface__shine {
+    display: none;
   }
 }

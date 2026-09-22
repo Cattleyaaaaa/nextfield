@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { SplitText, gsap, useGSAP } from "@/lib/gsap";
 import { useMotionPreference } from "@/lib/use-motion-preference";
+import { useLanguage } from "@/components/site/language-provider";
 
 // 换屏动画约 0.36s，加帘幕，屏内动效统一等这个时间再起。
 const AGENT_SLIDE_MOTION = {
@@ -52,6 +53,7 @@ const agentFrameworks: Omit<PipelineStep, "id">[] = [
 
 export function AgentSlide() {
   const reducedMotion = useMotionPreference();
+  const { locale } = useLanguage();
   const slideRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const splitRef = useRef<SplitText | null>(null);
@@ -125,7 +127,7 @@ export function AgentSlide() {
       }
       splitRef.current = null;
     };
-  }, { scope: slideRef, dependencies: [reducedMotion], revertOnUpdate: true });
+  }, { scope: slideRef, dependencies: [reducedMotion, locale], revertOnUpdate: true });
 
   return (
     <section className="mx-auto flex h-full max-w-site items-center px-5 py-8 sm:px-8 lg:px-12" ref={slideRef}>
@@ -133,7 +135,7 @@ export function AgentSlide() {
         <header className="mb-5 flex items-end justify-between gap-6 border-b border-line pb-5 sm:mb-6 sm:pb-6">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">01 / Specialty</p>
-            <h2 className="mt-3 font-display text-[clamp(2.6rem,5vw,4.75rem)] leading-[0.92] tracking-[-0.055em]" ref={titleRef}>Agent 开发</h2>
+            <h2 className="mt-3 font-display text-[clamp(2.6rem,5vw,4.75rem)] leading-[0.92] tracking-[-0.055em]" ref={titleRef}>{locale === "en" ? "Agent Development" : "Agent 开发"}</h2>
           </div>
           <p className="hidden max-w-sm text-sm leading-6 text-muted sm:block">让模型推理、工具调用与知识检索在产品中可靠发生。</p>
         </header>

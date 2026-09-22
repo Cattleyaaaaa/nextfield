@@ -7,7 +7,7 @@ const isProduction = process.env.NODE_ENV === "production";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   distDir: isProduction ? ".next-production" : ".next-development",
-  output: isProduction ? "export" : undefined,
+  // Vercel serves authenticated APIs alongside pre-rendered course pages.
   images: { unoptimized: true },
   pageExtensions: ["ts", "tsx", "md", "mdx"],
   poweredByHeader: false,

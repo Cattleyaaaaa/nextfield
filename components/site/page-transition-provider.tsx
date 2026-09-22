@@ -22,7 +22,6 @@ export function PageTransitionProvider({ children }: { children: React.ReactNode
   const [motionSetting, setMotionSetting] = useState<"system" | "on" | "off">("system");
   const [phase, setPhase] = useState<"idle" | "covering" | "revealing">("idle");
   const targetRef = useRef<string | null>(null);
-  const lastWheelTransition = useRef(0);
   const motionEnabled = motionSetting === "on" || (motionSetting === "system" && !reducedMotion);
 
   useEffect(() => {
@@ -48,28 +47,6 @@ export function PageTransitionProvider({ children }: { children: React.ReactNode
     setPhase("covering");
     window.setTimeout(() => router.push(href), 500);
   }, [motionEnabled, pathname, router]);
-
-  useEffect(() => {
-    if (!motionEnabled || window.innerWidth < 768) return;
-    const onWheel = (event: WheelEvent) => {
-      if (document.documentElement.dataset.fullpage === "true") return;
-      if (targetRef.current || Math.abs(event.deltaY) < 28) return;
-      const now = performance.now();
-      if (now - lastWheelTransition.current < 900) return;
-      const atBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 8;
-      const atTop = window.scrollY <= 4;
-      if (pathname === "/" && event.deltaY > 0 && atBottom) {
-        lastWheelTransition.current = now;
-        navigate("/about", { x: window.innerWidth / 2, y: window.innerHeight - 32 });
-      }
-      if (pathname === "/about" && event.deltaY < 0 && atTop) {
-        lastWheelTransition.current = now;
-        navigate("/", { x: window.innerWidth / 2, y: 32 });
-      }
-    };
-    window.addEventListener("wheel", onWheel, { passive: true });
-    return () => window.removeEventListener("wheel", onWheel);
-  }, [motionEnabled, navigate, pathname]);
 
   useEffect(() => {
     const targetPathname = targetRef.current?.split("#")[0];

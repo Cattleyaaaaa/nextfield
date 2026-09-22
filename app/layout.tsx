@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
 import { Footer } from "@/components/site/footer";
+import { FieldRadio } from "@/components/site/field-radio";
+import { NextfieldOS } from "@/components/site/nextfield-os";
+import { FieldAtmosphere } from "@/components/site/field-atmosphere";
+import { MissionTracker } from "@/components/evidence/local-systems";
+import { LanguageProvider } from "@/components/site/language-provider";
 import { Header } from "@/components/site/header";
 import { PageTransitionProvider } from "@/components/site/page-transition-provider";
 import { ThemeProvider } from "@/components/site/theme-provider";
@@ -30,17 +35,23 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="zh-CN" suppressHydrationWarning>
       <body>
         <ThemeProvider>
-          <Grain />
-          <StudioBadgeDropProvider>
-            <PageTransitionProvider>
-              <WaterRipple />
-              <div className="relative flex min-h-screen flex-col">
-                <Header />
-                <main className="flex-1">{children}</main>
-                <Footer />
-              </div>
-            </PageTransitionProvider>
-          </StudioBadgeDropProvider>
+          <LanguageProvider>
+            <Grain />
+            <FieldAtmosphere />
+            <StudioBadgeDropProvider>
+              <PageTransitionProvider>
+                <WaterRipple />
+                <FieldRadio />
+                <NextfieldOS />
+                <MissionTracker />
+                <div className="relative flex min-h-screen flex-col">
+                  <Header />
+                  <main className="flex-1">{children}</main>
+                  <Footer />
+                </div>
+              </PageTransitionProvider>
+            </StudioBadgeDropProvider>
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>

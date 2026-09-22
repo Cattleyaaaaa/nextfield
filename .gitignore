@@ -7,5 +7,6 @@ out
 *.log
 .DS_Store
 *.tsbuildinfo
+tmp/
 .env*
 !.env.example

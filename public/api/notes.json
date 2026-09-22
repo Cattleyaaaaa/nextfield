@@ -1,0 +1,7 @@
+{
+  "notes": [
+    { "slug": "building-a-living-index", "title": "为什么把作品集做成一个持续生长的索引", "category": "设计" },
+    { "slug": "depth-without-weight", "title": "不使用重型场景，如何给网页增加空间感", "category": "交互" },
+    { "slug": "agent-interface-is-a-state-machine", "title": "Agent 界面首先是一台状态机", "category": "Agent" }
+  ]
+}

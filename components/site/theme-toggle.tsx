@@ -5,6 +5,7 @@ import { useTheme } from "next-themes";
 import { useCallback, useEffect, useState, type MouseEvent } from "react";
 import { HeaderSpecularButton } from "@/components/site/header-specular-button";
 import { useMotionPreference } from "@/lib/use-motion-preference";
+import { THEME_USER_SELECTION_KEY } from "@/lib/theme-preference";
 
 // 圆形揭示的时长 —— 通过 CSS 变量传给 globals.css 里的 ::view-transition-new，
 // 这样 JS 与 CSS 只有一处真值。
@@ -36,6 +37,8 @@ export function ThemeToggle() {
   const onToggle = (event: MouseEvent<HTMLButtonElement>) => {
     const next = resolvedTheme === "dark" ? "light" : "dark";
     const root = document.documentElement;
+    // 首页只在用户从未选过主题时固定浅色；首次主动切换后始终尊重该选择。
+    window.localStorage.setItem(THEME_USER_SELECTION_KEY, "true");
     const viewTransitionDocument = document as unknown as ViewTransitionDocument;
     const startViewTransition = viewTransitionDocument.startViewTransition;
 

@@ -1,0 +1,3 @@
+import type { Metadata } from "next"; import { ArchitectureXray } from "@/components/evidence/evidence-labs";
+export const metadata: Metadata = { title: "Architecture X-Ray", description: "逐层查看 Agent 产品的界面、状态、工作流和数据。" };
+export default function Page() { return <div className="mx-auto max-w-site px-5 pb-28 pt-20 sm:px-8 sm:pt-28 lg:px-12"><p className="text-xs font-semibold uppercase tracking-[.24em] text-accent">Architecture x-ray / 15</p><h1 className="mt-6 font-display text-[clamp(3rem,7vw,6rem)] leading-[.9] tracking-[-.06em]">LOOK THROUGH<br />THE SURFACE.</h1><ArchitectureXray /></div>; }

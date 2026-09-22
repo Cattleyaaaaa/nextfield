@@ -1,0 +1,3 @@
+import type { Metadata } from "next"; import { SpatialDesktop } from "@/components/evidence/local-systems";
+export const metadata: Metadata = { title: "Spatial Desktop", description: "一个可拖动、缩放并保存布局的 NEXTFIELD 桌面实验。" };
+export default function Page() { return <div className="mx-auto max-w-site px-5 pb-28 pt-20 sm:px-8 sm:pt-28 lg:px-12"><p className="text-xs font-semibold uppercase tracking-[.24em] text-accent">Spatial desktop / 24</p><h1 className="mt-6 font-display text-[clamp(3rem,7vw,6rem)] leading-[.9] tracking-[-.06em]">THE FIELD,<br />AS A DESKTOP.</h1><p className="mt-8 max-w-2xl text-sm leading-7 text-muted">拖动窗口标题栏、改变窗口大小并重新排列工作区。布局会保存在当前浏览器。</p><SpatialDesktop /></div>; }

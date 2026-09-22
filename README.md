@@ -1,6 +1,6 @@
-# Agent & Full-stack Portfolio
+# NEXTFIELD / 下一场域
 
-一个以 Agent 开发与全栈开发能力为核心的个人主页 / 作品集。使用 Next.js 14 App Router、TypeScript、Tailwind CSS 和 Framer Motion 构建，并输出纯静态网站。
+一个持续生长的项目、笔记与实验索引。它包含 NEXTFIELD OS 命令中心、90 秒快速介绍、项目回放、失败博物馆、开放实验室、Field Radio、每日生成封面、能力证据图和 Live Studio，并输出为纯静态网站。
 
 ## 技术栈
 
@@ -9,6 +9,9 @@
 - Framer Motion
 - Lucide React 图标
 - next-themes 深浅主题
+- GSAP 滚动与 3D 交互
+- Web Audio API 程序化环境声
+- Canvas / OGL 视觉实验
 
 ## 安装与运行
 
@@ -40,7 +43,7 @@ npm run build
 - `statement`：首页主视觉文案
 - `description`：网站描述
 - `url`：部署后的正式域名
-- `email` 与 `socials`：联系方式
+- `socials`：联系方式（当前仅保留 GitHub）
 
 项目展示占位内容位于 `components/home/project-showcase.tsx`；替换项目名、描述、技术标签和链接即可。
 

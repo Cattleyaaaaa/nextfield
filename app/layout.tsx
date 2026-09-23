@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Footer } from "@/components/site/footer";
 import { FieldRadio } from "@/components/site/field-radio";
+import { ClickFireworks } from "@/components/site/click-fireworks";
 import { NextfieldOS } from "@/components/site/nextfield-os";
 import { FieldAtmosphere } from "@/components/site/field-atmosphere";
+import { InkDrift } from "@/components/site/ink-drift";
 import { MissionTracker } from "@/components/evidence/local-systems";
 import { LanguageProvider } from "@/components/site/language-provider";
 import { Header } from "@/components/site/header";
@@ -41,6 +43,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <StudioBadgeDropProvider>
               <PageTransitionProvider>
                 <WaterRipple />
+                <InkDrift />
+                <ClickFireworks />
                 <FieldRadio />
                 <NextfieldOS />
                 <MissionTracker />

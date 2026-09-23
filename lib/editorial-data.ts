@@ -13,7 +13,27 @@ export type EditorialArticle = {
 
 export const BUILD_LOG_ARTICLES: EditorialArticle[] = [
   {
-    slug: "a-page-each-for-images-and-sound", date: "2026 · 09 · 22", eyebrow: "Build log / 01", tags: ["Content", "Audio", "Navigation"], minutes: 4,
+    slug: "the-radio-got-a-record", date: "2026 · 09 · 22", eyebrow: "Build log / 01", tags: ["Audio", "CSS", "Layout"], minutes: 5,
+    title: { zh: "电台有了一张会转的唱片", en: "The radio got a spinning record" },
+    summary: { zh: "给场域电台换上真实专辑封面和绕心旋转的黑胶，顺手修正悬浮歌词的停靠对齐；一次视觉改造背后是三个排版细节。", en: "The Field Radio gained real album covers and a centre-spun vinyl, and the floating lyrics learned to dock precisely. Behind the visual pass sit three layout details." },
+    sections: [
+      { heading: { zh: "封面是内容的一部分", en: "Covers are content" }, paragraphs: [
+        { zh: "唱片不只是装饰：切换曲目时，封面帮助访客确认「现在放的是这首」。封面通过音乐商店的公开接口抓取，并且只相信歌手与歌名同时匹配的结果——商店里有不少同名的翻唱与伴奏，只看标题就会抓错。优先录音室版本，现场与伴奏只作兜底。", en: "The disc is not just decoration: when tracks change, the cover confirms what is playing. Covers are fetched through the music store's public API, trusting only results where artist and title both match — the store is full of same-named covers and instrumentals, and title-only matching grabs the wrong art. Studio versions come first; live takes are a fallback." },
+        { zh: "有两首独立发行的曲目在商店里查不到，它们继续使用程序生成的占位图。占位不是权宜之计：它保证任何曲目都有确定的视觉，不会留白。", en: "Two independently released tracks cannot be found in the store and keep generated placeholder art. Placeholders are not a stopgap: they guarantee every track has a definite visual instead of a blank." },
+      ]},
+      { heading: { zh: "旋转要绕着圆心", en: "Rotation must spin around the centre" }, paragraphs: [
+        { zh: "旋转由一段 CSS 关键帧完成，组件只切换 animation-play-state：播放时 running，暂停时 paused，再次播放从停住的角度继续，而不是回到起点。纹路、封面与中心孔画在同一层里绕圆心转，高光留在外面不随盘转动——像固定光源下的反光。", en: "The spin is one CSS keyframe; the component only toggles animation-play-state — running while playing, paused otherwise, resuming from the angle where it stopped rather than restarting. Grooves, cover and spindle hole sit in one layer rotating around the centre, while the highlight stays outside the rotation like a reflection under a fixed light." },
+      ]},
+      { heading: { zh: "img 是替换元素", en: "An img is a replaced element" }, paragraphs: [
+        { zh: "第一版封面的位置偏在左上角。原因写在 CSS 规范里：img 这类替换元素不会被绝对定位的 inset 拉伸，只会保持固有尺寸、锚定在左上角；div 和 span 才会按 inset 铺满。修法是让普通容器负责定位，图片只负责填满容器。这类问题不实际跑起来看很难发现。", en: "The first version put the cover in the top-left corner. The reason is in the CSS spec: replaced elements such as img are not stretched by absolute-position insets — they keep their intrinsic size anchored top-left, while div and span do fill the insets. The fix hands positioning to an ordinary container and lets the image only fill it. This kind of bug is hard to see without running the page." },
+      ]},
+      { heading: { zh: "歌词的停靠点", en: "Where the lyrics dock" }, paragraphs: [
+        { zh: "悬浮歌词默认停在播放器正上方。此前停靠点写死了 24px 的右边距，移动端会差出 8px；卡片首帧留在文档流里还会把容器撑高，量出来的位置必然不对。现在改为按播放器实测矩形对齐右缘，测量完成前先隐藏，量完再落位——跳位就看不见了。", en: "Floating lyrics dock right above the player. The docked spot used to hardcode a 24px right margin — 8px off on mobile — and the card's first frame stayed in the document flow, inflating the container and guaranteeing a wrong measurement. It now aligns to the player's measured rect, hides until measured, and lands before first paint, so the jump is invisible." },
+      ]},
+    ],
+  },
+  {
+    slug: "a-page-each-for-images-and-sound", date: "2026 · 09 · 22", eyebrow: "Build log / 02", tags: ["Content", "Audio", "Navigation"], minutes: 4,
     title: { zh: "给画廊和电台各自一个页面", en: "A page each for the gallery and the radio" },
     summary: { zh: "图片档案与曲目清单变成独立页面并接入探索入口；电台补上跟随播放的歌词，音频统一压成 MP3。", en: "The image archive and the track list became standalone pages reachable from site-wide exploration, while the radio gained synced lyrics and audio was recompressed to MP3." },
     sections: [
@@ -32,7 +52,7 @@ export const BUILD_LOG_ARTICLES: EditorialArticle[] = [
     ],
   },
   {
-    slug: "a-field-with-a-voice", date: "2026 · 09 · 21", eyebrow: "Build log / 02", tags: ["Audio", "Interaction", "Content"], minutes: 5,
+    slug: "a-field-with-a-voice", date: "2026 · 09 · 21", eyebrow: "Build log / 03", tags: ["Audio", "Interaction", "Content"], minutes: 5,
     title: { zh: "NEXTFIELD 有了自己的声音", en: "NEXTFIELD found its voice" },
     summary: { zh: "加入 Field Radio、项目星图与开放实验室，把首页从内容目录改造成可以探索的数字场域。", en: "Field Radio, a project constellation and open experiments turned the homepage from a directory into a field to explore." },
     sections: [
@@ -49,7 +69,7 @@ export const BUILD_LOG_ARTICLES: EditorialArticle[] = [
     ],
   },
   {
-    slug: "depth-with-restraint", date: "2026 · 09 · 21", eyebrow: "Build log / 03", tags: ["GSAP", "3D", "A11y"], minutes: 4,
+    slug: "depth-with-restraint", date: "2026 · 09 · 21", eyebrow: "Build log / 04", tags: ["GSAP", "3D", "A11y"], minutes: 4,
     title: { zh: "为平面增加一点深度", en: "Adding depth to a flat surface" },
     summary: { zh: "用克制的倾斜、Z 轴分层和指针反馈建立空间感，同时保留触屏与减少动态效果模式。", en: "Restrained tilt, Z-axis layers and pointer feedback create depth while preserving touch and reduced-motion experiences." },
     sections: [
@@ -59,7 +79,7 @@ export const BUILD_LOG_ARTICLES: EditorialArticle[] = [
     ],
   },
   {
-    slug: "rebuilding-the-home-story", date: "2026 · 09 · 20", eyebrow: "Build log / 04", tags: ["Design", "Index"], minutes: 5,
+    slug: "rebuilding-the-home-story", date: "2026 · 09 · 20", eyebrow: "Build log / 05", tags: ["Design", "Index"], minutes: 5,
     title: { zh: "重做首页叙事", en: "Rewriting the homepage narrative" },
     summary: { zh: "用开放索引替代传统自我介绍，让作品、笔记与实验成为站点主角。", en: "An open index replaced the conventional biography and made work, notes and experiments the protagonists." },
     sections: [
@@ -69,7 +89,7 @@ export const BUILD_LOG_ARTICLES: EditorialArticle[] = [
     ],
   },
   {
-    slug: "the-first-foundation", date: "2026 · 09 · 18", eyebrow: "Build log / 05", tags: ["Next.js", "System"], minutes: 4,
+    slug: "the-first-foundation", date: "2026 · 09 · 18", eyebrow: "Build log / 06", tags: ["Next.js", "System"], minutes: 4,
     title: { zh: "第一块地基", en: "The first foundation" },
     summary: { zh: "建立 Next.js、MDX、主题系统和页面转场，确定墨色、液态青与纸张色组成的视觉语言。", en: "Next.js, MDX, theming and page transitions formed the first foundation, alongside an ink, liquid-cyan and paper palette." },
     sections: [
@@ -82,7 +102,23 @@ export const BUILD_LOG_ARTICLES: EditorialArticle[] = [
 
 export const COLOPHON_ARTICLES: EditorialArticle[] = [
   {
-    slug: "why-nextfield", date: "2026 · 09", eyebrow: "Colophon / 01", tags: ["Identity", "Direction"], minutes: 4,
+    slug: "how-the-record-is-made", date: "2026 · 09", eyebrow: "Colophon / 01", tags: ["Audio", "Craft"], minutes: 4,
+    title: { zh: "一张唱片的制作说明", en: "How the record is made" },
+    summary: { zh: "从封面来源、旋转实现到安静模式，说明电台唱片背后的取材规则与技术约束。", en: "From cover sourcing and the spin implementation to quiet modes, the rules and constraints behind the radio's vinyl." },
+    sections: [
+      { heading: { zh: "封面的来源与替换", en: "Where covers come from" }, paragraphs: [
+        { zh: "封面图存放在 public/covers/，来自音乐商店的公开接口，只保存商店返回的标准缩略图。想换成自己的图，用同名文件覆盖即可，不需要改任何代码；商店里查不到的独立发行曲目使用程序生成的占位图，保证每首歌都有确定的视觉。", en: "Cover images live in public/covers/, fetched from the music store's public API and saved at the store's standard thumbnail size. To use your own art, replace the file under the same name — no code changes needed. Tracks the store cannot find keep generated placeholder art, so every song has a definite visual." },
+      ]},
+      { heading: { zh: "旋转的实现与边界", en: "How the spin is built, and where it stops" }, paragraphs: [
+        { zh: "旋转由一段 CSS 关键帧完成，组件只切换 animation-play-state。这样暂停不会丢失角度，再次播放从原处继续；系统开启减少动态效果时，整个动画可以直接停用而不影响布局。唱片对读屏是装饰，曲目名始终以文字形式存在于旁边。", en: "The spin is a single CSS keyframe; the component only toggles animation-play-state. Pausing keeps the angle, replay resumes from it, and when the system asks for reduced motion the whole animation switches off without affecting layout. The disc is decoration to screen readers — the track title always exists as text beside it." },
+      ]},
+      { heading: { zh: "组件的边界", en: "Boundaries of the component" }, paragraphs: [
+        { zh: "唱片组件不知道播放器的存在：它只接收封面、标题和播放状态。尺寸由使用方决定——展开的面板里是大盘，收起的入口里是小事。同一份结构在两个尺寸下都成立，是因为所有比例都用百分比声明，没有一处写死像素。", en: "The disc component knows nothing about the player: it receives a cover, a title and a playing state. Size belongs to the caller — a large disc in the open panel, a small one in the collapsed entrance. One structure works at both sizes because every proportion is declared in percentages, with no hardcoded pixels." },
+      ]},
+    ],
+  },
+  {
+    slug: "why-nextfield", date: "2026 · 09", eyebrow: "Colophon / 02", tags: ["Identity", "Direction"], minutes: 4,
     title: { zh: "为什么叫 NEXTFIELD", en: "Why NEXTFIELD" },
     summary: { zh: "名字不是包装，而是内容结构和更新方式的约束。", en: "The name is not packaging; it constrains the content structure and how the site evolves." },
     sections: [
@@ -92,7 +128,7 @@ export const COLOPHON_ARTICLES: EditorialArticle[] = [
     ],
   },
   {
-    slug: "content-before-decoration", date: "2026 · 09", eyebrow: "Colophon / 02", tags: ["Content", "Design"], minutes: 4,
+    slug: "content-before-decoration", date: "2026 · 09", eyebrow: "Colophon / 03", tags: ["Content", "Design"], minutes: 4,
     title: { zh: "内容先于装饰", en: "Content before decoration" },
     summary: { zh: "每一种视觉效果都必须帮助理解、建立层次或提供反馈。", en: "Every visual effect must support understanding, hierarchy or feedback." },
     sections: [
@@ -102,7 +138,7 @@ export const COLOPHON_ARTICLES: EditorialArticle[] = [
     ],
   },
   {
-    slug: "motion-with-an-exit", date: "2026 · 09", eyebrow: "Colophon / 03", tags: ["Motion", "A11y"], minutes: 4,
+    slug: "motion-with-an-exit", date: "2026 · 09", eyebrow: "Colophon / 04", tags: ["Motion", "A11y"], minutes: 4,
     title: { zh: "动态效果必须有出口", en: "Motion with an exit" },
     summary: { zh: "持续动画可以关闭，复杂交互可以降级，核心内容不能依赖运动存在。", en: "Continuous animation can be stopped, complex interaction can fall back, and core content never depends on movement." },
     sections: [
@@ -112,7 +148,7 @@ export const COLOPHON_ARTICLES: EditorialArticle[] = [
     ],
   },
   {
-    slug: "the-system-underneath", date: "2026 · 09", eyebrow: "Colophon / 04", tags: ["Stack", "Delivery"], minutes: 5,
+    slug: "the-system-underneath", date: "2026 · 09", eyebrow: "Colophon / 05", tags: ["Stack", "Delivery"], minutes: 5,
     title: { zh: "界面下面的系统", en: "The system beneath the interface" },
     summary: { zh: "从内容管线、设计令牌到静态交付，说明这个场域如何保持可维护。", en: "From content pipelines and design tokens to static delivery, this explains how the field stays maintainable." },
     sections: [

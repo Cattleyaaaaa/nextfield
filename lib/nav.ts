@@ -18,7 +18,7 @@ export const navSections: NavSection[] = [
     label: "关于我",
     eyebrow: "about",
     href: "/about",
-    description: "九屏自述：从 Agent 工作流，到生产级 Web 产品。",
+    description: "八屏自述：从 Agent 工作流，到生产级 Web 产品。",
   },
   {
     number: "02",

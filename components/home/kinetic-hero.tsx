@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, type ReactNode } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { TransitionLink } from "@/components/site/transition-link";
 import { AmbientGlow } from "@/components/visual/ambient-glow";
@@ -14,16 +14,20 @@ const HERO_LINES = ["Create", "Anything"];
 const SPRING_PATH =
   "M28 8 C 62 16, 62 28, 28 36 C -2 44, -2 56, 28 64 C 62 72, 62 84, 28 92 C -2 100, -2 112, 28 120 C 62 128, 60 140, 34 150";
 
-function CharLine({ text }: { text: string }) {
+// 行容器用 inline-block 收缩到文字实际宽度：弹簧线 absolute left-full 才能贴着
+// 最后一个字母，而不是靠百分比去猜词尾在哪（猜错就会盖住字母，看起来像 bug）。
+function CharLine({ text, trailing }: { text: string; trailing?: ReactNode }) {
   return (
-    <div>
+    <div className="relative inline-block">
       {text.split("").map((char, index) => (
-        <span className="inline-block overflow-hidden pb-[0.06em] -mb-[0.06em] align-top" key={`${text}-${index}`}>
+        // pb 给下伸部（y / g 的尾巴）留出可见区域，-mb 抵消掉它占的高度，排版不受影响
+        <span className="inline-block overflow-hidden pb-[0.26em] -mb-[0.26em] align-top" key={`${text}-${index}`}>
           <span className="inline-block will-change-transform" data-hero-char>
             {char}
           </span>
         </span>
       ))}
+      {trailing}
     </div>
   );
 }
@@ -46,9 +50,10 @@ export function KineticHero() {
       { scale: 1, rotate: 0, autoAlpha: 1, duration: 0.9, ease: "back.out(1.6)" },
     );
 
+    // 位移要盖住「文字下沿 + 裁切留白」，留白加大后 118% 会在入场前露出一截字头
     timeline.fromTo(
       chars,
-      { yPercent: 118 },
+      { yPercent: 140 },
       { yPercent: 0, duration: 1.05, ease: "expo.out", stagger: 0.04 },
       0.1,
     );
@@ -100,26 +105,29 @@ export function KineticHero() {
               <CharLine text={HERO_LINES[0]} />
             </div>
             <div className="pl-[14%] sm:pl-[26%]">
-              <CharLine text={HERO_LINES[1]} />
+              <CharLine
+                text={HERO_LINES[1]}
+                trailing={
+                  /* 右下弹簧线：锚在行容器（词尾）右侧，随字号用 em 缩放 */
+                  <svg
+                    aria-hidden="true"
+                    className="pointer-events-none absolute bottom-0 left-full ml-[0.03em] w-[0.38em]"
+                    data-hero-spring
+                    fill="none"
+                    viewBox="0 0 80 160"
+                  >
+                    <defs>
+                      <linearGradient id="hero-spring" x1="0" x2="1" y1="0" y2="1">
+                        <stop offset="0" stopColor="rgb(var(--liquid-foam))" />
+                        <stop offset="1" stopColor="rgb(var(--liquid-mid))" />
+                      </linearGradient>
+                    </defs>
+                    <path d={SPRING_PATH} ref={springRef} stroke="url(#hero-spring)" strokeLinecap="round" strokeWidth="11" />
+                  </svg>
+                }
+              />
             </div>
           </div>
-
-          {/* 右下弹簧线 */}
-          <svg
-            aria-hidden="true"
-            className="pointer-events-none absolute bottom-[4%] right-[14%] w-[3.2rem] sm:w-[4.5rem]"
-            data-hero-spring
-            fill="none"
-            viewBox="0 0 80 160"
-          >
-            <defs>
-              <linearGradient id="hero-spring" x1="0" x2="1" y1="0" y2="1">
-                <stop offset="0" stopColor="rgb(var(--liquid-foam))" />
-                <stop offset="1" stopColor="rgb(var(--liquid-mid))" />
-              </linearGradient>
-            </defs>
-            <path d={SPRING_PATH} ref={springRef} stroke="url(#hero-spring)" strokeLinecap="round" strokeWidth="11" />
-          </svg>
         </div>
 
         {/* 左下大括号副题 + 右下按钮 */}

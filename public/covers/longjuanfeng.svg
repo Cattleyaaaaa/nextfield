@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300" role="img">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="hsl(232 68% 58%)"/>
+      <stop offset="1" stop-color="hsl(284 62% 28%)"/>
+    </linearGradient>
+    <radialGradient id="vignette" cx="0.5" cy="0.5" r="0.62">
+      <stop offset="0.55" stop-color="rgb(0 0 0 / 0)"/>
+      <stop offset="1" stop-color="rgb(0 0 0 / 0.5)"/>
+    </radialGradient>
+    <linearGradient id="sheen" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="rgb(255 255 255 / 0.34)"/>
+      <stop offset="0.45" stop-color="rgb(255 255 255 / 0)"/>
+    </linearGradient>
+  </defs>
+  <rect width="300" height="300" fill="url(#bg)"/>
+  <path d="M150 150 L150 26 A124 124 0 0 1 257 79 Z" fill="rgb(255 255 255 / 0.1)"/>
+  <g fill="none" stroke="rgb(255 255 255 / 0.22)" stroke-width="1.4">
+    <circle cx="150" cy="150" r="124"/>
+    <circle cx="150" cy="150" r="104"/>
+    <circle cx="150" cy="150" r="84"/>
+    <circle cx="150" cy="150" r="64"/>
+    <circle cx="150" cy="150" r="44"/>
+  </g>
+  <circle cx="150" cy="150" r="26" fill="rgb(0 0 0 / 0.32)"/>
+  <circle cx="150" cy="150" r="5" fill="rgb(255 255 255 / 0.75)"/>
+  <rect width="300" height="300" fill="url(#vignette)"/>
+  <rect width="300" height="300" fill="url(#sheen)"/>
+</svg>

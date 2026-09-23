@@ -211,6 +211,21 @@ html.theme-transition * {
   transform-origin: bottom;
 }
 
+/* 唱片：默认 paused，由组件按 playing 切成 running。
+   用 play-state 而不是反复增删动画，暂停后继续播会从停住的角度接着转。 */
+@keyframes radio-disc-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.radio-disc {
+  animation: radio-disc-spin 7s linear infinite;
+  animation-play-state: paused;
+  /* 绕圆心转：显式声明，不依赖默认值 */
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
 .radio-volume {
   accent-color: rgb(var(--liquid-foam));
 }

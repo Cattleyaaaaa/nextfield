@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ArrowDown, ArrowUpRight, Boxes, FileClock, FlaskConical, Wrench } from "lucide-react";
+import { TiltSurface } from "@/components/motion/tilt-surface";
 import { TransitionLink } from "@/components/site/transition-link";
 import { EVIDENCE_SYSTEMS } from "@/lib/evidence-data";
 
@@ -18,9 +19,11 @@ const GROUPS = [
 function SystemLink({ item }: { item: (typeof EVIDENCE_SYSTEMS)[number] }) {
   const content = <><span className="font-mono text-[10px] tracking-[0.16em] text-accent">{item.number}</span><span className="min-w-0"><span className="block font-display text-xl tracking-[-0.035em] sm:text-2xl">{item.title}</span><span className="mt-1 block text-xs leading-5 text-muted sm:text-sm sm:leading-6">{item.copy}</span></span><span className="flex items-center gap-3 self-start"><span className="hidden rounded-full border border-line px-2 py-1 font-mono text-[8px] tracking-[0.13em] text-muted sm:inline-flex">{item.status}</span><ArrowUpRight className="mt-1 size-4 shrink-0 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" /></span></>;
   const className = "group grid grid-cols-[2rem_1fr_auto] gap-3 border-t border-line py-5 transition-colors hover:text-accent sm:grid-cols-[2.5rem_1fr_auto] sm:gap-5";
-  return item.href.endsWith(".json") || item.href.endsWith(".pdf")
+  // 这是个 server 组件文件，TiltSurface 是客户端组件——在 server 里直接渲染客户端组件是允许的
+  const inner = item.href.endsWith(".json") || item.href.endsWith(".pdf")
     ? <a className={className} href={item.href}>{content}</a>
     : <TransitionLink className={className} href={item.href}>{content}</TransitionLink>;
+  return <TiltSurface className="rounded-xl" lift={2} maxTilt={2}>{inner}</TiltSurface>;
 }
 
 export default function SystemsPage() {

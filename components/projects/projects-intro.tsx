@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { useMotionPreference } from "@/lib/use-motion-preference";
+import { useLanguage } from "@/components/site/language-provider";
 
 export const PROJECTS_INTRO_MOTION = {
   delay: 0.12,
@@ -16,6 +17,7 @@ export const PROJECTS_INTRO_MOTION = {
 const TITLE_LINES = ["把想法，", "做成产品。"];
 
 export function ProjectsIntro() {
+  const { locale } = useLanguage();
   const reducedMotion = useMotionPreference();
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -90,7 +92,9 @@ export function ProjectsIntro() {
         </h1>
       </div>
       <p className="hidden max-w-sm text-sm leading-6 text-muted sm:block" data-projects-description>
-        以下为可直接替换链接、描述和技术标签的作品占位内容。
+        {locale === "zh"
+          ? "从已提供网站与源码入口的 Neptune 开始，再看仍在整理中的其他项目方向。"
+          : "Start with Neptune's website and source repository, then explore other project directions still being developed."}
       </p>
       <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-px origin-left bg-line" data-projects-rule />
     </div>

@@ -23,9 +23,9 @@ export function LearningDashboard() {
       <h2 className="font-display text-3xl">{track.title[locale]}</h2>
       <p className="mt-5 font-mono text-sm text-accent">{done} / {track.lessons.length}</p>
       <progress className="mt-3 w-full accent-[rgb(var(--accent))]" value={done} max={track.lessons.length} aria-label={track.title[locale]} />
-      <p className="mt-7 text-xs text-muted">{next ? (zh ? "下一课" : "Next lesson") : (zh ? "路径已完成" : "Path complete")}</p>
-      <p className="mt-3 text-lg">{next ? next.title[locale] : (zh ? "回顾课程并巩固知识。" : "Review the lessons and reinforce your knowledge.")}</p>
-      <TransitionLink className="mt-8 inline-flex rounded-full bg-ink px-5 py-3 text-sm text-paper" href={next ? `/learn/${track.slug}/${next.slug}` : `/learn/${track.slug}`}>{next ? (done ? (zh ? "继续学习" : "Continue") : (zh ? "开始学习" : "Start learning")) : (zh ? "回顾路径" : "Review path")} →</TransitionLink>
+      <p className="mt-7 text-xs text-muted">{next ? (zh ? "下一课" : "Next lesson") : (zh ? "课程已完成" : "Lessons complete")}</p>
+      <p className="mt-3 text-lg">{next ? next.title[locale] : (zh ? "下一步：参加结课考试。" : "Next step: take the final exam.")}</p>
+      <TransitionLink className="mt-8 inline-flex rounded-full bg-ink px-5 py-3 text-sm text-paper" href={next ? `/learn/${track.slug}/${next.slug}` : `/learn/exam/${track.slug}`}>{next ? (done ? (zh ? "继续学习" : "Continue") : (zh ? "开始学习" : "Start learning")) : (zh ? "参加考试" : "Take exam")} →</TransitionLink>
     </section>)}</div>}
     <CloudWorkspace/>
   </div>;

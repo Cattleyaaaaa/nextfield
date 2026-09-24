@@ -12,10 +12,10 @@ export const PARTICLE_CONFIG = {
   desktopCount: 400,
   mobileCount: 200,
   mobileBreakpoint: 768,
-  size: 2,
-  opacity: 0.24,
-  introOpacity: 0.15,
-  speed: 0.025,
+  size: 2.6,
+  opacity: 0.7,
+  introOpacity: 0.28,
+  speed: 0.035,
   moveParticlesOnHover: true,
   hoverStrength: 4,
   hoverRadius: 100,
@@ -49,9 +49,10 @@ export function AmbientParticles({ quiet = false, fixed = false }: { quiet?: boo
       style={{
         opacity: quiet ? PARTICLE_CONFIG.introOpacity : PARTICLE_CONFIG.opacity,
         transition: reducedMotion ? "none" : `opacity ${PARTICLE_CONFIG.opacityTransitionMs}ms ease`,
-        // Keep the reading area quieter without placing an overlay on the content.
-        maskImage: "radial-gradient(ellipse 52% 34% at 50% 48%, rgba(0,0,0,0.25), rgba(0,0,0,0.65) 65%, #000 100%)",
-        WebkitMaskImage: "radial-gradient(ellipse 52% 34% at 50% 48%, rgba(0,0,0,0.25), rgba(0,0,0,0.65) 65%, #000 100%)",
+        // 中心留白是为了不压正文：蒙版中心的 alpha 直接乘在整体不透明度上，
+        // 中心给到 0.55 才看得见粒子，边缘仍是满值。
+        maskImage: "radial-gradient(ellipse 52% 34% at 50% 48%, rgba(0,0,0,0.55), rgba(0,0,0,0.8) 65%, #000 100%)",
+        WebkitMaskImage: "radial-gradient(ellipse 52% 34% at 50% 48%, rgba(0,0,0,0.55), rgba(0,0,0,0.8) 65%, #000 100%)",
       }}
     >
       <Particles

@@ -2,6 +2,7 @@
 
 import { BlurText } from "@/components/react-bits/blur-text";
 import { useLanguage } from "@/components/site/language-provider";
+import { usePageTransition } from "@/components/site/page-transition-provider";
 
 export const BLOG_INTRO_MOTION = {
   text: "写下来的东西。",
@@ -16,11 +17,15 @@ export const BLOG_INTRO_MOTION = {
 
 export function BlogIntro({ postCount }: { postCount: number }) {
   const { locale } = useLanguage();
+  const { motionEnabled } = usePageTransition();
   return (
     <>
-      <p className="mb-6 text-xs font-semibold uppercase tracking-[0.24em] text-accent">Writing / Index</p>
+      <p className="mb-6 text-xs font-semibold uppercase tracking-[0.24em] text-accent">
+        Writing / Index
+      </p>
       <BlurText
         {...BLOG_INTRO_MOTION}
+        enabled={motionEnabled}
         text={locale === "en" ? "Things written down." : BLOG_INTRO_MOTION.text}
         as="h1"
         className="max-w-5xl text-balance font-display text-[clamp(3.5rem,9vw,7.5rem)] leading-[0.92] tracking-[-0.06em]"

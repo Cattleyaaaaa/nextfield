@@ -1,5 +1,6 @@
 {
   "projects": [
+    { "name": "Neptune", "focus": "Multi-agent workspace", "site": "http://myneptune.tech/", "repository": "https://github.com/Cattleyaaaaa/Neptune-Multi-agent-Workspace", "tags": ["Agent", "Workspace"] },
     { "name": "Knowledge Copilot", "focus": "Cited retrieval and tool use", "tags": ["LangGraph", "RAG", "Next.js"] },
     { "name": "Agent Operations", "focus": "Agent observation, debugging and evaluation", "tags": ["TypeScript", "PostgreSQL", "Streaming"] },
     { "name": "Semantic Search", "focus": "Intent-aware search over business data", "tags": ["Embeddings", "Vector DB", "API"] },

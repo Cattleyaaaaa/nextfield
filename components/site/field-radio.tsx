@@ -7,8 +7,12 @@ import { RadioLyrics } from "@/components/site/radio-lyrics";
 import { TransitionLink } from "@/components/site/transition-link";
 import { lyricsPathFor } from "@/lib/lrc";
 import { RADIO_TRACKS } from "@/lib/radio-data";
+import { RADIO_STATE_EVENT, RADIO_STATE_REQUEST_EVENT, RADIO_TIME_EVENT, type RadioSignal, type RadioTimeSignal } from "@/lib/radio-signal";
+import { usePageTransition } from "@/components/site/page-transition-provider";
 
-const VOLUME_KEY = "nextfield-radio-volume";
+const VOLUME_KEY = "nextfield-radio-volume-v2";
+const LEGACY_VOLUME_KEY = "nextfield-radio-volume";
+const DEFAULT_VOLUME = 0.3;
 const LYRICS_KEY = "nextfield-radio-lyrics";
 /** 访客主动停过一次音乐后写 1，之后不再自动起播。 */
 const SILENCE_KEY = "nextfield-radio-silence";
@@ -23,11 +27,13 @@ function formatTime(seconds: number) {
 }
 
 export function FieldRadio() {
+  const { motionEnabled } = usePageTransition();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [open, setOpen] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [index, setIndex] = useState(0);
-  const [volume, setVolume] = useState(0.7);
+  const [volume, setVolume] = useState(DEFAULT_VOLUME);
+  const [volumeReady, setVolumeReady] = useState(false);
   const [current, setCurrent] = useState(0);
   const [duration, setDuration] = useState(0);
   const [failed, setFailed] = useState(false);
@@ -42,6 +48,33 @@ export function FieldRadio() {
   const progressPercent = duration > 0 ? Math.min(100, (current / duration) * 100) : 0;
   // 歌词默认按约定找 /lyrics/同名.lrc；曲目里写了 lyrics 就用它。
   const lyricsPath = track?.lyrics ?? lyricsPathFor(track?.src);
+
+  // 首页只读取播放状态；不连接 Web Audio，也不触碰 audio 节点。
+  useEffect(() => {
+    const publish = () => {
+      const detail: RadioSignal = {
+        playing,
+        index,
+        title: track?.title ?? "Field Radio",
+        artist: track?.artist ?? "",
+        cover: track?.cover,
+      };
+      window.dispatchEvent(new CustomEvent<RadioSignal>(RADIO_STATE_EVENT, { detail }));
+    };
+    publish();
+    window.addEventListener(RADIO_STATE_REQUEST_EVENT, publish);
+    return () => window.removeEventListener(RADIO_STATE_REQUEST_EVENT, publish);
+  }, [playing, index, track?.title, track?.artist, track?.cover]);
+
+  // 同步给电台页的歌词。进度单独广播，避免每次 timeupdate 都重绘整张曲库。
+  useEffect(() => {
+    const publish = () => window.dispatchEvent(new CustomEvent<RadioTimeSignal>(RADIO_TIME_EVENT, {
+      detail: { index, current },
+    }));
+    publish();
+    window.addEventListener(RADIO_STATE_REQUEST_EVENT, publish);
+    return () => window.removeEventListener(RADIO_STATE_REQUEST_EVENT, publish);
+  }, [index, current]);
 
   // 页面上的「点歌」按钮走 window 事件（和 field-radio:open 同一套约定）。
   // 用 state 承接请求而不是 ref：事件回调只在挂载时创建一次，闭包读不到最新的 index / play。
@@ -118,8 +151,18 @@ export function FieldRadio() {
   }, [scrubbing]);
 
   useEffect(() => {
+    const audio = audioRef.current;
     const saved = window.localStorage.getItem(VOLUME_KEY);
-    if (saved) setVolume(Number(saved));
+    const legacy = window.localStorage.getItem(LEGACY_VOLUME_KEY);
+    const raw = saved ?? legacy;
+    const parsed = raw === null ? DEFAULT_VOLUME : Number(raw);
+    // 旧版默认是 70%，首次迁移时整体减半；之后尊重访客手动设置的新音量。
+    const restored = Number.isFinite(parsed)
+      ? Math.min(1, Math.max(0, saved === null && legacy !== null ? parsed * 0.5 : parsed))
+      : DEFAULT_VOLUME;
+    setVolume(restored);
+    if (audio) audio.volume = restored;
+    setVolumeReady(true);
     if (window.localStorage.getItem(LYRICS_KEY) === "1") setLyricsVisible(true);
     const openRadio = () => setOpen(true);
     // 曲目清单页点某一首：切到那一首并立刻开始播
@@ -136,7 +179,7 @@ export function FieldRadio() {
     return () => {
       window.removeEventListener("field-radio:open", openRadio);
       window.removeEventListener("field-radio:play", playTrack);
-      audioRef.current?.pause();
+      audio?.pause();
     };
   }, []);
 
@@ -170,10 +213,11 @@ export function FieldRadio() {
   }, []);
 
   useEffect(() => {
+    if (!volumeReady) return;
     window.localStorage.setItem(VOLUME_KEY, String(volume));
     const audio = audioRef.current;
     if (audio) audio.volume = Math.min(1, Math.max(0, volume));
-  }, [volume]);
+  }, [volume, volumeReady]);
 
   useEffect(() => {
     window.localStorage.setItem(LYRICS_KEY, lyricsVisible ? "1" : "0");
@@ -259,7 +303,7 @@ export function FieldRadio() {
                   <p className="truncate font-display text-2xl tracking-[-0.04em]">{track.title}</p>
                   <p className="mt-1 truncate font-mono text-[10px] uppercase tracking-[0.16em] text-paper/50">{track.artist}{track.note ? ` · ${track.note}` : ""}</p>
                   <div className="mt-3 flex h-6 items-end gap-[2px]" aria-hidden="true">
-                    {Array.from({ length: 20 }).map((_, barIndex) => <span className="radio-bar flex-1 rounded-full bg-liquid-foam/70" key={barIndex} style={{ animationDelay: `${-barIndex * 90}ms`, height: `${20 + ((barIndex * 17) % 70)}%`, animationPlayState: playing ? "running" : "paused" }} />)}
+                    {Array.from({ length: 20 }).map((_, barIndex) => <span className="radio-bar flex-1 rounded-full bg-liquid-foam/70" key={barIndex} style={{ animationDelay: `${-barIndex * 90}ms`, height: `${20 + ((barIndex * 17) % 70)}%`, animationPlayState: playing && motionEnabled ? "running" : "paused" }} />)}
                   </div>
                 </div>
               ) : (

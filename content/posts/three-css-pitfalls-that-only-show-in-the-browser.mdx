@@ -1,0 +1,83 @@
+---
+title: "三个只在浏览器里现形的排版坑"
+date: "2026-09-23"
+category: "前端"
+tags: ["CSS", "排版", "GSAP", "调试"]
+summary: "替换元素不吃 inset、裁切层要按 descender 留白、装饰必须锚在文字上——这三个坑都不报错，只会静静地看起来像 bug。"
+---
+
+写样式最有欺骗性的时刻，不是报错，而是「没报错」。页面照常渲染，代码看着也合理，只有眼睛觉得哪里不对劲。下面三个坑都来自这个站点最近的一次首页改造，它们的共同点是：静态审查代码时全部通过，只有把页面跑到浏览器里量一遍才现形。
+
+## 一、替换元素不会被 inset 拉伸
+
+电台的唱片要在中间贴一张封面，第一版写成这样：
+
+```jsx
+<div className="absolute inset-0 rounded-full">
+  <img className="absolute inset-[22%] rounded-full object-cover" src={cover} />
+</div>
+```
+
+意图很清楚：用四个方向的 inset 把图片撑成一个居中的圆。结果封面贴在左上角，还超出了唱片。
+
+原因在规范里：绝对定位元素的 `left` / `right` 同时存在、且 `width: auto` 时，普通元素会被撑开填满这段距离，但 **img 这类替换元素不会**——它取的是固有尺寸，然后被锚在左上角，多余的 inset 变成「过约束」被忽略。Tailwind 的 preflight 又补了一刀 `img { max-width: 100%; height: auto }`，让这个行为更稳定地复现。
+
+修法只有一句话：**让普通元素负责定位，图片只负责填满容器**。
+
+```jsx
+<span className="absolute inset-[22%] overflow-hidden rounded-full">
+  <img className="h-full w-full object-cover" src={cover} />
+</span>
+```
+
+记住这条经验：凡是 `inset-0` + `object-cover` 的组合，中间都该垫一层普通容器。video、iframe 同理。
+
+## 二、裁切层的留白要按 descender 给
+
+逐字入场动画的标准做法是「裁切层 + 内层字母」：外层 `overflow-hidden` 当遮罩，内层从下方 `yPercent` 顶上来。外层通常还会加一点底部留白，避免遮罩把字切掉。
+
+问题出在留白给多少。常见写法是 `pb-[0.06em] -mb-[0.06em]`（负 margin 抵消，不改变排版高度），这对没有下伸部的字是够的。但 `y`、`g`、`p`、`q` 的下伸部在 Inter 上约 **0.24em**，0.06em 直接把尾巴切平。屏幕上看到的就是「这个字母显示有问题」。
+
+正确的留白不是拍一个数，而是**按字体的 descender 深度给**，本项目最终取 0.26em。改完之后还有一个连带影响：留白变大，入场位移也要跟着加大，否则字母在动画开始前会从下面露出一截字头——`yPercent` 从 118 提到 140 才够。
+
+怎么确认有没有被裁？不用截图猜，用 canvas 的字体度量算：
+
+```js
+const ctx = document.createElement("canvas").getContext("2d");
+ctx.font = `${weight} ${size} ${family}`;
+const m = ctx.measureText("y");
+const inkBottom = baseline + m.actualBoundingBoxDescent; // 与该字符裁切盒高度比较
+```
+
+墨迹底部小于裁切盒高度，就没裁。
+
+## 三、装饰的坐标系必须挂在内容上
+
+首页标语是巨幅文字，旁边有花朵和弹簧线做装饰。弹簧线原本用百分比定位：`right-[14%]`。
+
+这在某个窗口宽度下是对的，换个宽度就压到字母上了——**文字按 `clamp(4rem, 14vw, 12.5rem)` 缩放，百分比锚点按容器缩放，两者比例不同**，装饰就会在字母之间漂移。用户看到的不是「装饰」，而是一坨盖住字母的乱码。
+
+修法是给装饰换一个坐标系：**让行容器收缩到文字实际宽度，装饰再锚在词尾**。
+
+```jsx
+<div className="relative inline-block">   {/* 收缩到词宽 */}
+  {letters}
+  <svg className="absolute bottom-0 left-full w-[0.38em]" />  {/* 贴着最后一个字母 */}
+</div>
+```
+
+尺寸用 `em` 而不是 `rem`，装饰就会跟着字号一起缩放。判断有没有冲突也别靠肉眼：
+
+```js
+const overlap = !(decor.left >= letter.right || decor.right <= letter.left);
+```
+
+## 附赠一个时序坑
+
+装饰加完动效后，还有一类 bug 只在特定时机出现：**入场动画还没播完时鼠标划过，悬停动画用了 `overwrite: "auto"`，会把入场 tween 杀掉，字母就冻在半空**。
+
+解法不是调参数，而是加一道门：用一个 ref 记录「入场已完成」，`timeline.eventCallback("onComplete")` 置真，悬停回调里先 early-return。
+
+## 小结
+
+这四个问题的共同点是：**它们都不是写错，而是写对了一半**。inset 对普通元素成立、留白对多数字母够用、百分比在某个宽度下精确、overwrite 在多数时机无害。所以唯一的防线是把页面真的跑起来，并且用可测量的数字（矩形、字体度量、矩阵）代替「我觉得差不多」。

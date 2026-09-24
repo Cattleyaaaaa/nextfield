@@ -27,8 +27,14 @@ export const BLUR_TEXT_CONFIG = {
   ] as MotionVars[],
 };
 
-const buildKeyframes = (from: MotionVars, steps: MotionVars[]): TargetAndTransition => {
-  const keys = new Set([...Object.keys(from), ...steps.flatMap((step) => Object.keys(step))]);
+const buildKeyframes = (
+  from: MotionVars,
+  steps: MotionVars[],
+): TargetAndTransition => {
+  const keys = new Set([
+    ...Object.keys(from),
+    ...steps.flatMap((step) => Object.keys(step)),
+  ]);
   const keyframes: Record<string, unknown[]> = {};
   keys.forEach((key) => {
     keyframes[key] = [from[key], ...steps.map((step) => step[key])];
@@ -38,6 +44,7 @@ const buildKeyframes = (from: MotionVars, steps: MotionVars[]): TargetAndTransit
 
 export interface BlurTextProps {
   text: string;
+  enabled?: boolean;
   as?: ElementType;
   className?: string;
   lineClassName?: string;
@@ -50,6 +57,7 @@ export interface BlurTextProps {
 
 export function BlurText({
   text,
+  enabled = true,
   as = "p",
   className = "",
   lineClassName = "",
@@ -64,7 +72,7 @@ export function BlurText({
   const [inView, setInView] = useState(false);
 
   useEffect(() => {
-    if (reducedMotion) return;
+    if (reducedMotion || !enabled) return;
     const element = ref.current;
     if (!element) return;
     // 全屏翻页模式下元素挂载即在视口内，观察器会立刻回调，等价于「挂载即播」。
@@ -79,11 +87,14 @@ export function BlurText({
     );
     observer.observe(element);
     return () => observer.disconnect();
-  }, [reducedMotion]);
+  }, [reducedMotion, enabled]);
 
   const lines = useMemo(() => text.split("\n"), [text]);
   const segments = useMemo(
-    () => lines.map((line) => (animateBy === "chars" ? Array.from(line) : line.split(" "))),
+    () =>
+      lines.map((line) =>
+        animateBy === "chars" ? Array.from(line) : line.split(" "),
+      ),
     [lines, animateBy],
   );
   // 每行的起始序号：让 delay 跨行连续，而不是每行重新计时
@@ -99,17 +110,22 @@ export function BlurText({
   const keyframes = useMemo(() => buildKeyframes(from, to), [from, to]);
   const totalDuration = stepDuration * to.length;
   const times = useMemo(
-    () => Array.from({ length: to.length + 1 }, (_, index) => index / to.length),
+    () =>
+      Array.from({ length: to.length + 1 }, (_, index) => index / to.length),
     [to.length],
   );
 
   const Element = as;
 
-  if (reducedMotion) {
+  if (reducedMotion || !enabled) {
     return (
       <Element className={className} ref={ref}>
         {lines.map((line, index) => (
-          <span className={lineClassName} key={index} style={{ display: "block" }}>
+          <span
+            className={lineClassName}
+            key={index}
+            style={{ display: "block" }}
+          >
             {line}
           </span>
         ))}
@@ -120,7 +136,11 @@ export function BlurText({
   return (
     <Element className={className} ref={ref}>
       {segments.map((segmentsOfLine, lineIndex) => (
-        <span className={lineClassName} key={lineIndex} style={{ display: "block" }}>
+        <span
+          className={lineClassName}
+          key={lineIndex}
+          style={{ display: "block" }}
+        >
           {segmentsOfLine.map((segment, index) => (
             <motion.span
               animate={inView ? keyframes : (from as unknown as Target)}

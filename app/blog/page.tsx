@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { BlogIntro } from "@/components/blog/blog-intro";
-import { PostList } from "@/components/blog/post-list";
+import { PostTopicIndex } from "@/components/blog/post-topic-index";
 import { getAllPosts } from "@/lib/posts";
 
 export const metadata: Metadata = {
@@ -16,7 +16,7 @@ export default function BlogIndexPage() {
       <BlogIntro postCount={posts.length} />
 
       <div className="mt-14">
-        <PostList posts={posts} />
+        <PostTopicIndex posts={posts} />
       </div>
     </div>
   );

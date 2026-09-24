@@ -13,7 +13,26 @@ export type EditorialArticle = {
 
 export const BUILD_LOG_ARTICLES: EditorialArticle[] = [
   {
-    slug: "the-radio-got-a-record", date: "2026 · 09 · 22", eyebrow: "Build log / 01", tags: ["Audio", "CSS", "Layout"], minutes: 5,
+    slug: "making-the-hero-move", date: "2026 · 09 · 23", eyebrow: "Build log / 01", tags: ["Motion", "GSAP", "Typography"], minutes: 5,
+    title: { zh: "让首屏动起来，同时站得住", en: "Making the hero move without falling apart" },
+    summary: { zh: "给标语加上悬停起伏、给弹簧线和花朵加上循环动效，并在过程中修掉两处只在浏览器里现形的排版问题。", en: "Hover waves for the headline, looping motion for the spring and the flower, plus two layout bugs that only surfaced in a real browser." },
+    sections: [
+      { heading: { zh: "装饰要有一个坐标系", en: "Decorations need a coordinate system" }, paragraphs: [
+        { zh: "弹簧线原本用百分比定位。文字按视口宽度缩放，百分比锚点按容器缩放，两者比例不同——换个窗口宽度，装饰就压到了别的字母上。现在行容器收缩到文字实际宽度，装饰锚在最后一个字母右侧，尺寸用 em 跟着字号走。", en: "The spring used to be positioned by percentage. The headline scales with the viewport while a percentage anchor scales with the container, so at another window width the decoration landed on a different letter. The line now shrink-wraps the word, the decoration anchors to the right of the last letter, and its size is set in em so it scales with the type." },
+      ]},
+      { heading: { zh: "裁切层会吃掉字母的尾巴", en: "The clip layer eats descenders" }, paragraphs: [
+        { zh: "逐字入场靠「裁切层 + 内层字母」实现，裁切层要留一点底部空白。之前给的是 0.06em，对没有下伸部的字母够用，却把 y 和 g 的尾巴切平了。留白改成按字体的 descender 深度给（0.26em），入场位移同步加大，否则动画开始前会露出字头。", en: "The per-letter entrance relies on a clip layer plus an inner span, and the clip needs bottom padding. It had 0.06em — enough for letters without descenders, but it flattened the tails of y and g. Padding now follows the font's descender depth (0.26em) and the entrance offset grew with it, otherwise a sliver of the letter showed before the animation started." },
+      ]},
+      { heading: { zh: "循环动效不能挤进入场", en: "Looping motion cannot join the entrance" }, paragraphs: [
+        { zh: "弹簧线的呼吸和花朵的自转都是无限循环，只能作为独立动画排在入场之后启动：一旦放进入场时间轴，时长被撑成无限，后面所有带负偏移的插入点都到不了，副题和按钮会静默失效。", en: "The spring's breathing and the flower's slow spin are infinite loops, so they run as separate tweens scheduled after the entrance. Inside the entrance timeline they would stretch its duration to infinity, and every later negative-offset insertion point would be unreachable — the subtitle and the button would silently never animate." },
+      ]},
+      { heading: { zh: "给交互留一道门", en: "A gate for interaction" }, paragraphs: [
+        { zh: "入场还没播完时划过标语，悬停动画会把入场进度覆盖掉，字母冻在半空。现在入场完成前悬停不生效；悬停只动 scale、循环只动 rotate，两者互不打断。", en: "Hovering while the entrance is still running overwrites its progress and freezes letters mid-air. Hover is now ignored until the entrance completes, and hover only touches scale while the loop only touches rotate, so neither interrupts the other." },
+      ]},
+    ],
+  },
+  {
+    slug: "the-radio-got-a-record", date: "2026 · 09 · 22", eyebrow: "Build log / 02", tags: ["Audio", "CSS", "Layout"], minutes: 5,
     title: { zh: "电台有了一张会转的唱片", en: "The radio got a spinning record" },
     summary: { zh: "给场域电台换上真实专辑封面和绕心旋转的黑胶，顺手修正悬浮歌词的停靠对齐；一次视觉改造背后是三个排版细节。", en: "The Field Radio gained real album covers and a centre-spun vinyl, and the floating lyrics learned to dock precisely. Behind the visual pass sit three layout details." },
     sections: [
@@ -33,7 +52,7 @@ export const BUILD_LOG_ARTICLES: EditorialArticle[] = [
     ],
   },
   {
-    slug: "a-page-each-for-images-and-sound", date: "2026 · 09 · 22", eyebrow: "Build log / 02", tags: ["Content", "Audio", "Navigation"], minutes: 4,
+    slug: "a-page-each-for-images-and-sound", date: "2026 · 09 · 22", eyebrow: "Build log / 03", tags: ["Content", "Audio", "Navigation"], minutes: 4,
     title: { zh: "给画廊和电台各自一个页面", en: "A page each for the gallery and the radio" },
     summary: { zh: "图片档案与曲目清单变成独立页面并接入探索入口；电台补上跟随播放的歌词，音频统一压成 MP3。", en: "The image archive and the track list became standalone pages reachable from site-wide exploration, while the radio gained synced lyrics and audio was recompressed to MP3." },
     sections: [
@@ -52,7 +71,7 @@ export const BUILD_LOG_ARTICLES: EditorialArticle[] = [
     ],
   },
   {
-    slug: "a-field-with-a-voice", date: "2026 · 09 · 21", eyebrow: "Build log / 03", tags: ["Audio", "Interaction", "Content"], minutes: 5,
+    slug: "a-field-with-a-voice", date: "2026 · 09 · 21", eyebrow: "Build log / 04", tags: ["Audio", "Interaction", "Content"], minutes: 5,
     title: { zh: "NEXTFIELD 有了自己的声音", en: "NEXTFIELD found its voice" },
     summary: { zh: "加入 Field Radio、项目星图与开放实验室，把首页从内容目录改造成可以探索的数字场域。", en: "Field Radio, a project constellation and open experiments turned the homepage from a directory into a field to explore." },
     sections: [
@@ -69,7 +88,7 @@ export const BUILD_LOG_ARTICLES: EditorialArticle[] = [
     ],
   },
   {
-    slug: "depth-with-restraint", date: "2026 · 09 · 21", eyebrow: "Build log / 04", tags: ["GSAP", "3D", "A11y"], minutes: 4,
+    slug: "depth-with-restraint", date: "2026 · 09 · 21", eyebrow: "Build log / 05", tags: ["GSAP", "3D", "A11y"], minutes: 4,
     title: { zh: "为平面增加一点深度", en: "Adding depth to a flat surface" },
     summary: { zh: "用克制的倾斜、Z 轴分层和指针反馈建立空间感，同时保留触屏与减少动态效果模式。", en: "Restrained tilt, Z-axis layers and pointer feedback create depth while preserving touch and reduced-motion experiences." },
     sections: [
@@ -79,7 +98,7 @@ export const BUILD_LOG_ARTICLES: EditorialArticle[] = [
     ],
   },
   {
-    slug: "rebuilding-the-home-story", date: "2026 · 09 · 20", eyebrow: "Build log / 05", tags: ["Design", "Index"], minutes: 5,
+    slug: "rebuilding-the-home-story", date: "2026 · 09 · 20", eyebrow: "Build log / 06", tags: ["Design", "Index"], minutes: 5,
     title: { zh: "重做首页叙事", en: "Rewriting the homepage narrative" },
     summary: { zh: "用开放索引替代传统自我介绍，让作品、笔记与实验成为站点主角。", en: "An open index replaced the conventional biography and made work, notes and experiments the protagonists." },
     sections: [
@@ -89,7 +108,7 @@ export const BUILD_LOG_ARTICLES: EditorialArticle[] = [
     ],
   },
   {
-    slug: "the-first-foundation", date: "2026 · 09 · 18", eyebrow: "Build log / 06", tags: ["Next.js", "System"], minutes: 4,
+    slug: "the-first-foundation", date: "2026 · 09 · 18", eyebrow: "Build log / 07", tags: ["Next.js", "System"], minutes: 4,
     title: { zh: "第一块地基", en: "The first foundation" },
     summary: { zh: "建立 Next.js、MDX、主题系统和页面转场，确定墨色、液态青与纸张色组成的视觉语言。", en: "Next.js, MDX, theming and page transitions formed the first foundation, alongside an ink, liquid-cyan and paper palette." },
     sections: [
@@ -102,7 +121,23 @@ export const BUILD_LOG_ARTICLES: EditorialArticle[] = [
 
 export const COLOPHON_ARTICLES: EditorialArticle[] = [
   {
-    slug: "how-the-record-is-made", date: "2026 · 09", eyebrow: "Colophon / 01", tags: ["Audio", "Craft"], minutes: 4,
+    slug: "decoration-follows-content", date: "2026 · 09", eyebrow: "Colophon / 01", tags: ["Typography", "Motion"], minutes: 4,
+    title: { zh: "装饰跟着内容走", en: "Decoration follows content" },
+    summary: { zh: "花朵、弹簧线、唱片这些装饰都不能自己决定位置：它们的位置必须由文字、尺寸和状态推导出来。", en: "Flowers, springs and records never decide their own position: it is derived from the type, the size and the state they belong to." },
+    sections: [
+      { heading: { zh: "位置是一种关系", en: "Position is a relationship" }, paragraphs: [
+        { zh: "装饰最容易坏的地方是「坐标来自哪里」。用容器百分比去猜词尾，等于假设装饰和文字按同一个比例缩放——一旦文字随视口缩放，这个假设就不成立。装饰的位置应当由它要陪伴的内容推导：行容器收缩到词宽，装饰锚在词尾，尺寸用 em 跟随字号。", en: "The fragile part of a decoration is where its coordinates come from. Guessing the end of a word with container percentages assumes the decoration and the type scale by the same ratio — false as soon as the type scales with the viewport. A decoration's position should be derived from the content it accompanies: shrink-wrap the line, anchor to the word end, size in em." },
+      ]},
+      { heading: { zh: "尺寸用 em，不用 rem", en: "Size in em, not rem" }, paragraphs: [
+        { zh: "只要装饰和文字有关，它的尺寸就该用 em。改用 rem 意味着某个断点之后装饰不再跟着字号变化，同一个组件在小屏和大屏上会长成两种关系。", en: "Whenever a decoration relates to type, its size belongs in em. Switching to rem means that past some breakpoint the decoration stops tracking the type, and one component grows into two different relationships on small and large screens." },
+      ]},
+      { heading: { zh: "装饰也要能被替换", en: "Decoration must be replaceable" }, paragraphs: [
+        { zh: "封面、占位图和配色都放在确定的位置，替换它们不需要改组件。装饰可以有默认值，但默认值必须诚实——查不到封面的曲目就明确使用占位图，而不是假装那是一张专辑封面。", en: "Covers, placeholders and palettes live in fixed places and can be replaced without touching components. Decorations may have defaults, but defaults must be honest — a track with no artwork explicitly uses a placeholder instead of pretending to have a real cover." },
+      ]},
+    ],
+  },
+  {
+    slug: "how-the-record-is-made", date: "2026 · 09", eyebrow: "Colophon / 02", tags: ["Audio", "Craft"], minutes: 4,
     title: { zh: "一张唱片的制作说明", en: "How the record is made" },
     summary: { zh: "从封面来源、旋转实现到安静模式，说明电台唱片背后的取材规则与技术约束。", en: "From cover sourcing and the spin implementation to quiet modes, the rules and constraints behind the radio's vinyl." },
     sections: [
@@ -118,7 +153,7 @@ export const COLOPHON_ARTICLES: EditorialArticle[] = [
     ],
   },
   {
-    slug: "why-nextfield", date: "2026 · 09", eyebrow: "Colophon / 02", tags: ["Identity", "Direction"], minutes: 4,
+    slug: "why-nextfield", date: "2026 · 09", eyebrow: "Colophon / 03", tags: ["Identity", "Direction"], minutes: 4,
     title: { zh: "为什么叫 NEXTFIELD", en: "Why NEXTFIELD" },
     summary: { zh: "名字不是包装，而是内容结构和更新方式的约束。", en: "The name is not packaging; it constrains the content structure and how the site evolves." },
     sections: [
@@ -128,7 +163,7 @@ export const COLOPHON_ARTICLES: EditorialArticle[] = [
     ],
   },
   {
-    slug: "content-before-decoration", date: "2026 · 09", eyebrow: "Colophon / 03", tags: ["Content", "Design"], minutes: 4,
+    slug: "content-before-decoration", date: "2026 · 09", eyebrow: "Colophon / 04", tags: ["Content", "Design"], minutes: 4,
     title: { zh: "内容先于装饰", en: "Content before decoration" },
     summary: { zh: "每一种视觉效果都必须帮助理解、建立层次或提供反馈。", en: "Every visual effect must support understanding, hierarchy or feedback." },
     sections: [
@@ -138,7 +173,7 @@ export const COLOPHON_ARTICLES: EditorialArticle[] = [
     ],
   },
   {
-    slug: "motion-with-an-exit", date: "2026 · 09", eyebrow: "Colophon / 04", tags: ["Motion", "A11y"], minutes: 4,
+    slug: "motion-with-an-exit", date: "2026 · 09", eyebrow: "Colophon / 05", tags: ["Motion", "A11y"], minutes: 4,
     title: { zh: "动态效果必须有出口", en: "Motion with an exit" },
     summary: { zh: "持续动画可以关闭，复杂交互可以降级，核心内容不能依赖运动存在。", en: "Continuous animation can be stopped, complex interaction can fall back, and core content never depends on movement." },
     sections: [
@@ -148,7 +183,7 @@ export const COLOPHON_ARTICLES: EditorialArticle[] = [
     ],
   },
   {
-    slug: "the-system-underneath", date: "2026 · 09", eyebrow: "Colophon / 05", tags: ["Stack", "Delivery"], minutes: 5,
+    slug: "the-system-underneath", date: "2026 · 09", eyebrow: "Colophon / 06", tags: ["Stack", "Delivery"], minutes: 5,
     title: { zh: "界面下面的系统", en: "The system beneath the interface" },
     summary: { zh: "从内容管线、设计令牌到静态交付，说明这个场域如何保持可维护。", en: "From content pipelines and design tokens to static delivery, this explains how the field stays maintainable." },
     sections: [
@@ -159,34 +194,195 @@ export const COLOPHON_ARTICLES: EditorialArticle[] = [
   },
 ];
 
+// 改法：把每条 title / summary / sections 里的 zh 与 en 换成自己的文字。
+//   · slug 不要改 —— 它决定网址 /essays/<slug>，改了旧链接会 404
+//   · 想加一篇：照抄一条，换 slug 与文案；想删一篇：整条删掉
+//   · eyebrow 惯例：最新一篇是 01，往下递增
+
+/*
+格式示例
+{
+    slug: "a-quiet-kind-of-progress", date: "2026 · 09 · 20", eyebrow: "Essay / 04", tags: ["待写"], minutes: 1,
+    title: { zh: "随笔占位 · 04", en: "Placeholder · 04" },
+    summary: { zh: "这里留给还没写下的随笔。替换标题、摘要与正文即可，网址不变。", en: "Reserved for a note not yet written. Replace the title, summary and body — the URL stays the same." },
+    sections: [
+      { heading: { zh: "待写", en: "To be written" }, paragraphs: [
+        { zh: "这是占位段落。把这一段换成你的内容：一个段落一个对象，英文版写在 en 字段里；再加一节就往 sections 数组里补一条。", en: "Placeholder paragraph. Replace it with your own text: one object per paragraph, English in the en field; add another section by appending to the sections array." },
+      ]},
+    ],
+  },
+*/
+
 export const ESSAY_ARTICLES: EditorialArticle[] = [
-  {
-    slug: "leave-room-for-the-unnamed", date: "2026 · 09 · 22", eyebrow: "Essay / 01", tags: ["Field note"], minutes: 3,
-    title: { zh: "给尚未命名的东西留一个位置", en: "Leave a place for what has no name yet" },
-    summary: { zh: "不是每个想法都需要立刻成为项目、文章或产品。", en: "Not every idea needs to become a project, article or product immediately." },
-    sections: [
-      { heading: { zh: "分类往往来得太早", en: "Categories often arrive too early" }, paragraphs: [{ zh: "当一个想法刚出现时，我们习惯问它属于什么：项目、文章、实验，还是一个可以交付的功能。这个问题看似帮助整理，实际上也可能过早关闭可能性。", en: "When an idea first appears, we ask what it belongs to: a project, an article, an experiment or a shippable feature. The question seems organizational, but it can close possibilities too early." }]},
-      { heading: { zh: "先允许它存在", en: "Let it exist first" }, paragraphs: [{ zh: "一个持续生长的网站应该允许半成品、问题和没有结论的观察存在。它们不必伪装成完成的作品，只需要留下足够清楚的痕迹，等待下一次连接。", en: "A living website should allow fragments, questions and unresolved observations to exist. They do not need to pretend to be finished; they only need to leave a clear enough trace for the next connection." }]},
-    ],
+{
+  slug: "the-breeze-tonight",     
+  date: "2026 · 09 · 20",
+  eyebrow: "Essay / 01",              
+  tags: ["大学生活", "慢下来", "成长"],
+  minutes: 2,                         
+  title: { zh: "慢慢走，也没关系", en: "It's Okay to Walk Slowly" },
+  summary: {
+    zh: "傍晚下课后走回宿舍，看着操场上快慢不一的身影，忽然明白：每个人都有自己的节奏，偶尔慢一点也没关系。",
+    en: "Walking back to the dorm after an evening class, watching runners move at different paces, I realized everyone has their own rhythm — and it's okay to slow down sometimes."
   },
+  sections: [
+    { heading: { zh: "傍晚的路", en: "An Evening Walk" }, paragraphs: [
+      { zh: "傍晚下课，我一个人走在回宿舍的路上。", en: "After an evening class, I walked back to the dorm alone." },
+      { zh: "天还没有完全暗下来，夕阳从教学楼之间斜斜地落下来，把路边的树影拉得很长。有人骑着自行车匆匆经过，有人和朋友讨论晚上吃什么，还有人戴着耳机，低着头慢慢走。这样的场景每天都会出现，普通得让人很少注意。", en: "The sky had not yet fully darkened. The setting sun fell slantwise between the teaching buildings, stretching the shadows of the trees long along the road. Someone cycled past in a hurry, someone discussed dinner with a friend, and someone else, wearing earphones, walked slowly with their head down. Scenes like this appear every day, so ordinary that people rarely notice them." },
+    ]},
+    { heading: { zh: "越来越着急的我们", en: "Always in a Hurry" }, paragraphs: [
+      { zh: "不知道从什么时候开始，我们好像越来越着急了。", en: "I don't know when it started, but we seem to be in a hurry more and more." },
+      { zh: "上大学以后，总觉得自己应该做很多事情：考试要考好，证书要拿到，比赛要参加，还要考虑实习和未来。打开朋友圈，看见有人获奖，有人旅行，有人已经开始为工作做准备，再看看自己，好像还在为明天交什么作业发愁。偶尔也会忍不住怀疑，是不是自己走得太慢了。", en: "Since starting university, I've always felt I should be doing so many things: do well on exams, earn certificates, join competitions, and think about internships and the future. Opening my social feed, I see someone winning an award, someone traveling, someone already preparing for work. Then I look at myself, still worrying about which assignment is due tomorrow. Sometimes I can't help wondering — am I walking too slowly?" },
+    ]},
+    { heading: { zh: "操场上的一圈又一圈", en: "Laps Around the Track" }, paragraphs: [
+      { zh: "经过操场时，我看到有人正在跑步。有人跑得很快，一圈接着一圈；也有人跑得很慢，累了就停下来走几步。但过了一会儿，他们依然会从我面前经过。", en: "Passing the sports field, I saw people running. Some ran fast, lap after lap; others ran slowly, stopping to walk a few steps when tired. But after a while, they would still pass in front of me again." },
+      { zh: "那一刻我突然想到，其实生活也是这样。", en: "In that moment it struck me — life is like this too." },
+      { zh: "每个人都有自己的节奏。有人很早就知道自己想要什么，有人却需要走很多弯路才能找到方向。我们总是习惯和别人比较，却忘了每个人想去的地方本来就不一样。", en: "Everyone has their own rhythm. Some know early what they want; others need many detours before finding their direction. We are always used to comparing ourselves with others, forgetting that the places we want to go were never the same to begin with." },
+    ]},
+    { heading: { zh: "普通的日子", en: "Ordinary Days" }, paragraphs: [
+      { zh: "大学生活也许没有想象中那么轰轰烈烈。更多时候，不过是上课、吃饭、写作业，再和朋友说一些没什么意义的话。但或许多年以后，真正让我们怀念的，恰恰就是这些普通的日子。", en: "University life may not be as dramatic as we imagined. More often, it's just classes, meals, homework, and meaningless chats with friends. But perhaps years later, what we truly miss will be exactly these ordinary days." },
+      { zh: "所以，偶尔慢一点也没关系。累了就休息，迷茫的时候就先把今天过好。未来没有想清楚，也不必急着找到答案。", en: "So it's okay to slow down once in a while. Rest when tired; when lost, just live today well first. If the future isn't clear yet, there's no need to rush to find the answer." },
+    ]},
+    { heading: { zh: "路灯亮起", en: "The Streetlights Come On" }, paragraphs: [
+      { zh: "走到宿舍楼下时，天已经黑了，路灯一盏一盏亮起来。", en: "By the time I reached the dorm, it was dark, and the streetlights were coming on one by one." },
+      { zh: "明天大概还是普通的一天。", en: "Tomorrow will probably be just another ordinary day." },
+      { zh: "但今晚的风很舒服，而我正慢慢走在自己的路上。", en: "But tonight's breeze is pleasant, and I am walking slowly along my own path." },
+    ]},
+  ],
+},
   {
-    slug: "interfaces-are-promises", date: "2026 · 09 · 21", eyebrow: "Essay / 02", tags: ["Interface"], minutes: 3,
-    title: { zh: "界面也是一种承诺", en: "An interface is also a promise" },
-    summary: { zh: "按钮、进度和确认状态，都在告诉用户系统接下来会怎样行动。", en: "Buttons, progress and confirmation states all tell people how the system will act next." },
-    sections: [
-      { heading: { zh: "每个状态都在建立预期", en: "Every state creates an expectation" }, paragraphs: [{ zh: "按钮写着“保存”，就承诺结果不会悄悄丢失；进度条开始移动，就承诺系统知道任务走到了哪里；请求确认，则承诺用户仍然拥有最终控制权。", en: "A button labeled save promises the result will not quietly disappear. A moving progress bar promises the system knows where the task stands. A confirmation request promises the user still has final control." }]},
-      { heading: { zh: "错误不是承诺的终点", en: "Failure is not the end of the promise" }, paragraphs: [{ zh: "真正可靠的界面不只展示成功。它会说明哪里失败、已经发生什么、是否可以重试，以及下一步由谁决定。", en: "A reliable interface does not only display success. It explains what failed, what already happened, whether retry is possible and who decides the next step." }]},
-    ],
+  slug: "when-the-rain-falls",        
+  date: "2026 · 09 · 21",
+  eyebrow: "Essay / 02",              
+  tags: ["随笔", "慢下来", "生活"],
+  minutes: 2,                         
+  title: { zh: "雨落下来的时候", en: "When the Rain Falls" },
+  summary: {
+    zh: "一场不急不慢的小雨，让喧闹的城市安静下来，也让我想起小时候踩水坑的自己。或许人也该偶尔停下来，像雨一样，让世界慢一点。",
+    en: "A gentle rain quiets the noisy city and reminds me of the child who loved splashing in puddles. Perhaps we too should pause sometimes — let the world slow down, the way rain does."
   },
+  sections: [
+    { heading: { zh: "一场小雨", en: "A Gentle Rain" }, paragraphs: [
+      { zh: "我喜欢下雨天。", en: "I like rainy days." },
+      { zh: "尤其是那种不急不慢的小雨。雨点落在窗台上，发出轻轻的声音，街上的行人撑着伞匆匆走过，路边的树叶被雨水洗得发亮。平日里喧闹的城市，也像忽然安静了下来。", en: "Especially the kind of gentle rain that neither hurries nor lingers. Raindrops fall on the windowsill with a soft sound; pedestrians pass by under umbrellas in a hurry; the leaves along the street are washed bright by the rain. The city, usually so noisy, seems to fall suddenly quiet." },
+    ]},
+    { heading: { zh: "坐在窗边发呆", en: "Lost in Thought by the Window" }, paragraphs: [
+      { zh: "下雨的时候，我总喜欢坐在窗边发呆。看着玻璃上的水珠慢慢滑落，心里那些乱七八糟的事情，好像也会一点点平静下来。", en: "When it rains, I like to sit by the window and let my mind drift. Watching the droplets slide slowly down the glass, all the tangled things in my heart seem to settle, bit by bit." },
+    ]},
+    { heading: { zh: "想起小时候", en: "Thinking of Childhood" }, paragraphs: [
+      { zh: "有时候，我会想起小时候。那时最喜欢踩水坑，就算鞋子湿了也不在乎。长大以后，我们开始习惯绕开积水，也越来越少做那些看起来“没意义”的事。", en: "Sometimes I think back to childhood. Back then I loved splashing in puddles, not caring if my shoes got wet. Growing up, we learn to walk around the water, and we do fewer and fewer of those things that seem to have no point." },
+    ]},
+    { heading: { zh: "偶尔也该停下来", en: "Sometimes We Should Pause" }, paragraphs: [
+      { zh: "其实，人偶尔也该停下来。", en: "In truth, we should pause once in a while." },
+      { zh: "不必总想着学习、工作和未来，也不用时时刻刻催着自己往前走。就像一场雨，它什么也没有说，却能让整个世界慢下来。", en: "We don't have to keep thinking about study, work, and the future, nor push ourselves forward every single moment. Like a rain — it says nothing at all, yet it can slow the whole world down." },
+    ]},
+    { heading: { zh: "等雨停了", en: "When the Rain Stops" }, paragraphs: [
+      { zh: "等雨停了，天会重新变亮，而我们也可以带着更轻松的心情，再继续出发。", en: "When the rain stops, the sky will brighten again, and we can set off once more with a lighter heart." },
+    ]},
+  ],
+},
   {
-    slug: "a-quiet-kind-of-progress", date: "2026 · 09 · 20", eyebrow: "Essay / 03", tags: ["Process"], minutes: 3,
-    title: { zh: "一种安静的进度", en: "A quiet kind of progress" },
-    summary: { zh: "并非所有进展都需要发布一个新功能，有时只是让系统少一个意外。", en: "Not every improvement needs a new feature; sometimes progress is simply one fewer surprise." },
-    sections: [
-      { heading: { zh: "看不见的工作", en: "Invisible work" }, paragraphs: [{ zh: "类型更清楚、错误更可恢复、页面在慢设备上少一次卡顿，这些变化很难成为醒目的发布说明，却会持续改变产品被信任的方式。", en: "Clearer types, recoverable failures and one fewer pause on a slow device rarely make dramatic release notes, yet they steadily change how a product earns trust." }]},
-      { heading: { zh: "把稳定也记录下来", en: "Record stability too" }, paragraphs: [{ zh: "记录不应该只追逐新功能。写下约束、删除的复杂度和没有发生的事故，才能看见系统真正变好的轨迹。", en: "A record should not chase new features alone. Writing down constraints, removed complexity and incidents that did not happen reveals how a system is genuinely improving." }]},
-    ],
+  slug: "things-we-cannot-throw-away",  
+  date: "2026 · 09 · 23",
+  eyebrow: "Essay / 03",                 
+  tags: ["随笔", "旧物", "时间"],
+  minutes: 1,                            
+  title: { zh: "舍不得扔的，其实不是东西", en: "What We Can't Throw Away Isn't the Thing Itself" },
+  summary: {
+    zh: "整理房间时翻出的旧物，总让人犹豫再三。后来才明白，舍不得的从来不是那件东西，而是和它有关的那段时间。",
+    en: "Sorting through old belongings always makes us hesitate. Only later do we realize it was never the object we couldn't let go of, but the time attached to it."
   },
+  sections: [
+    { heading: { zh: "翻出旧东西", en: "Finding Old Things" }, paragraphs: [
+      { zh: "整理房间的时候，我经常会翻出一些很久没用过的东西。", en: "When I tidy my room, I often come across things I haven't used in a long time." },
+      { zh: "可能是一张以前的车票，也可能是一支已经写不出字的笔，或者是一件早就不穿的衣服。它们看起来都没什么用，甚至有点占地方，但真正准备扔掉的时候，我又总会犹豫。", en: "Maybe an old ticket, maybe a pen that no longer writes, or a piece of clothing I stopped wearing long ago. They all seem useless, even a bit of a burden in space — yet when I'm about to throw them away, I always hesitate." },
+    ]},
+    { heading: { zh: "过去的痕迹", en: "Traces of the Past" }, paragraphs: [
+      { zh: "因为这些东西好像都带着一点过去的痕迹。", en: "Because these things seem to carry a trace of the past." },
+      { zh: "看到一张旧照片，会想起当时和谁在一起；看到一本写满字的本子，会突然记起以前认真做过的事。很多记忆平时根本不会想起，却会因为一个小东西一下子重新出现。", en: "An old photo brings back who I was with; a notebook filled with writing suddenly recalls the things I once did with care. Memories that never surface in daily life reappear all at once, because of a small object." },
+    ]},
+    { heading: { zh: "舍不得的是什么", en: "What We Hold Onto" }, paragraphs: [
+      { zh: "后来我发现，人舍不得的可能并不是这些物品本身，而是和它们有关的那段时间。", en: "Later I realized: what we can't let go of may not be the object itself, but the stretch of time connected to it." },
+    ]},
+    { heading: { zh: "被收起的自己", en: "The Self Tucked Away" }, paragraphs: [
+      { zh: "东西会旧，很多事情也会慢慢过去。但偶尔翻到这些旧物，还是会让人觉得，原来以前的自己一直没有真正消失，只是被时间轻轻地收了起来。", en: "Things grow old, and many things pass. But now and then, stumbling on these old belongings makes you feel that the person you once were never truly disappeared — only gently tucked away by time." },
+    ]},
+  ],
+},
+  {
+  slug: "the-meaning-of-life",
+  date: "2026 · 09 · 24",
+  eyebrow: "Essay / 04",
+  tags: ["生命", "思考"],
+  minutes: 2,
+
+  title: {
+    zh: "生命",
+    en: "Life"
+  },
+
+  summary: {
+    zh: "生命或许没有标准答案，它的意义藏在不断流逝的时间、人与人的相遇，以及每一个真正活过的瞬间里。",
+    en: "Life may not have a single answer. Its meaning can be found in passing time, human encounters, and every moment we truly experience."
+  },
+
+  sections: [
+    {
+      heading: {
+        zh: "关于生命",
+        en: "On Life"
+      },
+      paragraphs: [
+        {
+          zh: "生命到底是什么，我想了很久，也没有一个准确的答案。",
+          en: "I have thought for a long time about what life really is, yet I still do not have a definite answer."
+        },
+        {
+          zh: "有时候觉得，生命像一条不断向前的河流。我们站在其中，被时间推着往前走，无法停下，也无法回头。很多当时以为会永远记得的事情，后来渐渐模糊；很多以为不会失去的人，也可能在某个时刻走散。",
+          en: "Sometimes life feels like a river that never stops moving forward. We stand within it, carried onward by time, unable to pause or return. Many things we once believed we would remember forever slowly fade, and some people we thought would always remain may eventually drift away."
+        },
+        {
+          zh: "正因为如此，生命才显得珍贵。",
+          en: "Perhaps that is exactly why life feels so precious."
+        }
+      ]
+    },
+
+    {
+      heading: {
+        zh: "有限与意义",
+        en: "Finitude and Meaning"
+      },
+      paragraphs: [
+        {
+          zh: "一片叶子的落下，并不意味着世界停止；一个人的离开，也不会让时间暂停。我们终究只是漫长岁月中的一小段，却可以在有限的时间里留下属于自己的痕迹。",
+          en: "The falling of a leaf does not stop the world, nor does a person's departure pause time. We are only a brief moment in the vast flow of years, yet within that limited time, we can still leave traces that belong to us."
+        },
+        {
+          zh: "也许生命的意义，并不是找到一个标准答案，而是在一次次经历中慢慢明白自己想成为什么样的人。有人追求远方，有人珍惜眼前，其实都没有错。",
+          en: "Perhaps the meaning of life is not about finding a standard answer, but about gradually understanding, through experience, what kind of person we want to become. Some people pursue distant dreams, while others treasure what is already before them. Neither path is wrong."
+        }
+      ]
+    },
+
+    {
+      heading: {
+        zh: "正在发生的此刻",
+        en: "The Present Moment"
+      },
+      paragraphs: [
+        {
+          zh: "我渐渐觉得，生命最重要的不是长度，而是我们是否真正感受过它。认真爱过，努力过，失落过，也重新站起来过，这些看似普通的瞬间，或许正是生命本身。",
+          en: "I have gradually come to believe that what matters most about life is not its length, but whether we have truly felt it. To love sincerely, to struggle, to lose, and to stand up again — these seemingly ordinary moments may be life itself."
+        },
+        {
+          zh: "时间一直向前，而我们能做的，就是尽量不辜负每一个正在发生的此刻。",
+          en: "Time keeps moving forward, and perhaps all we can do is try not to waste the moment that is unfolding before us."
+        }
+      ]
+    }
+  ]
+}
 ];
 
 export function findEditorialArticle(collection: readonly EditorialArticle[], slug: string) {

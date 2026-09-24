@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Footer } from "@/components/site/footer";
 import { FieldRadio } from "@/components/site/field-radio";
 import { ClickFireworks } from "@/components/site/click-fireworks";
+import { GlobalEffectsProvider } from "@/components/site/global-effects-provider";
 import { NextfieldOS } from "@/components/site/nextfield-os";
 import { FieldAtmosphere } from "@/components/site/field-atmosphere";
 import { InkDrift } from "@/components/site/ink-drift";
@@ -32,7 +33,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <body>
@@ -42,17 +45,19 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <FieldAtmosphere />
             <StudioBadgeDropProvider>
               <PageTransitionProvider>
-                <WaterRipple />
-                <InkDrift />
-                <ClickFireworks />
-                <FieldRadio />
-                <NextfieldOS />
-                <MissionTracker />
-                <div className="relative flex min-h-screen flex-col">
-                  <Header />
-                  <main className="flex-1">{children}</main>
-                  <Footer />
-                </div>
+                <GlobalEffectsProvider>
+                  <WaterRipple />
+                  <InkDrift />
+                  <ClickFireworks />
+                  <FieldRadio />
+                  <NextfieldOS />
+                  <MissionTracker />
+                  <div className="relative flex min-h-screen flex-col">
+                    <Header />
+                    <main className="flex-1">{children}</main>
+                    <Footer />
+                  </div>
+                </GlobalEffectsProvider>
               </PageTransitionProvider>
             </StudioBadgeDropProvider>
           </LanguageProvider>

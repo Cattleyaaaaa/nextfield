@@ -34,7 +34,7 @@ export function InkDrift() {
     let frameId = 0;
     let pointerX = -9999;
     let pointerY = -9999;
-    let colors = { ink: "24 28 34", foam: "0 191 188" };
+    const colors = { ink: "24 28 34", foam: "0 191 188" };
     let colorsReadAt = 0;
 
     const readColors = () => {

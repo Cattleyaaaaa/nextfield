@@ -1,6 +1,6 @@
 # NEXTFIELD / 下一场域
 
-一个持续生长的项目、笔记与实验索引。它包含 NEXTFIELD OS 命令中心、90 秒快速介绍、项目回放、失败博物馆、开放实验室、Field Radio、每日生成封面、能力证据图和 Live Studio，并输出为纯静态网站。
+一个持续生长的项目、笔记与实验索引。它包含 NEXTFIELD OS 命令中心、90 秒快速介绍、项目回放、失败博物馆、开放实验室、Field Radio、每日生成封面、能力证据图、Live Studio 和 FIELD SCHOOL 学习区。课程可直接浏览；GitHub 登录与跨设备进度需要 Supabase。
 
 ## 技术栈
 
@@ -19,10 +19,10 @@
 
 ```bash
 npm install
-npm run dev
+npm run dev -- -p 3333
 ```
 
-打开 [http://localhost:3000](http://localhost:3000)。
+打开 [http://localhost:3333](http://localhost:3333)。如改用其他端口，也要更新 `SITE_URL` 和 Supabase OAuth 回调白名单。
 
 执行生产检查：
 
@@ -30,9 +30,13 @@ npm run dev
 npm run typecheck
 npm run lint
 npm run build
+node scripts/test-school.cjs
+node scripts/test-learning-content.cjs
+node scripts/test-school-exam.cjs
+node scripts/test-school-auth.cjs
 ```
 
-静态文件输出到 `out/`。
+生产构建使用 Next.js 服务端运行时；登录和学习 API 不支持纯静态导出。FIELD SCHOOL 的 GitHub OAuth、数据库和 AI 配置见 [部署说明](docs/field-school-deployment.md)。
 
 ## 修改个人资料
 
@@ -69,7 +73,7 @@ site.config.ts       个人资料与站点配置
 4. Build Command 使用 `npm run build`。
 5. 点击 Deploy。
 
-项目会构建为静态资源。设置自定义域名后，将该地址写入 `site.config.ts` 的 `url` 并重新部署。
+设置自定义域名后，将该地址写入 `site.config.ts` 的 `url`、Vercel 的 `SITE_URL` 和 Supabase Redirect URLs，然后重新部署。启用 GitHub 登录前需完成 [FIELD SCHOOL 部署说明](docs/field-school-deployment.md)中的 Supabase 与 GitHub OAuth 配置。
 
 ## 设计与动效
 

@@ -7,6 +7,7 @@ import { GlareHover } from "@/components/react-bits/glare-hover";
 import SpotlightCard from "@/components/SpotlightCard";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { useMotionPreference } from "@/lib/use-motion-preference";
+import { useLanguage } from "@/components/site/language-provider";
 
 // 进场：先卡片容器，再卡片内部元素，层次感比整体淡入更好。
 const PROJECT_GRID_REVEAL_CONFIG = {
@@ -32,26 +33,32 @@ const PROJECT_SPOTLIGHT_CONFIG = {
 export const projects = [
   {
     name: "Knowledge Copilot",
-    description: "面向团队知识库的 Agent 工作台，将文档检索、引用与工具调用整合到一次自然对话中。",
+    description: {
+      zh: "探索团队知识库中的 Agent 体验：把文档检索、引用与工具调用放在同一条任务路径上。",
+      en: "Exploring an Agent experience for team knowledge: retrieval, citations, and tool use in one task flow.",
+    },
     tags: ["LangGraph", "RAG", "Next.js"],
     icon: Bot,
-    href: "#",
     cover: "linear-gradient(135deg, rgb(var(--liquid-mid) / 0.26), rgb(var(--accent) / 0.06))",
   },
   {
     name: "Agent Operations",
-    description: "用于观察、调试与评估 Agent 运行情况的内部平台，帮助团队持续优化复杂流程。",
+    description: {
+      zh: "探索如何将 Agent 的运行轨迹、失败原因与评估结果组织成可读的工作界面。",
+      en: "Exploring how traces, failures, and evaluation results can become an understandable workspace.",
+    },
     tags: ["TypeScript", "PostgreSQL", "Streaming"],
     icon: LayoutDashboard,
-    href: "#",
     cover: "linear-gradient(160deg, rgb(var(--accent) / 0.22), rgb(var(--liquid-foam) / 0.12))",
   },
   {
     name: "Semantic Search",
-    description: "将结构化业务数据与语义检索结合，为产品提供更贴近意图的搜索体验。",
+    description: {
+      zh: "探索结构化数据与语义检索如何协作，让搜索结果更贴近用户意图。",
+      en: "Exploring how structured data and semantic retrieval can bring search closer to user intent.",
+    },
     tags: ["Embedding", "Vector DB", "API"],
     icon: SearchCheck,
-    href: "#",
     cover: "linear-gradient(205deg, rgb(var(--liquid-deep) / 0.2), rgb(var(--accent) / 0.07))",
   },
 ];
@@ -59,6 +66,7 @@ export const projects = [
 type Project = (typeof projects)[number];
 
 function ProjectCardItem({ project }: { project: Project }) {
+  const { locale } = useLanguage();
   const reducedMotion = useMotionPreference();
   const coverRef = useRef<HTMLDivElement>(null);
   const parallaxRef = useRef<((value: number) => void) | null>(null);
@@ -114,13 +122,13 @@ function ProjectCardItem({ project }: { project: Project }) {
               <span className="grid size-10 place-items-center rounded-2xl border border-line text-accent transition-colors duration-300 group-hover:border-accent group-hover:bg-accent group-hover:text-white" data-project-item>
                 <Icon className="size-4" />
               </span>
-              <a aria-label={`查看 ${project.name}`} className="grid size-9 place-items-center rounded-full border border-line transition-all duration-300 hover:border-accent hover:bg-accent hover:text-white" data-project-item href={project.href}>
+              <span aria-hidden="true" className="grid size-9 place-items-center rounded-full border border-line text-muted" data-project-item>
                 <ArrowUpRight className="size-4" />
-              </a>
+              </span>
             </div>
             <div className="mt-auto pt-7">
               <h2 className="font-display text-2xl leading-none tracking-[-0.04em] transition-colors duration-300 group-hover:text-accent" data-project-item>{project.name}</h2>
-              <p className="mt-3 text-xs leading-5 text-muted" data-project-item>{project.description}</p>
+              <p className="mt-3 text-xs leading-5 text-muted" data-project-item>{project.description[locale]}</p>
               <div className="mt-5 flex flex-wrap gap-1.5" data-project-item>
                 {project.tags.map((tag) => <span className="rounded-full border border-line px-2 py-1 text-[9px] uppercase tracking-[0.12em] text-muted" key={tag}>{tag}</span>)}
               </div>
@@ -133,6 +141,7 @@ function ProjectCardItem({ project }: { project: Project }) {
 }
 
 export function ProjectGrid() {
+  const { locale } = useLanguage();
   const reducedMotion = useMotionPreference();
   const gridRef = useRef<HTMLDivElement>(null);
 
@@ -180,6 +189,7 @@ export function ProjectGrid() {
 
   return (
     <div ref={gridRef}>
+      <p className="mb-5 font-mono text-[10px] uppercase tracking-[0.18em] text-accent">{locale === "zh" ? "探索中的方向 / 02" : "PROJECT DIRECTIONS / 02"}</p>
       <span aria-hidden="true" className="mb-8 block h-px origin-left bg-accent" data-project-rule />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {projects.map((project) => (

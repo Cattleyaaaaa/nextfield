@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { TransitionLink } from "@/components/site/transition-link";
 import { AmbientGlow } from "@/components/visual/ambient-glow";
@@ -20,8 +20,9 @@ function CharLine({ text, trailing }: { text: string; trailing?: ReactNode }) {
   return (
     <div className="relative inline-block">
       {text.split("").map((char, index) => (
-        // pb 给下伸部（y / g 的尾巴）留出可见区域，-mb 抵消掉它占的高度，排版不受影响
-        <span className="inline-block overflow-hidden pb-[0.26em] -mb-[0.26em] align-top" key={`${text}-${index}`}>
+        // pb 给下伸部（y / g 的尾巴）留出可见区域，-mb 抵消掉它占的高度，排版不受影响。
+        // data-hero-cell 是悬停起伏的目标：动 clip 层本身，字母不会被自己的裁剪切到。
+        <span className="inline-block overflow-hidden pb-[0.26em] -mb-[0.26em] align-top" data-hero-cell key={`${text}-${index}`}>
           <span className="inline-block will-change-transform" data-hero-char>
             {char}
           </span>
@@ -36,6 +37,9 @@ export function KineticHero() {
   const reducedMotion = useMotionPreference();
   const rootRef = useRef<HTMLElement>(null);
   const springRef = useRef<SVGPathElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
+  /** 入场完成前悬停会 overwrite 掉入场进度，把字母冻在半空——就绪前不响应悬停 */
+  const heroReadyRef = useRef(false);
 
   useGSAP(() => {
     const chars = gsap.utils.toArray<HTMLElement>("[data-hero-char]");
@@ -50,6 +54,16 @@ export function KineticHero() {
       { scale: 1, rotate: 0, autoAlpha: 1, duration: 0.9, ease: "back.out(1.6)" },
     );
 
+    // 花朵慢速自转：与弹簧线同理，无限循环独立排在入场之后；
+    // 只转 rotate，悬停动效只动 scale，两者互不 overwrite。
+    gsap.to("[data-hero-flower]", {
+      rotate: "+=360",
+      duration: 26,
+      ease: "none",
+      repeat: -1,
+      delay: 1.4,
+    });
+
     // 位移要盖住「文字下沿 + 裁切留白」，留白加大后 118% 会在入场前露出一截字头
     timeline.fromTo(
       chars,
@@ -63,6 +77,23 @@ export function KineticHero() {
       const length = path.getTotalLength();
       gsap.set(path, { strokeDasharray: length, strokeDashoffset: length });
       timeline.to(path, { strokeDashoffset: 0, duration: 1, ease: "power2.inOut" }, "-=0.55");
+
+      // 弹簧线的呼吸：挤压—回弹。无限循环不能进 entrance timeline，
+      // 否则 timeline 时长被撑成无限，后面 "-=0.5" 的插入点永远到不了，副题会静默失效。
+      const spring = path.ownerSVGElement;
+      if (spring) {
+        gsap.to(spring, {
+          duration: 1.9,
+          ease: "sine.inOut",
+          repeat: -1,
+          rotate: 5,
+          scaleX: 0.94,
+          scaleY: 1.07,
+          transformOrigin: "50% 100%",
+          yoyo: true,
+          delay: 2.1,
+        });
+      }
     }
 
     timeline.fromTo(
@@ -71,7 +102,70 @@ export function KineticHero() {
       { autoAlpha: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.12 },
       "-=0.5",
     );
+
+    timeline.eventCallback("onComplete", () => {
+      heroReadyRef.current = true;
+    });
   }, { scope: rootRef, dependencies: [reducedMotion] });
+
+  // 悬停逐字起伏：靠近指针的字母抬得高、邻座轻微带动，像被指尖推了一下。
+  // 目标是 clip 层（cell）而不是内层字母——内层在自己的 overflow-hidden 里，转起来会被裁掉角。
+  useEffect(() => {
+    if (reducedMotion) return;
+    const root = rootRef.current;
+    const text = textRef.current;
+    if (!root || !text) return;
+
+    const cells = Array.from(root.querySelectorAll<HTMLElement>("[data-hero-cell]"));
+    const spring = springRef.current?.ownerSVGElement ?? null;
+
+    const settle = () => {
+      gsap.to(cells, { duration: 0.5, ease: "power2.out", overwrite: "auto", rotate: 0, scale: 1, yPercent: 0 });
+      if (spring) gsap.to(spring, { duration: 0.5, ease: "power2.out", overwrite: "auto", y: 0 });
+    };
+
+    const lift = (event: PointerEvent) => {
+      if (!heroReadyRef.current) return;
+      const cell = (event.target as HTMLElement | null)?.closest<HTMLElement>("[data-hero-cell]");
+      if (!cell) return;
+      const index = cells.indexOf(cell);
+      gsap.to(cells, {
+        duration: 0.45,
+        ease: "back.out(1.6)",
+        overwrite: "auto",
+        rotate: (i: number) => (i === index ? -3 : 0),
+        scale: (i: number) => (i === index ? 1.06 : 1),
+        yPercent: (i: number) => (i === index ? -9 : Math.abs(i - index) === 1 ? -4 : 0),
+      });
+      // 弹簧线跟着被压下一点（用 y，不和呼吸动画的 rotate/scale 抢属性）
+      if (spring) gsap.to(spring, { duration: 0.4, ease: "power2.out", overwrite: "auto", y: -10 });
+    };
+
+    text.addEventListener("pointerover", lift);
+    text.addEventListener("pointerleave", settle);
+
+    // 花朵悬停：弹性放大一下。只动 scale——自转动画占着 rotate，
+    // overwrite "auto" 只杀同名属性，自转不会被悬停打断。
+    const flower = root.querySelector<HTMLElement>("[data-hero-flower]");
+    const flowerPop = () => {
+      if (!heroReadyRef.current) return;
+      gsap.to(flower, { duration: 0.4, ease: "back.out(1.7)", overwrite: "auto", scale: 1.18 });
+    };
+    const flowerRest = () => {
+      gsap.to(flower, { duration: 0.45, ease: "power2.out", overwrite: "auto", scale: 1 });
+    };
+    flower?.addEventListener("pointerover", flowerPop);
+    flower?.addEventListener("pointerout", flowerRest);
+
+    return () => {
+      text.removeEventListener("pointerover", lift);
+      text.removeEventListener("pointerleave", settle);
+      flower?.removeEventListener("pointerover", flowerPop);
+      flower?.removeEventListener("pointerout", flowerRest);
+      gsap.killTweensOf(cells);
+      if (flower) gsap.killTweensOf(flower);
+    };
+  }, [reducedMotion]);
 
   return (
     <section className="relative overflow-hidden bg-paper text-ink" ref={rootRef}>
@@ -100,7 +194,7 @@ export function KineticHero() {
           </svg>
 
           <h1 className="sr-only">Create Anything</h1>
-          <div aria-hidden="true" className="relative font-sans text-[clamp(4rem,14vw,12.5rem)] font-medium leading-[0.85] tracking-[-0.04em]">
+          <div aria-hidden="true" className="relative font-sans text-[clamp(4rem,14vw,12.5rem)] font-medium leading-[0.85] tracking-[-0.04em]" ref={textRef}>
             <div className="pl-[4%]">
               <CharLine text={HERO_LINES[0]} />
             </div>

@@ -2,20 +2,25 @@
 
 import { useEffect, useRef } from "react";
 import { usePageTransition } from "@/components/site/page-transition-provider";
+import { useGlobalEffects } from "@/components/site/global-effects-provider";
 
-type Ripple = { x: number; y: number; radius: number; opacity: number; velocity: number };
+type Ripple = {
+  x: number;
+  y: number;
+  radius: number;
+  opacity: number;
+  velocity: number;
+};
 
 const MAX_RIPPLES = 10;
-const MIN_DISTANCE = 34;
-const MIN_INTERVAL = 48;
-
 export function WaterRipple() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { motionEnabled } = usePageTransition();
+  const { rippleEnabled, rippleStrength, rippleDensity } = useGlobalEffects();
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas || !motionEnabled) return;
+    if (!canvas || !motionEnabled || !rippleEnabled) return;
     const context = canvas.getContext("2d", { alpha: true });
     if (!context) return;
 
@@ -40,16 +45,31 @@ export function WaterRipple() {
     };
 
     const addRipple = (x: number, y: number, emphasis = false) => {
-      ripples.push({ x, y, radius: emphasis ? 9 : 5, opacity: emphasis ? 0.38 : 0.24, velocity: emphasis ? 2.6 : 1.4 });
-      ripples.push({ x, y, radius: emphasis ? 2 : 0, opacity: emphasis ? 0.16 : 0.1, velocity: emphasis ? 1.55 : 0.9 });
+      const count = emphasis
+        ? Math.min(3, Math.ceil(rippleStrength / 2) + 1)
+        : Math.ceil(rippleStrength / 2);
+      for (let index = 0; index < count; index += 1)
+        ripples.push({
+          x,
+          y,
+          radius: (emphasis ? 8 : 4) + index * 8,
+          opacity:
+            (emphasis ? 0.4 : 0.2 + rippleStrength * 0.035) - index * 0.055,
+          velocity: (emphasis ? 2 : 1.1) + rippleStrength * 0.22 + index * 0.15,
+        });
       while (ripples.length > MAX_RIPPLES) ripples.shift();
+      if (!frameId) frameId = requestAnimationFrame(draw);
     };
 
     const onPointerMove = (event: PointerEvent) => {
-      if (event.pointerType && event.pointerType !== "mouse") return;
+      if (
+        event.target instanceof Element &&
+        event.target.closest("[data-effect-lab]")
+      )
+        return;
       const now = performance.now();
       const distance = Math.hypot(event.clientX - lastX, event.clientY - lastY);
-      if (distance < MIN_DISTANCE || now - lastTime < MIN_INTERVAL) return;
+      if (distance < 60 - rippleDensity * 10 || now - lastTime < 28) return;
       lastX = event.clientX;
       lastY = event.clientY;
       lastTime = now;
@@ -63,23 +83,26 @@ export function WaterRipple() {
 
     const draw = () => {
       context.clearRect(0, 0, width, height);
-      const accent = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim().split(/\s+/).join(", ");
+      const accent = getComputedStyle(document.documentElement)
+        .getPropertyValue("--accent")
+        .trim()
+        .split(/\s+/)
+        .join(", ");
       for (let index = ripples.length - 1; index >= 0; index -= 1) {
         const ripple = ripples[index];
         context.beginPath();
         context.arc(ripple.x, ripple.y, ripple.radius, 0, Math.PI * 2);
         context.strokeStyle = `rgba(${accent}, ${ripple.opacity})`;
-        context.lineWidth = ripple.opacity > 0.2 ? 1.5 : 1;
+        context.lineWidth = Math.max(0.8, rippleStrength * 0.4);
         context.stroke();
         ripple.radius += ripple.velocity;
         ripple.opacity *= 0.972;
         if (ripple.opacity < 0.012) ripples.splice(index, 1);
       }
-      frameId = requestAnimationFrame(draw);
+      frameId = ripples.length ? requestAnimationFrame(draw) : 0;
     };
 
     resize();
-    frameId = requestAnimationFrame(draw);
     window.addEventListener("resize", resize, { passive: true });
     window.addEventListener("pointermove", onPointerMove, { passive: true });
     window.addEventListener("water-ripple", onTransitionRipple);
@@ -90,8 +113,14 @@ export function WaterRipple() {
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("water-ripple", onTransitionRipple);
     };
-  }, [motionEnabled]);
+  }, [motionEnabled, rippleEnabled, rippleStrength, rippleDensity]);
 
-  if (!motionEnabled) return null;
-  return <canvas aria-hidden="true" className="pointer-events-none fixed inset-0 z-50 hidden md:block" ref={canvasRef} />;
+  if (!motionEnabled || !rippleEnabled) return null;
+  return (
+    <canvas
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-0 z-50"
+      ref={canvasRef}
+    />
+  );
 }

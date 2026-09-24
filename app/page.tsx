@@ -10,6 +10,8 @@ import { IndexThemeInitializer } from "@/components/site/index-theme-initializer
 import { INDEX_INITIAL_THEME, THEME_STORAGE_KEY, THEME_USER_SELECTION_KEY } from "@/lib/theme-preference";
 import { getPublishedPosts } from "@/lib/posts";
 import { FieldSchoolCallout } from "@/components/home/field-school-callout";
+import { StartHere } from "@/components/home/start-here";
+import { BuildJourney } from "@/components/home/build-journey";
 
 // 首页采用大字叙事、滚动舞台与能力卡片；只使用 CSS / GSAP / React Bits 微交互。
 const INDEX_THEME_BOOTSTRAP = `try {
@@ -33,8 +35,10 @@ export default function HomePage() {
       <IndexThemeInitializer />
       <KineticHero />
       <ZentryHome />
+      <StartHere />
       <FieldSchoolCallout />
       <ProjectConstellation />
+      <BuildJourney />
       <DailyField dayKey={dayKey} />
       <FieldChannels />
       <OpenExperiments />

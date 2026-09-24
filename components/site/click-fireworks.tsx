@@ -2,11 +2,30 @@
 
 import { useEffect, useRef } from "react";
 import { usePageTransition } from "@/components/site/page-transition-provider";
+import {
+  useGlobalEffects,
+  type ClickEffectStyle,
+} from "@/components/site/global-effects-provider";
+import {
+  CLICK_EFFECT_PREVIEW_EVENT,
+  type ClickEffectPreview,
+} from "@/lib/effect-signal";
 
-type Spark = { x: number; y: number; vx: number; vy: number; life: number; maxLife: number; radius: number; color: string };
+type Spark = {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  life: number;
+  maxLife: number;
+  radius: number;
+  color: string;
+  angle: number;
+  spin: number;
+  style: ClickEffectStyle;
+};
 type Ring = { x: number; y: number; radius: number; life: number };
 
-const SPARKS_PER_BURST = 30;
 const MAX_SPARKS = 420; // 连点时兜底，超过就少生成
 const GRAVITY = 0.055;
 const DRAG = 0.985;
@@ -19,10 +38,11 @@ const DRAG = 0.985;
 export function ClickFireworks() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { motionEnabled } = usePageTransition();
+  const { clickEnabled, clickStyle, clickAmount } = useGlobalEffects();
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas || !motionEnabled) return;
+    if (!canvas || !motionEnabled || !clickEnabled) return;
     const context = canvas.getContext("2d", { alpha: true });
     if (!context) return;
 
@@ -31,7 +51,7 @@ export function ClickFireworks() {
     let sparks: Spark[] = [];
     let rings: Ring[] = [];
     let frameId = 0;
-    let colors = { foam: "0 191 188", accent: "0 140 160", ink: "24 28 34" };
+    const colors = { foam: "0 191 188", accent: "0 140 160", ink: "24 28 34" };
     let colorsReadAt = 0;
 
     const readColors = () => {
@@ -57,11 +77,16 @@ export function ClickFireworks() {
       context.setTransform(scale, 0, 0, scale, 0, 0);
     };
 
-    const spawnBurst = (x: number, y: number) => {
+    const spawnBurst = (
+      x: number,
+      y: number,
+      style: ClickEffectStyle = clickStyle,
+    ) => {
       readColors();
       const palette = [colors.foam, colors.foam, colors.accent, colors.ink];
-      const budget = Math.max(12, Math.floor((MAX_SPARKS - sparks.length) / 1));
-      const count = Math.min(SPARKS_PER_BURST, budget);
+      const budget = Math.max(0, MAX_SPARKS - sparks.length);
+      const count =
+        style === "rings" ? 0 : Math.min(8 + clickAmount * 8, budget);
       for (let i = 0; i < count; i += 1) {
         const angle = Math.random() * Math.PI * 2;
         const speed = 1.6 + Math.random() * 4.6;
@@ -75,10 +100,21 @@ export function ClickFireworks() {
           maxLife,
           radius: 0.9 + Math.random() * 1.6,
           color: palette[Math.floor(Math.random() * palette.length)],
+          angle: Math.random() * Math.PI,
+          spin: (Math.random() - 0.5) * 0.14,
+          style,
         });
       }
-      rings.push({ x, y, radius: 4, life: 1 });
+      const ringCount = style === "rings" ? clickAmount : 1;
+      for (let index = 0; index < ringCount; index += 1)
+        rings.push({
+          x,
+          y,
+          radius: 6 + index * 17,
+          life: Math.max(0.62, 1 - index * 0.08),
+        });
       if (sparks.length > MAX_SPARKS) sparks = sparks.slice(-MAX_SPARKS);
+      if (rings.length > 24) rings = rings.slice(-24);
     };
 
     const step = () => {
@@ -88,25 +124,44 @@ export function ClickFireworks() {
       for (const spark of sparks) {
         spark.life -= 1;
         spark.vx *= DRAG;
-        spark.vy = spark.vy * DRAG + GRAVITY;
+        spark.vy =
+          spark.vy * DRAG +
+          (spark.style === "confetti" ? GRAVITY * 1.5 : GRAVITY);
         spark.x += spark.vx;
         spark.y += spark.vy;
+        spark.angle += spark.spin;
         const alpha = Math.max(0, spark.life / spark.maxLife);
-        context.beginPath();
-        context.arc(spark.x, spark.y, spark.radius, 0, Math.PI * 2);
         context.fillStyle = `rgb(${spark.color} / ${alpha.toFixed(3)})`;
-        context.fill();
+        if (spark.style === "confetti") {
+          context.save();
+          context.translate(spark.x, spark.y);
+          context.rotate(spark.angle);
+          context.fillRect(
+            -spark.radius * 2,
+            -spark.radius / 2,
+            spark.radius * 4,
+            spark.radius,
+          );
+          context.restore();
+        } else {
+          context.beginPath();
+          context.arc(spark.x, spark.y, spark.radius, 0, Math.PI * 2);
+          context.fill();
+        }
       }
 
       rings = rings.filter((ring) => ring.life > 0);
       for (const ring of rings) {
-        ring.life -= 0.045;
-        ring.radius += 2.6;
+        ring.life -= 0.027;
+        ring.radius += 3.2;
         context.beginPath();
-        context.strokeStyle = `rgb(${colors.foam} / ${(ring.life * 0.4).toFixed(3)})`;
-        context.lineWidth = Math.max(0.5, ring.life * 1.8);
+        context.strokeStyle = `rgb(${colors.accent} / ${(Math.max(0, ring.life) * 0.9).toFixed(3)})`;
+        context.lineWidth = Math.max(1.5, ring.life * 3.6);
+        context.shadowColor = `rgb(${colors.foam} / 0.9)`;
+        context.shadowBlur = 12;
         context.arc(ring.x, ring.y, ring.radius, 0, Math.PI * 2);
         context.stroke();
+        context.shadowBlur = 0;
       }
 
       if (sparks.length > 0 || rings.length > 0) {
@@ -122,7 +177,18 @@ export function ClickFireworks() {
     };
 
     const onPointerDown = (event: PointerEvent) => {
+      if (
+        event.target instanceof Element &&
+        event.target.closest("[data-effect-lab], [data-effect-controls]")
+      )
+        return;
       spawnBurst(event.clientX, event.clientY);
+      ensureLoop();
+    };
+
+    const onPreview = (event: Event) => {
+      const { x, y, style } = (event as CustomEvent<ClickEffectPreview>).detail;
+      spawnBurst(x, y, style);
       ensureLoop();
     };
 
@@ -140,14 +206,22 @@ export function ClickFireworks() {
     resize();
     window.addEventListener("resize", resize);
     window.addEventListener("pointerdown", onPointerDown);
+    window.addEventListener(CLICK_EFFECT_PREVIEW_EVENT, onPreview);
     document.addEventListener("visibilitychange", onVisibility);
     return () => {
       if (frameId) window.cancelAnimationFrame(frameId);
       window.removeEventListener("resize", resize);
       window.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener(CLICK_EFFECT_PREVIEW_EVENT, onPreview);
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [motionEnabled]);
+  }, [motionEnabled, clickEnabled, clickStyle, clickAmount]);
 
-  return <canvas aria-hidden="true" className="pointer-events-none fixed inset-0 z-[90]" ref={canvasRef} />;
+  return (
+    <canvas
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-0 z-[90]"
+      ref={canvasRef}
+    />
+  );
 }

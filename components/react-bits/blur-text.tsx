@@ -10,7 +10,7 @@
 //   3. 默认按「字」拆分 —— 中文没有空格，按词拆只会得到一个整体，看不出错落
 //   4. 命中 prefers-reduced-motion 时直接渲染纯文本，杜绝「动画没触发导致文字一直不可见」
 import { motion, type Target, type TargetAndTransition } from "framer-motion";
-import { useEffect, useMemo, useRef, useState, type ElementType } from "react";
+import { useEffect, useMemo, useRef, useState, type Ref } from "react";
 import { useMotionPreference } from "@/lib/use-motion-preference";
 
 type MotionVars = Record<string, string | number>;
@@ -45,7 +45,7 @@ const buildKeyframes = (
 export interface BlurTextProps {
   text: string;
   enabled?: boolean;
-  as?: ElementType;
+  as?: "p" | "h1" | "h2";
   className?: string;
   lineClassName?: string;
   animateBy?: "chars" | "words";
@@ -115,11 +115,13 @@ export function BlurText({
     [to.length],
   );
 
-  const Element = as;
+  // These heading/paragraph tags share the props used below. A concrete tag
+  // avoids React 19 intersecting their different ref types into `never`.
+  const Element = as as "p";
 
   if (reducedMotion || !enabled) {
     return (
-      <Element className={className} ref={ref}>
+      <Element className={className} ref={ref as Ref<HTMLParagraphElement>}>
         {lines.map((line, index) => (
           <span
             className={lineClassName}
@@ -134,7 +136,7 @@ export function BlurText({
   }
 
   return (
-    <Element className={className} ref={ref}>
+    <Element className={className} ref={ref as Ref<HTMLParagraphElement>}>
       {segments.map((segmentsOfLine, lineIndex) => (
         <span
           className={lineClassName}

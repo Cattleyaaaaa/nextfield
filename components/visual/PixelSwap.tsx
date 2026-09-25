@@ -189,7 +189,7 @@ export default function PixelSwap({
       tabIndex: 0,
     };
 
-  const layer = (content: ReactNode, shown: boolean, ref?: React.RefObject<HTMLDivElement>) => (
+  const layer = (content: ReactNode, shown: boolean, ref?: React.RefObject<HTMLDivElement | null>) => (
     <div ref={ref} className="pixel-swap__layer" data-visible={shown && !transitioning} style={{ zIndex: shown ? 2 : 1 }}>
       {content}
     </div>

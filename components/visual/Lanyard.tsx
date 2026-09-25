@@ -4,8 +4,7 @@ import {
   Canvas,
   extend,
   useFrame,
-  type BufferGeometryNode,
-  type MaterialNode,
+  type ThreeElement,
   type ThreeEvent
 } from '@react-three/fiber';
 import { useGLTF, useTexture, Environment, Lightformer } from '@react-three/drei';
@@ -22,16 +21,16 @@ import {
 import { MeshLineGeometry, MeshLineMaterial } from 'meshline';
 import * as THREE from 'three';
 
-// replace with your own imports, see the usage snippet for details
-import cardGLB from './card.glb';
 import lanyard from './lanyard.png';
+
+const cardGLB = '/models/nextfield-id.glb';
 
 extend({ MeshLineGeometry, MeshLineMaterial });
 
 declare module '@react-three/fiber' {
   interface ThreeElements {
-    meshLineGeometry: BufferGeometryNode<MeshLineGeometry, typeof MeshLineGeometry>;
-    meshLineMaterial: MaterialNode<MeshLineMaterial, typeof MeshLineMaterial>;
+    meshLineGeometry: ThreeElement<typeof MeshLineGeometry>;
+    meshLineMaterial: ThreeElement<typeof MeshLineMaterial>;
   }
 }
 
@@ -454,6 +453,10 @@ function Band({
   );
   const [dragged, drag] = useState<false | THREE.Vector3>(false);
   const [hovered, hover] = useState(false);
+  const bandMaterialArgs = useMemo<[ConstructorParameters<typeof MeshLineMaterial>[0]]>(
+    () => [{ resolution: new THREE.Vector2(1000, isMobile ? 2000 : 1000) }],
+    [isMobile]
+  );
 
   useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], 1]);
   useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], 1]);
@@ -484,7 +487,9 @@ function Band({
         z: vec.z - dragged.z
       });
     }
-    if (fixed.current) {
+    // Rapier refs can become available on different frames, especially on a
+    // cold production load. Never read a joint or mesh before it has mounted.
+    if (fixed.current && j1.current && j2.current && j3.current && card.current && band.current?.geometry) {
       [j1, j2].forEach(ref => {
         const lerped = getLerped(ref.current);
         const clampedDistance = Math.max(0.1, Math.min(1, lerped.distanceTo(ref.current.translation())));
@@ -556,9 +561,9 @@ function Band({
       <mesh ref={band}>
         <meshLineGeometry />
         <meshLineMaterial
+          args={bandMaterialArgs}
           color="white"
           depthTest={false}
-          resolution={isMobile ? new THREE.Vector2(1000, 2000) : new THREE.Vector2(1000, 1000)}
           useMap={1}
           map={texture}
           repeat={new THREE.Vector2(-4, 1)}

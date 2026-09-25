@@ -8,7 +8,7 @@ export function CodePractice(){
  const {locale}=useLanguage(),zh=locale==="zh";
  const [index,setIndex]=useState(0),[code,setCode]=useState(SCHOOL_EXERCISES[0].starter),[busy,setBusy]=useState(false),[doc,setDoc]=useState(""),[error,setError]=useState("");
  const [results,setResults]=useState<{pass:boolean;actual:string}[]>([]);
- const frame=useRef<HTMLIFrameElement>(null),nonce=useRef(""),timer=useRef<ReturnType<typeof setTimeout>>();
+ const frame=useRef<HTMLIFrameElement>(null),nonce=useRef(""),timer=useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
  const exercise=SCHOOL_EXERCISES[index];
  useEffect(()=>{try{const saved=localStorage.getItem("school-code-"+exercise.id);setCode(saved?.slice(0,10000)||exercise.starter);}catch{setCode(exercise.starter);}setResults([]);setError("");setDoc("");setBusy(false);nonce.current="";clearTimeout(timer.current);},[exercise]);
  useEffect(()=>{function receive(e:MessageEvent){if(e.source!==frame.current?.contentWindow||e.data?.type!=="school-exercise"||e.data.nonce!==nonce.current)return;clearTimeout(timer.current);setBusy(false);setDoc("");const result=e.data.result;if(Array.isArray(result))setResults(result.slice(0,20).map(r=>({pass:r?.pass===true,actual:String(r?.actual).slice(0,200)})));else setError(String(result?.error||"Execution failed"));}window.addEventListener("message",receive);return()=>{window.removeEventListener("message",receive);clearTimeout(timer.current);};},[]);

@@ -1,10 +1,15 @@
 {
-  "name": "agent-fullstack-portfolio",
+  "name": "nextfield-personal-site",
   "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "cloudflare:build": "cross-env CLOUDFLARE_BUILD=1 XDG_CONFIG_HOME=.wrangler opennextjs-cloudflare build",
+    "preview": "npm run cloudflare:build && cross-env XDG_CONFIG_HOME=.wrangler opennextjs-cloudflare preview",
+    "deploy": "npm run cloudflare:build && cross-env XDG_CONFIG_HOME=.wrangler opennextjs-cloudflare deploy",
+    "upload": "npm run cloudflare:build && cross-env XDG_CONFIG_HOME=.wrangler opennextjs-cloudflare upload",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"
@@ -13,7 +18,7 @@
     "@gsap/react": "^2.1.2",
     "@mdx-js/loader": "^3.1.1",
     "@mdx-js/react": "^3.1.1",
-    "@next/mdx": "^16.3.5",
+    "@next/mdx": "^15.5.26",
     "@react-three/drei": "^9.122.0",
     "@react-three/fiber": "^8.18.0",
     "@react-three/rapier": "^1.5.0",
@@ -22,7 +27,7 @@
     "gsap": "^3.15.0",
     "lucide-react": "^0.468.0",
     "meshline": "^3.3.1",
-    "next": "14.2.35",
+    "next": "^15.5.26",
     "next-themes": "^0.4.4",
     "ogl": "^1.0.11",
     "react": "^18.3.1",
@@ -32,16 +37,19 @@
     "three": "^0.170.0"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "^1.20.6",
     "@types/mdx": "^2.0.14",
     "@types/node": "^22.10.2",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "autoprefixer": "^10.4.20",
+    "cross-env": "^10.1.0",
     "eslint": "^8.57.1",
-    "eslint-config-next": "14.2.35",
+    "eslint-config-next": "^15.5.26",
     "postcss": "^8.4.49",
     "prettier": "^3.4.2",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "wrangler": "^4.138.0"
   }
 }

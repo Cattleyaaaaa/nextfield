@@ -1,0 +1,27 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "nextfield-personal-site",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-09-24",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "routes": [
+    {
+      "pattern": "nextfield.top",
+      "custom_domain": true
+    }
+  ],
+  "vars": {
+    "SITE_URL": "https://nextfield.top",
+    "FIELD_AI_ENABLED": "false"
+  },
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "nextfield-personal-site"
+    }
+  ]
+}

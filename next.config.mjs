@@ -3,10 +3,12 @@ import remarkFrontmatter from "remark-frontmatter";
 import remarkGfm from "remark-gfm";
 
 const isProduction = process.env.NODE_ENV === "production";
+const isCloudflareBuild = process.env.CLOUDFLARE_BUILD === "1";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  distDir: isProduction ? ".next-production" : ".next-development",
+  distDir: isCloudflareBuild ? ".next" : isProduction ? ".next-production" : ".next-development",
+  outputFileTracingRoot: process.cwd(),
   // Vercel serves authenticated APIs alongside pre-rendered course pages.
   images: { unoptimized: true },
   pageExtensions: ["ts", "tsx", "md", "mdx"],

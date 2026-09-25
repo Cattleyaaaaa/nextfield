@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="920" viewBox="0 0 1600 920" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1600" y2="920" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F6F8F5"/><stop offset="1" stop-color="#E9F1EF"/>
+    </linearGradient>
+    <linearGradient id="dark" x1="120" y1="180" x2="1480" y2="490" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B252B"/><stop offset="1" stop-color="#123940"/>
+    </linearGradient>
+    <filter id="shadow" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB" filterUnits="objectBoundingBox">
+      <feGaussianBlur stdDeviation="14"/>
+    </filter>
+    <style>
+      .mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.16em}
+      .sans{font-family:Inter,"Segoe UI",Arial,sans-serif}
+    </style>
+  </defs>
+  <rect width="1600" height="920" rx="34" fill="url(#bg)"/>
+  <circle cx="1450" cy="104" r="180" fill="#9DE5E2" opacity=".12"/>
+  <circle cx="120" cy="820" r="220" fill="#7CB8B7" opacity=".10"/>
+  <rect x="72" y="58" width="1456" height="804" rx="30" fill="url(#dark)"/>
+  <text x="126" y="126" fill="#9DE5E2" font-size="16" font-weight="700" class="mono">NEXTFIELD / PROJECT MAP</text>
+  <text x="126" y="194" fill="#F2F6F3" font-size="42" font-weight="650" class="sans">A personal site, built as a field of ideas.</text>
+  <text x="128" y="231" fill="#A9C1C1" font-size="18" class="sans">作品、过程、实验与课程，在同一片场域里互相连接。</text>
+
+  <g class="sans">
+    <rect x="126" y="286" width="640" height="214" rx="20" fill="#F2F6F3"/>
+    <text x="158" y="329" fill="#218A8A" font-size="13" font-weight="700" class="mono">01 / WORK &amp; NOTES</text>
+    <text x="158" y="374" fill="#102C32" font-size="26" font-weight="650">作品与文字</text>
+    <text x="158" y="412" fill="#526A6C" font-size="17">项目 · 写作 · 建站纪事 · 制作说明 · 随笔</text>
+    <text x="158" y="454" fill="#718789" font-size="14" class="mono">/projects   /blog   /build-log   /colophon   /essays</text>
+    <path d="M681 345h42M702 324v42" stroke="#8EDDD9" stroke-width="3" stroke-linecap="round"/>
+
+    <rect x="798" y="286" width="650" height="214" rx="20" fill="#F2F6F3"/>
+    <text x="830" y="329" fill="#218A8A" font-size="13" font-weight="700" class="mono">02 / PLAY &amp; EXPLORE</text>
+    <text x="830" y="374" fill="#102C32" font-size="26" font-weight="650">画廊与实验</text>
+    <text x="830" y="412" fill="#526A6C" font-size="17">相册 · Field Radio · 全站交互效果</text>
+    <text x="830" y="454" fill="#718789" font-size="14" class="mono">/gallery   /gallery/radio   /live-studio</text>
+    <circle cx="1372" cy="372" r="26" stroke="#5ABAB5" stroke-width="2" opacity=".8"/>
+    <circle cx="1372" cy="372" r="42" stroke="#5ABAB5" stroke-width="2" opacity=".36"/>
+    <circle cx="1372" cy="372" r="58" stroke="#5ABAB5" stroke-width="2" opacity=".18"/>
+
+    <rect x="126" y="526" width="640" height="214" rx="20" fill="#F2F6F3"/>
+    <text x="158" y="569" fill="#218A8A" font-size="13" font-weight="700" class="mono">03 / LEARN &amp; BUILD</text>
+    <text x="158" y="614" fill="#102C32" font-size="26" font-weight="650">FIELD SCHOOL</text>
+    <text x="158" y="652" fill="#526A6C" font-size="17">Agent · 全栈开发 · 产品设计</text>
+    <text x="158" y="694" fill="#718789" font-size="14" class="mono">课程 → 练习 → 考试 → 学习记录</text>
+    <rect x="665" y="583" width="50" height="74" rx="8" fill="#B7E6E2"/>
+    <rect x="677" y="568" width="50" height="74" rx="8" fill="#78C6C3"/>
+    <rect x="689" y="553" width="50" height="74" rx="8" fill="#227E83"/>
+
+    <rect x="798" y="526" width="650" height="214" rx="20" fill="#F2F6F3"/>
+    <text x="830" y="569" fill="#218A8A" font-size="13" font-weight="700" class="mono">04 / SYSTEM &amp; PROOF</text>
+    <text x="830" y="614" fill="#102C32" font-size="26" font-weight="650">过程与证据</text>
+    <text x="830" y="652" fill="#526A6C" font-size="17">系统架构 · 可访问性 · 失败记录 · 原型</text>
+    <text x="830" y="694" fill="#718789" font-size="14" class="mono">/systems   /proof   /failures   /scenario-lab</text>
+    <path d="M1370 568l39 22v44l-39 22-39-22v-44l39-22Z" stroke="#52AAA9" stroke-width="2" opacity=".8"/>
+    <path d="M1370 583l26 15v30l-26 15-26-15v-30l26-15Z" stroke="#52AAA9" stroke-width="2" opacity=".4"/>
+  </g>
+
+  <path d="M126 782h1322" stroke="#31545A" stroke-width="1"/>
+  <text x="128" y="819" fill="#A9C1C1" font-size="14" class="sans">一个持续生长的个人网站：展示已经完成的作品，也记录它们如何成为现在这样。</text>
+  <text x="1447" y="819" fill="#9DE5E2" font-size="12" text-anchor="end" class="mono">NEXTFIELD · 2026</text>
+</svg>

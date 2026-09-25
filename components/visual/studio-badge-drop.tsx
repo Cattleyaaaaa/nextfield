@@ -5,7 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { X } from "lucide-react";
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
 
-const Lanyard = dynamic(() => import("@/components/Lanyard"), {
+const Lanyard = dynamic(() => import("@/components/visual/Lanyard"), {
   ssr: false,
   loading: () => <div className="h-screen w-full" aria-hidden="true" />,
 });

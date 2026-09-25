@@ -4,7 +4,7 @@ import { useRef, type MouseEvent } from "react";
 import { ArrowUpRight, Bot, LayoutDashboard, SearchCheck } from "lucide-react";
 import { motion } from "framer-motion";
 import { GlareHover } from "@/components/react-bits/glare-hover";
-import SpotlightCard from "@/components/SpotlightCard";
+import SpotlightCard from "@/components/visual/SpotlightCard";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { useMotionPreference } from "@/lib/use-motion-preference";
 import { useLanguage } from "@/components/site/language-provider";

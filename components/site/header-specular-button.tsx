@@ -1,7 +1,7 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import SpecularButton, { type SpecularButtonProps } from "@/components/SpecularButton";
+import SpecularButton, { type SpecularButtonProps } from "@/components/visual/SpecularButton";
 
 // Shared header settings. Colors match the light/dark tokens in app/globals.css.
 const HEADER_SPECULAR_CONFIG = {

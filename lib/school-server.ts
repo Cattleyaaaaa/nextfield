@@ -12,12 +12,14 @@ export async function supabase(path: string, token?: string, init: RequestInit =
  }
  const body = await r.text(); return body ? JSON.parse(body) : null;
 }
-export function saveSession(s: {access_token:string;refresh_token:string}) {
+export async function saveSession(s: {access_token:string;refresh_token:string}) {
+ const cookieStore = await cookies();
  const o = {httpOnly:true,secure:process.env.NODE_ENV === "production",sameSite:"lax" as const,path:"/",maxAge:2592000};
- cookies().set("school-access",s.access_token,o); cookies().set("school-refresh",s.refresh_token,o);
+ cookieStore.set("school-access",s.access_token,o); cookieStore.set("school-refresh",s.refresh_token,o);
 }
 export async function authenticate() {
- let token = cookies().get("school-access")?.value; const refresh = cookies().get("school-refresh")?.value;
+ const cookieStore = await cookies();
+ let token = cookieStore.get("school-access")?.value; const refresh = cookieStore.get("school-refresh")?.value;
  if (!token) throw new SchoolError(401,"Please sign in / 请先登录");
  try {return {user:await supabase("/auth/v1/user",token),token};}
  catch(e) {
@@ -26,11 +28,11 @@ export async function authenticate() {
   try { s = await supabase("/auth/v1/token?grant_type=refresh_token",undefined,{method:"POST",body:JSON.stringify({refresh_token:refresh})}); }
   catch (refreshError) {
    if (refreshError instanceof SchoolError && refreshError.status === 401) {
-    cookies().delete("school-access");cookies().delete("school-refresh");
+    cookieStore.delete("school-access");cookieStore.delete("school-refresh");
    }
    throw refreshError;
   }
-  saveSession(s); token=s.access_token;
+  await saveSession(s); token=s.access_token;
   return {user:await supabase("/auth/v1/user",token),token:token!};
  }
 }

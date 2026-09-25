@@ -1,6 +1,6 @@
 "use client";
 
-import ParticleText from "@/components/ParticleText";
+import ParticleText from "@/components/visual/ParticleText";
 import { useTheme } from "next-themes";
 
 // All React Bits ParticleText settings for the opening screen.

@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { ArrowUpRight, Magnet, Rotate3D, SlidersHorizontal, Sparkles } from "lucide-react";
-import ParticleText from "@/components/ParticleText";
+import ParticleText from "@/components/visual/ParticleText";
 import { TiltSurface } from "@/components/motion/tilt-surface";
 import { TransitionLink } from "@/components/site/transition-link";
 import { useMotionPreference } from "@/lib/use-motion-preference";

@@ -5,7 +5,7 @@ import { useMotionPreference } from "@/lib/use-motion-preference";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 
-const Particles = dynamic(() => import("@/components/Particles"), { ssr: false });
+const Particles = dynamic(() => import("@/components/visual/Particles"), { ssr: false });
 
 // Particle size / hover radius / hover displacement are measured in CSS pixels.
 export const PARTICLE_CONFIG = {

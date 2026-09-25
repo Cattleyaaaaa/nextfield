@@ -10,18 +10,20 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { album: string };
+  params: Promise<{ album: string }>;
 }): Promise<Metadata> {
-  const album = await getGalleryAlbum(params.album);
+  const { album: slug } = await params;
+  const album = await getGalleryAlbum(slug);
   return { title: album ? `${album.title} · 画廊` : "相册不存在" };
 }
 
 export default async function GalleryAlbumPage({
   params,
 }: {
-  params: { album: string };
+  params: Promise<{ album: string }>;
 }) {
-  const album = await getGalleryAlbum(params.album);
+  const { album: slug } = await params;
+  const album = await getGalleryAlbum(slug);
   if (!album) notFound();
   return <GalleryAlbumView album={album} />;
 }

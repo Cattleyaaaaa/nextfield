@@ -7,15 +7,13 @@ import { mdxComponents } from "@/mdx-components";
 
 type PostPageParams = { slug: string };
 
-// 静态导出要求所有动态路由都在构建期确定，因此必须关掉按需渲染。
-export const dynamicParams = false;
-
 export function generateStaticParams(): PostPageParams[] {
   return getAllPosts().map((post) => ({ slug: post.slug }));
 }
 
-export function generateMetadata({ params }: { params: PostPageParams }): Metadata {
-  const post = getPostBySlug(params.slug);
+export async function generateMetadata({ params }: { params: Promise<PostPageParams> }): Promise<Metadata> {
+  const { slug } = await params;
+  const post = getPostBySlug(slug);
   if (!post) return {};
   return {
     title: post.title,
@@ -25,8 +23,9 @@ export function generateMetadata({ params }: { params: PostPageParams }): Metada
   };
 }
 
-export default async function PostPage({ params }: { params: PostPageParams }) {
-  const post = getPostBySlug(params.slug);
+export default async function PostPage({ params }: { params: Promise<PostPageParams> }) {
+  const { slug } = await params;
+  const post = getPostBySlug(slug);
   if (!post) notFound();
 
   const Content = await loadPostComponent(post.slug);

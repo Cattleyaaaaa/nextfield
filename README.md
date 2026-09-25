@@ -4,6 +4,18 @@
 
 站内还有开放实验室、按文件夹生成相册的画廊、Field Radio，以及 FIELD SCHOOL：3 条学习路径、12 节双语课程、案例库、代码练习和结课考试。课程可直接阅读；GitHub 登录、跨设备进度、账户记录及正式考试依赖 Supabase。课程导师另需模型接口配置。
 
+## 页面预览
+
+下方是网站的实际页面截图。点击图片可以查看大图。
+
+| 项目展示 | 学习系统 |
+| :---: | :---: |
+| [![Neptune 项目页面](docs/images/projects.jpg)](docs/images/projects.jpg) | [![FIELD SCHOOL 学习页面](docs/images/learn.jpg)](docs/images/learn.jpg) |
+
+| 音乐电台 | 建站纪事 |
+| :---: | :---: |
+| [![Field Radio 电台页面](docs/images/gallery-radio.jpg)](docs/images/gallery-radio.jpg) | [![建站纪事页面](docs/images/build-log.jpg)](docs/images/build-log.jpg) |
+
 ## 本地运行
 
 当前项目使用 Next.js 14、React 18、TypeScript、Tailwind CSS、GSAP 和 Framer Motion。请使用 Node.js 18.17 或更新版本。

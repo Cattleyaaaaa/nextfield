@@ -60,3 +60,6 @@ test-results/
 
 # Locally held radio tracks (kept out of Git; files remain available for local builds)
 public/audio/
+
+# Local source archive for UI experiments (exceeds GitHub's file size limit)
+.agents/skills/react-bits-main.zip

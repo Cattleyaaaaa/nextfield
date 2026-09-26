@@ -11,8 +11,14 @@ function hash(value: string) {
 }
 
 function random(seed: number, offset: number) {
-  const value = Math.sin(seed * 0.001 + offset * 91.17) * 43758.5453;
-  return value - Math.floor(value);
+  // Use integer-only mixing so the server and browser produce identical values.
+  // Math.sin can differ by a few ULPs across runtimes, which is enough to make
+  // React report a style-attribute hydration mismatch for these generated forms.
+  let value = (seed ^ Math.imul(offset + 1, 0x45d9f3b)) >>> 0;
+  value = Math.imul(value ^ (value >>> 16), 0x45d9f3b) >>> 0;
+  value = Math.imul(value ^ (value >>> 16), 0x45d9f3b) >>> 0;
+  value = (value ^ (value >>> 16)) >>> 0;
+  return value / 0x1_0000_0000;
 }
 
 export function DailyField({ dayKey }: { dayKey: string }) {

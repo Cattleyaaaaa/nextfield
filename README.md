@@ -8,6 +8,14 @@
 
 网站入口:https://nextfield.top/
 
+## Analytics（V1.2.0）
+
+本地新增 `/analytics` 公开统计看板，并在顶栏提供主要入口。包含 7/14/30/365 天筛选、请求数、周期独立访问、页面浏览、缓存命中率、传输带宽、小时与每日趋势、数据表和 JSON 导出。使用 Cloudflare Zone GraphQL 汇总数据，令牌仅存放服务端；不新增访客追踪脚本。未配置或查询失败会明确展示状态，不伪造实际流量；主动选择示例模式可审核布局和交互。
+
+配置和指标口径见 [Analytics 说明](docs/analytics-deployment.md)。真实数据需要在部署环境配置具备 Zone Analytics 读取权限的 Cloudflare API Token；本仓库不包含令牌。
+
+版本更新记录见 [CHANGELOG.md](CHANGELOG.md)。
+
 ## 页面预览
 
 下方是网站的实际页面截图。点击图片可以查看大图。

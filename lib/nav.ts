@@ -64,6 +64,7 @@ export const headerSections: NavSection[] = [
 
 /** 常驻全站的深层入口，避免它们只在首页底部和页脚出现。 */
 export const fieldSections = [
+  { label: "访问统计", eyebrow: "Analytics", href: "/analytics", description: "公开查看 Cloudflare 汇总访问、缓存与带宽趋势。" },
   { label: "FIELD SCHOOL", eyebrow: "Learn", href: "/learn", description: "通过交互课程学习 Agent、全栈与产品实践。" },
   { label: "开放实验室", eyebrow: "Experiments", href: "/gallery", description: "触碰文字、空间、声音与界面反馈的开放实验。" },
   { label: "画廊", eyebrow: "Gallery", href: "/gallery/visual", description: "以图片为主的视觉档案：插画、配色与现场记录。" },

@@ -136,7 +136,7 @@ export function ZentryHome() {
           <div className="flex justify-between text-[10px] font-semibold uppercase tracking-[0.22em] text-paper/55"><span>Room for new work</span><span>Scroll to explore</span></div>
           <div className="grid items-end gap-10 lg:grid-cols-[1fr_0.72fr]" data-zentry-stage-title>
             <h2 className="max-w-5xl font-display text-[clamp(3.8rem,10vw,9.5rem)] leading-[0.8] tracking-[-0.075em]">IDEAS<br /><span className="text-liquid-foam">IN MOTION.</span></h2>
-            <p className="max-w-sm text-base leading-7 text-paper/72 sm:text-lg sm:leading-8">首页不承担个人介绍，而是一张会持续生长的地图：新的内容可以从任何一个节点进入。</p>
+            <p className="max-w-sm text-base leading-7 text-paper/72 sm:text-lg sm:leading-8">这里记录正在发生的事：做过的项目、持续的学习，以及下一步想去的方向。</p>
           </div>
           <div className="absolute bottom-[18%] right-[9%] max-w-xs rounded-2xl border border-paper/20 bg-paper/10 p-5 backdrop-blur" data-zentry-stage-copy>
             <p className="font-mono text-[10px] tracking-[0.18em] text-liquid-foam">FIELD / 03</p><p className="mt-3 text-sm leading-6 text-paper/80">项目、笔记与实验会在这里不断增加，也可以随时重新编排。</p>

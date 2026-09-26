@@ -1,4 +1,6 @@
 export const EN_TRANSLATIONS: Record<string, string> = {
+  "访问统计": "Analytics", "统计": "Analytics", "公开查看 Cloudflare 汇总访问、缓存与带宽趋势。": "Explore aggregate Cloudflare traffic, cache, and bandwidth trends.",
+  "这里记录正在发生的事：做过的项目、持续的学习，以及下一步想去的方向。": "A record of what's in motion: projects built, lessons learned, and directions still unfolding.",
   "首页": "Index", "关于我": "About", "项目": "Projects", "写作": "Notes", "实验室": "Lab", "建站纪事": "Build Log", "制作说明": "Colophon", "失败博物馆": "Failure Museum",
   "把 AI 能力，变成真正好用的产品。": "Turn AI capabilities into products people can actually use.",
   "看看我做过的项目": "Explore selected work", "阅读制作说明": "Read the colophon", "进入完整实验室": "Enter the full lab", "查看全部笔记": "View all notes", "查看项目档案": "Open project archive",

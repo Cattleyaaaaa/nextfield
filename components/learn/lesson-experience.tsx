@@ -1,44 +1,512 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, ArrowRight, Check, CheckCircle2, Clipboard, RotateCcw } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  CheckCircle2,
+  Clipboard,
+  RotateCcw,
+} from "lucide-react";
 import { TransitionLink } from "@/components/site/transition-link";
 import { useLanguage } from "@/components/site/language-provider";
-import { lessonKey, type LearningLesson, type LearningTrack } from "@/lib/learn-data";
+import {
+  lessonKey,
+  type LearningLesson,
+  type LearningTrack,
+} from "@/lib/learn-data";
 import { useLearningProgress } from "@/components/learn/use-learning-progress";
 import { SchoolNav } from "./school-nav";
 import type { LearningGuide } from "@/lib/learn-guides";
 import { LessonNotes } from "./lesson-notes";
+import { CourseOutline } from "./course-outline";
 
-export function LessonExperience({ track, lesson, previous, next, guide }: { track: LearningTrack; lesson: LearningLesson; previous?: LearningLesson; next?: LearningLesson; guide: LearningGuide }) {
+export function LessonExperience({
+  track,
+  lesson,
+  previous,
+  next,
+  guide,
+}: {
+  track: LearningTrack;
+  lesson: LearningLesson;
+  previous?: LearningLesson;
+  next?: LearningLesson;
+  guide: LearningGuide;
+}) {
   const { locale } = useLanguage();
   const { completed, complete, error } = useLearningProgress();
   const [choice, setChoice] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState(false);
+  const [practiceReady, setPracticeReady] = useState(false);
   const key = lessonKey(track.slug, lesson.slug);
   const done = completed.includes(key);
   const correct = choice !== null && lesson.challenge.options[choice].correct;
 
-  const copyCode = async () => { await navigator.clipboard.writeText(lesson.code); setCopied(true); window.setTimeout(() => setCopied(false), 1400); };
+  const copyCode = async () => {
+    try {
+      await navigator.clipboard.writeText(lesson.code);
+      setCopyError(false);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1400);
+    } catch {
+      setCopyError(true);
+    }
+  };
 
-  return <article className="mx-auto max-w-site px-5 pb-28 pt-16 sm:px-8 sm:pt-24 lg:px-12">
-    <SchoolNav/>
-    {error && <p role="alert">{locale === "zh" ? "进度保存或读取失败，请重试。" : "Could not save or load progress. Please retry."}</p>}
-    <TransitionLink className="inline-flex items-center gap-2 text-xs text-muted hover:text-accent" href={`/learn/${track.slug}`}><ArrowLeft className="size-3.5" />{locale === "zh" ? `返回${track.shortTitle.zh}` : `Back to ${track.shortTitle.en}`}</TransitionLink>
-    <header className="mt-12 max-w-5xl"><div className="flex flex-wrap items-center gap-3 font-mono text-[10px] uppercase tracking-[0.16em] text-accent"><span>PATH {track.number}</span><span className="text-line">/</span><span>LESSON {lesson.number}</span><span className="text-line">/</span><span>{lesson.minutes} {locale === "zh" ? "分钟" : "min"}</span>{done ? <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-2 py-1"><CheckCircle2 className="size-3" />{locale === "zh" ? "已完成" : "Complete"}</span> : null}</div><h1 className="mt-6 text-balance font-display text-[clamp(3.25rem,8vw,7rem)] leading-[0.88] tracking-[-0.065em]">{lesson.title[locale]}</h1><p className="mt-8 max-w-3xl text-lg leading-9 text-muted">{lesson.summary[locale]}</p><nav aria-label={locale === "zh" ? "本课目录" : "On this page"} className="mt-9 flex flex-wrap gap-2">{[["concept",locale === "zh" ? "概念" : "Concept"],["model",locale === "zh" ? "模型" : "Model"],["code",locale === "zh" ? "代码" : "Code"],["case",locale === "zh" ? "案例" : "Case"],["practice",locale === "zh" ? "动手做" : "Practice"],["checkpoint",locale === "zh" ? "检查点" : "Checkpoint"]].map(([id,label])=><a href={`#${id}`} key={id} className="rounded-full border border-line px-4 py-2 text-xs hover:border-accent">{label}</a>)}</nav></header>
+  return (
+    <article className="mx-auto max-w-site px-5 pb-28 pt-16 sm:px-8 sm:pt-24 lg:px-12">
+      <SchoolNav />
+      {error && (
+        <p role="alert">
+          {locale === "zh"
+            ? "进度保存或读取失败，请重试。"
+            : "Could not save or load progress. Please retry."}
+        </p>
+      )}
+      <TransitionLink
+        className="inline-flex items-center gap-2 text-xs text-muted hover:text-accent"
+        href={`/learn/${track.slug}`}
+      >
+        <ArrowLeft className="size-3.5" />
+        {locale === "zh"
+          ? `返回${track.shortTitle.zh}`
+          : `Back to ${track.shortTitle.en}`}
+      </TransitionLink>
+      <header className="mt-12 max-w-5xl">
+        <div className="flex flex-wrap items-center gap-3 font-mono text-[10px] uppercase tracking-[0.16em] text-accent">
+          <span>PATH {track.number}</span>
+          <span className="text-line">/</span>
+          <span>LESSON {lesson.number}</span>
+          <span className="text-line">/</span>
+          <span>
+            {lesson.minutes} {locale === "zh" ? "分钟" : "min"}
+          </span>
+          {done ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-2 py-1">
+              <CheckCircle2 className="size-3" />
+              {locale === "zh" ? "已完成" : "Complete"}
+            </span>
+          ) : null}
+        </div>
+        <h1 className="mt-6 text-balance font-display text-[clamp(2.5rem,5vw,4.5rem)] leading-[1.08] tracking-[-0.065em]">
+          {lesson.title[locale]}
+        </h1>
+        <p className="mt-8 max-w-3xl text-lg leading-9 text-muted">
+          {lesson.summary[locale]}
+        </p>
+        <nav
+          aria-label={locale === "zh" ? "本课目录" : "On this page"}
+          className="mt-9 flex flex-wrap gap-2"
+        >
+          {[
+            ["concept", locale === "zh" ? "概念" : "Concept"],
+            ["model", locale === "zh" ? "模型" : "Model"],
+            ["code", locale === "zh" ? "代码" : "Code"],
+            ["case", locale === "zh" ? "案例" : "Case"],
+            ["practice", locale === "zh" ? "动手做" : "Practice"],
+            ["checkpoint", locale === "zh" ? "检查点" : "Checkpoint"],
+          ].map(([id, label]) => (
+            <a
+              href={`#${id}`}
+              key={id}
+              className="rounded-full border border-line px-4 py-2 text-xs hover:border-accent"
+            >
+              {label}
+            </a>
+          ))}
+        </nav>
+      </header>
 
-    <section id="concept" className="mt-16 scroll-mt-24 grid gap-10 border-t border-line pt-12 lg:grid-cols-[12rem_minmax(0,48rem)] lg:gap-16"><p className="font-mono text-[9px] uppercase tracking-[0.16em] text-accent">01 / {locale === "zh" ? "核心概念" : "Concept"}</p><div className="space-y-6">{lesson.concept.map((paragraph) => <p className="text-base leading-8 text-muted sm:text-lg sm:leading-9" key={paragraph.en}>{paragraph[locale]}</p>)}</div></section>
+      <CourseOutline track={track} current={lesson.slug} />
+      <section className="mt-8 grid gap-6 rounded-3xl border border-line bg-panel p-6 sm:grid-cols-2">
+        <div>
+          <h2 className="text-sm font-medium">
+            {locale === "zh" ? "本课学习目标" : "Learning objectives"}
+          </h2>
+          <ul className="mt-4 space-y-2">
+            {lesson.model.map((item) => (
+              <li key={item.label.en} className="text-sm leading-6 text-muted">
+                • {item.label[locale]} — {item.detail[locale]}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h2 className="text-sm font-medium">
+            {locale === "zh" ? "完成路径" : "How to complete this lesson"}
+          </h2>
+          <p className="mt-4 text-sm leading-7 text-muted">
+            {locale === "zh"
+              ? "阅读概念与案例 → 完成动手任务 → 勾选实践检查 → 回答检查点 → 保存完成记录。练习由你自行检查，不会假装成自动代码评分。"
+              : "Read the concept and example → complete the task → confirm your practice → answer the checkpoint → save completion. Practice is self-checked, not automatically code-graded."}
+          </p>
+        </div>
+      </section>
+      <section
+        id="concept"
+        className="mt-16 scroll-mt-24 grid gap-10 border-t border-line pt-12 lg:grid-cols-[12rem_minmax(0,48rem)] lg:gap-16"
+      >
+        <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-accent">
+          01 / {locale === "zh" ? "核心概念" : "Concept"}
+        </p>
+        <div className="space-y-6">
+          {lesson.concept.map((paragraph) => (
+            <p
+              className="text-base leading-8 text-muted sm:text-lg sm:leading-9"
+              key={paragraph.en}
+            >
+              {paragraph[locale]}
+            </p>
+          ))}
+        </div>
+      </section>
 
-    <section id="model" className="mt-16 scroll-mt-24 grid gap-10 border-t border-line pt-12 lg:grid-cols-[12rem_minmax(0,1fr)] lg:gap-16"><p className="font-mono text-[9px] uppercase tracking-[0.16em] text-accent">02 / {locale === "zh" ? "心智模型" : "Mental model"}</p><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{lesson.model.map((item, index) => <article className="rounded-2xl border border-line bg-panel p-5" key={item.label.en}><span className="font-mono text-[9px] text-accent">{String(index + 1).padStart(2, "0")}</span><h2 className="mt-10 font-display text-2xl">{item.label[locale]}</h2><p className="mt-2 text-xs leading-5 text-muted">{item.detail[locale]}</p></article>)}</div></section>
+      <section
+        id="model"
+        className="mt-16 scroll-mt-24 grid gap-10 border-t border-line pt-12 lg:grid-cols-[12rem_minmax(0,1fr)] lg:gap-16"
+      >
+        <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-accent">
+          02 / {locale === "zh" ? "心智模型" : "Mental model"}
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {lesson.model.map((item, index) => (
+            <article
+              className="rounded-2xl border border-line bg-panel p-5"
+              key={item.label.en}
+            >
+              <span className="font-mono text-[9px] text-accent">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <h2 className="mt-10 font-display text-2xl">
+                {item.label[locale]}
+              </h2>
+              <p className="mt-2 text-xs leading-5 text-muted">
+                {item.detail[locale]}
+              </p>
+            </article>
+          ))}
+        </div>
+      </section>
 
-    <section id="code" className="mt-16 scroll-mt-24 grid gap-10 border-t border-line pt-12 lg:grid-cols-[12rem_minmax(0,48rem)] lg:gap-16"><p className="font-mono text-[9px] uppercase tracking-[0.16em] text-accent">03 / {locale === "zh" ? "代码骨架" : "Code skeleton"}</p><div><div className="overflow-hidden rounded-2xl bg-ink text-paper"><div className="flex items-center justify-between border-b border-paper/10 px-5 py-3"><span className="font-mono text-[9px] tracking-[0.14em] text-paper/45">TYPESCRIPT / CONCEPT</span><button className="inline-flex items-center gap-2 text-xs text-paper/55 hover:text-liquid-foam" onClick={copyCode} type="button">{copied ? <Check className="size-3.5" /> : <Clipboard className="size-3.5" />}{copied ? (locale === "zh" ? "已复制" : "Copied") : (locale === "zh" ? "复制" : "Copy")}</button></div><pre className="overflow-x-auto p-5 text-sm leading-7 text-liquid-foam"><code>{lesson.code}</code></pre></div><p className="mt-4 text-xs leading-6 text-muted">{locale === "zh" ? "这是解释结构的代码骨架，外部函数与数据需要在实际项目中实现。" : "This is a conceptual skeleton; external functions and data must be implemented in a real project."}</p></div></section>
+      <section
+        id="code"
+        className="mt-16 scroll-mt-24 grid gap-10 border-t border-line pt-12 lg:grid-cols-[12rem_minmax(0,48rem)] lg:gap-16"
+      >
+        <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-accent">
+          03 / {locale === "zh" ? "代码骨架" : "Code skeleton"}
+        </p>
+        <div>
+          <div className="overflow-hidden rounded-2xl bg-ink text-paper">
+            <div className="flex items-center justify-between border-b border-paper/10 px-5 py-3">
+              <span className="font-mono text-[9px] tracking-[0.14em] text-paper/45">
+                TYPESCRIPT / CONCEPT
+              </span>
+              <button
+                className="inline-flex items-center gap-2 text-xs text-paper/55 hover:text-liquid-foam"
+                onClick={copyCode}
+                type="button"
+              >
+                {copied ? (
+                  <Check className="size-3.5" />
+                ) : (
+                  <Clipboard className="size-3.5" />
+                )}
+                {copied
+                  ? locale === "zh"
+                    ? "已复制"
+                    : "Copied"
+                  : locale === "zh"
+                    ? "复制"
+                    : "Copy"}
+              </button>
+            </div>
+            <pre className="overflow-x-auto p-5 text-sm leading-7 text-liquid-foam">
+              <code>{lesson.code}</code>
+            </pre>
+          </div>
+          <p className="mt-4 text-xs leading-6 text-muted">
+            {locale === "zh"
+              ? "这是解释结构的代码骨架，外部函数与数据需要在实际项目中实现。"
+              : "This is a conceptual skeleton; external functions and data must be implemented in a real project."}
+          </p>
+        </div>
+      </section>
 
-    <section id="case" className="mt-16 scroll-mt-24 grid gap-10 border-t border-line pt-12 lg:grid-cols-[12rem_minmax(0,48rem)] lg:gap-16"><p className="font-mono text-[9px] uppercase tracking-[0.16em] text-accent">04 / {locale === "zh" ? "贯穿案例" : "Worked example"}</p><div><h2 className="font-display text-3xl tracking-tight">{locale === "zh" ? "放进真实情境里看" : "Put it in context"}</h2><p className="mt-6 text-base leading-8 text-muted">{guide.scenario[locale]}</p><ol className="mt-8 space-y-4">{guide.steps.map((step,index)=><li className="grid gap-4 rounded-2xl border border-line bg-panel p-5 sm:grid-cols-[2rem_1fr]" key={step.title.en}><span className="font-mono text-xs text-accent">{String(index+1).padStart(2,"0")}</span><div><h3 className="font-display text-xl">{step.title[locale]}</h3><p className="mt-2 text-sm leading-7 text-muted">{step.detail[locale]}</p></div></li>)}</ol><aside className="mt-6 rounded-2xl border-l-2 border-accent bg-accent/[0.05] p-5"><h3 className="text-sm font-medium">{locale === "zh" ? "容易踩的坑" : "Common pitfall"}</h3><p className="mt-2 text-sm leading-7 text-muted">{guide.pitfall[locale]}</p></aside></div></section>
+      <section
+        id="case"
+        className="mt-16 scroll-mt-24 grid gap-10 border-t border-line pt-12 lg:grid-cols-[12rem_minmax(0,48rem)] lg:gap-16"
+      >
+        <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-accent">
+          04 / {locale === "zh" ? "贯穿案例" : "Worked example"}
+        </p>
+        <div>
+          <h2 className="font-display text-3xl tracking-tight">
+            {locale === "zh" ? "放进真实情境里看" : "Put it in context"}
+          </h2>
+          <p className="mt-6 text-base leading-8 text-muted">
+            {guide.scenario[locale]}
+          </p>
+          <ol className="mt-8 space-y-4">
+            {guide.steps.map((step, index) => (
+              <li
+                className="grid gap-4 rounded-2xl border border-line bg-panel p-5 sm:grid-cols-[2rem_1fr]"
+                key={step.title.en}
+              >
+                <span className="font-mono text-xs text-accent">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <div>
+                  <h3 className="font-display text-xl">{step.title[locale]}</h3>
+                  <p className="mt-2 text-sm leading-7 text-muted">
+                    {step.detail[locale]}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ol>
+          <aside className="mt-6 rounded-2xl border-l-2 border-accent bg-accent/[0.05] p-5">
+            <h3 className="text-sm font-medium">
+              {locale === "zh" ? "容易踩的坑" : "Common pitfall"}
+            </h3>
+            <p className="mt-2 text-sm leading-7 text-muted">
+              {guide.pitfall[locale]}
+            </p>
+          </aside>
+        </div>
+      </section>
 
-    <section id="practice" className="mt-16 scroll-mt-24 grid gap-10 border-t border-line pt-12 lg:grid-cols-[12rem_minmax(0,48rem)] lg:gap-16"><p className="font-mono text-[9px] uppercase tracking-[0.16em] text-accent">05 / {locale === "zh" ? "动手做" : "Practice"}</p><div className="rounded-[2rem] bg-ink p-7 text-paper sm:p-9"><h2 className="font-display text-3xl">{locale === "zh" ? "用自己的产物检验理解" : "Make something you can inspect"}</h2><p className="mt-5 text-base leading-8 text-paper/80">{guide.task[locale]}</p><h3 className="mt-8 text-xs tracking-wider text-liquid-foam">{locale === "zh" ? "完成时检查" : "Definition of done"}</h3><ul className="mt-4 space-y-3">{guide.checks.map(check=><li key={check.en} className="flex gap-3 text-sm leading-6 text-paper/75"><Check className="mt-1 size-4 shrink-0 text-liquid-foam" aria-hidden="true"/>{check[locale]}</li>)}</ul><LessonNotes key={key} lessonKey={key} title={lesson.title[locale]}/><TransitionLink href="/learn/practice" className="mt-8 inline-flex items-center gap-2 text-sm text-liquid-foam hover:underline">{locale === "zh" ? "继续到代码练习" : "Continue to code practice"}<ArrowRight className="size-4"/></TransitionLink></div></section>
+      <section
+        id="practice"
+        className="mt-16 scroll-mt-24 grid gap-10 border-t border-line pt-12 lg:grid-cols-[12rem_minmax(0,48rem)] lg:gap-16"
+      >
+        <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-accent">
+          05 / {locale === "zh" ? "动手做" : "Practice"}
+        </p>
+        <div className="rounded-[2rem] bg-ink p-7 text-paper sm:p-9">
+          <h2 className="font-display text-3xl">
+            {locale === "zh"
+              ? "用自己的产物检验理解"
+              : "Make something you can inspect"}
+          </h2>
+          <p className="mt-5 text-base leading-8 text-paper/80">
+            {guide.task[locale]}
+          </p>
+          <h3 className="mt-8 text-xs tracking-wider text-liquid-foam">
+            {locale === "zh" ? "完成时检查" : "Definition of done"}
+          </h3>
+          <ul className="mt-4 space-y-3">
+            {guide.checks.map((check) => (
+              <li
+                key={check.en}
+                className="flex gap-3 text-sm leading-6 text-paper/75"
+              >
+                <Check
+                  className="mt-1 size-4 shrink-0 text-liquid-foam"
+                  aria-hidden="true"
+                />
+                {check[locale]}
+              </li>
+            ))}
+          </ul>
+          <label className="mt-6 flex cursor-pointer items-start gap-3 text-sm leading-6 text-paper/80">
+            <input
+              className="mt-1 size-4 accent-accent"
+              type="checkbox"
+              checked={practiceReady}
+              onChange={(event) => setPracticeReady(event.target.checked)}
+            />
+            {locale === "zh"
+              ? "我已检查实践产物，并确认上面的完成标准（自查）。"
+              : "I have checked my practice artifact against the criteria above (self-assessment)."}
+          </label>
+          <LessonNotes key={key} lessonKey={key} title={lesson.title[locale]} />
+          <TransitionLink
+            href="/learn/practice"
+            className="mt-8 inline-flex items-center gap-2 text-sm text-liquid-foam hover:underline"
+          >
+            {locale === "zh" ? "继续到代码练习" : "Continue to code practice"}
+            <ArrowRight className="size-4" />
+          </TransitionLink>
+        </div>
+      </section>
 
-    <section id="checkpoint" className="mt-16 scroll-mt-24 grid gap-10 border-t border-line pt-12 lg:grid-cols-[12rem_minmax(0,48rem)] lg:gap-16"><p className="font-mono text-[9px] uppercase tracking-[0.16em] text-accent">06 / {locale === "zh" ? "检查点" : "Checkpoint"}</p><div className="rounded-[2rem] border border-line bg-panel p-6 sm:p-8"><h2 className="font-display text-3xl leading-tight tracking-[-0.04em]">{lesson.challenge.question[locale]}</h2><div className="mt-8 space-y-3">{lesson.challenge.options.map((option, index) => <button className={`w-full rounded-2xl border p-4 text-left text-sm transition-colors ${choice === index ? option.correct ? "border-accent bg-accent/[0.08]" : "border-red-400/60 bg-red-400/[0.06]" : "border-line bg-paper hover:border-accent"}`} key={option.label.en} onClick={() => setChoice(index)} type="button">{option.label[locale]}</button>)}</div>{choice !== null ? <div className="mt-6 border-t border-line pt-5"><p className="text-sm leading-7 text-muted">{lesson.challenge.options[choice].feedback[locale]}</p><div className="mt-5 flex flex-wrap gap-3">{correct && !done ? <button className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm text-paper" onClick={() => complete(key)} type="button"><Check className="size-4" />{locale === "zh" ? "完成本课" : "Complete lesson"}</button> : null}{!correct ? <button className="inline-flex items-center gap-2 text-xs text-muted hover:text-accent" onClick={() => setChoice(null)} type="button"><RotateCcw className="size-3.5" />{locale === "zh" ? "重新选择" : "Try again"}</button> : null}</div></div> : null}</div></section>
+      <section
+        id="checkpoint"
+        className="mt-16 scroll-mt-24 grid gap-10 border-t border-line pt-12 lg:grid-cols-[12rem_minmax(0,48rem)] lg:gap-16"
+      >
+        <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-accent">
+          06 / {locale === "zh" ? "检查点" : "Checkpoint"}
+        </p>
+        <div className="rounded-[2rem] border border-line bg-panel p-6 sm:p-8">
+          <h2 className="font-display text-3xl leading-tight tracking-[-0.04em]">
+            {lesson.challenge.question[locale]}
+          </h2>
+          <div className="mt-8 space-y-3">
+            {lesson.challenge.options.map((option, index) => (
+              <button
+                className={`w-full rounded-2xl border p-4 text-left text-sm transition-colors ${choice === index ? (option.correct ? "border-accent bg-accent/[0.08]" : "border-red-400/60 bg-red-400/[0.06]") : "border-line bg-paper hover:border-accent"}`}
+                key={option.label.en}
+                onClick={() => setChoice(index)}
+                type="button"
+              >
+                {option.label[locale]}
+              </button>
+            ))}
+          </div>
+          {choice !== null ? (
+            <div className="mt-6 border-t border-line pt-5">
+              <p className="text-sm leading-7 text-muted">
+                {lesson.challenge.options[choice].feedback[locale]}
+              </p>
+              <div className="mt-5 flex flex-wrap gap-3">
+                {correct && practiceReady && !done ? (
+                  <button
+                    className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm text-paper"
+                    onClick={() => complete(key)}
+                    type="button"
+                  >
+                    <Check className="size-4" />
+                    {locale === "zh" ? "完成本课" : "Complete lesson"}
+                  </button>
+                ) : null}
+                {correct && !practiceReady && !done && (
+                  <a href="#practice" className="text-sm text-accent underline">
+                    {locale === "zh"
+                      ? "请先完成并确认动手任务"
+                      : "Complete and confirm the practice task first"}
+                  </a>
+                )}
+                {!correct ? (
+                  <button
+                    className="inline-flex items-center gap-2 text-xs text-muted hover:text-accent"
+                    onClick={() => setChoice(null)}
+                    type="button"
+                  >
+                    <RotateCcw className="size-3.5" />
+                    {locale === "zh" ? "重新选择" : "Try again"}
+                  </button>
+                ) : null}
+              </div>
+            </div>
+          ) : null}
+        </div>
+      </section>
 
-    <nav aria-label={locale === "zh" ? "课程导航" : "Lesson navigation"} className="mt-20 grid gap-3 border-t border-line pt-8 sm:grid-cols-2">{previous ? <TransitionLink className="rounded-2xl border border-line p-5 hover:border-accent" href={`/learn/${track.slug}/${previous.slug}`}><span className="flex items-center gap-2 text-xs text-muted"><ArrowLeft className="size-3.5" />{locale === "zh" ? "上一课" : "Previous"}</span><strong className="mt-4 block font-display text-2xl font-normal">{previous.title[locale]}</strong></TransitionLink> : <span />}{next ? <TransitionLink className="rounded-2xl border border-line p-5 text-right hover:border-accent" href={`/learn/${track.slug}/${next.slug}`}><span className="flex items-center justify-end gap-2 text-xs text-muted">{locale === "zh" ? "下一课" : "Next"}<ArrowRight className="size-3.5" /></span><strong className="mt-4 block font-display text-2xl font-normal">{next.title[locale]}</strong></TransitionLink> : <TransitionLink className="rounded-2xl border border-accent bg-accent/[0.07] p-5 text-right" href="/learn"><span className="text-xs text-accent">{locale === "zh" ? "返回学习中心" : "Return to Field School"}</span><strong className="mt-4 block font-display text-2xl font-normal">FIELD SCHOOL</strong></TransitionLink>}</nav>
-  </article>;
+      <section className="mt-12 rounded-2xl border border-line p-6">
+        <h2 className="text-sm font-medium">
+          {locale === "zh"
+            ? "延伸阅读 · 原始资料"
+            : "Further reading · primary sources"}
+        </h2>
+        <div className="mt-4 flex flex-wrap gap-4 text-sm text-accent">
+          {track.slug === "agent" ? (
+            <a
+              href="https://www.anthropic.com/engineering/building-effective-agents"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Anthropic ·{" "}
+              {locale === "zh" ? "构建有效 Agent" : "Building effective Agents"}{" "}
+              ↗
+            </a>
+          ) : (
+            <a
+              href="https://developer.mozilla.org/en-US/docs/Learn_web_development"
+              target="_blank"
+              rel="noreferrer"
+            >
+              MDN ·{" "}
+              {locale === "zh" ? "Web 开发学习指南" : "Learn web development"} ↗
+            </a>
+          )}
+          {track.slug === "fullstack" && (
+            <>
+              <a
+                href="https://react.dev/learn"
+                target="_blank"
+                rel="noreferrer"
+              >
+                React ↗
+              </a>
+              <a
+                href="https://nextjs.org/docs/app/getting-started/server-and-client-components"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Next.js ↗
+              </a>
+              <a
+                href="https://supabase.com/docs/guides/auth/social-login/auth-github"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Supabase · GitHub OAuth ↗
+              </a>
+            </>
+          )}
+        </div>
+        {copyError && (
+          <p role="alert" className="mt-3 text-xs text-muted">
+            {locale === "zh"
+              ? "无法自动复制，请手动选择代码复制。"
+              : "Clipboard unavailable; select and copy the code manually."}
+          </p>
+        )}
+      </section>
+      <nav
+        aria-label={locale === "zh" ? "课程导航" : "Lesson navigation"}
+        className="mt-20 grid gap-3 border-t border-line pt-8 sm:grid-cols-2"
+      >
+        {previous ? (
+          <TransitionLink
+            className="rounded-2xl border border-line p-5 hover:border-accent"
+            href={`/learn/${track.slug}/${previous.slug}`}
+          >
+            <span className="flex items-center gap-2 text-xs text-muted">
+              <ArrowLeft className="size-3.5" />
+              {locale === "zh" ? "上一课" : "Previous"}
+            </span>
+            <strong className="mt-4 block font-display text-2xl font-normal">
+              {previous.title[locale]}
+            </strong>
+          </TransitionLink>
+        ) : (
+          <span />
+        )}
+        {next ? (
+          <TransitionLink
+            className="rounded-2xl border border-line p-5 text-right hover:border-accent"
+            href={`/learn/${track.slug}/${next.slug}`}
+          >
+            <span className="flex items-center justify-end gap-2 text-xs text-muted">
+              {locale === "zh" ? "下一课" : "Next"}
+              <ArrowRight className="size-3.5" />
+            </span>
+            <strong className="mt-4 block font-display text-2xl font-normal">
+              {next.title[locale]}
+            </strong>
+          </TransitionLink>
+        ) : (
+          <TransitionLink
+            className="rounded-2xl border border-accent bg-accent/[0.07] p-5 text-right"
+            href={`/learn/review/${track.slug}`}
+          >
+            <span className="text-xs text-accent">
+              {locale === "zh"
+                ? "本路径阅读结束，检验理解"
+                : "Reading complete; check your understanding"}
+            </span>
+            <strong className="mt-4 block font-display text-2xl font-normal">
+              {locale === "zh"
+                ? "进入综合自测 →"
+                : "Take the course self-test →"}
+            </strong>
+          </TransitionLink>
+        )}
+      </nav>
+    </article>
+  );
 }

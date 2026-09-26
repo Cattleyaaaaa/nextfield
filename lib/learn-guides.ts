@@ -1,4 +1,6 @@
 import type { LocalizedText } from "@/lib/editorial-data";
+import { EXTRA_GUIDES } from "./learning/extensions";
+import { LEARNING_TRACKS } from "./learn-data";
 
 export type LearningGuide = {
   scenario: LocalizedText;
@@ -38,7 +40,17 @@ export const TRACK_PROJECTS: Record<string, TrackProject> = {
   },
 };
 
+for (const track of LEARNING_TRACKS) {
+  const project = TRACK_PROJECTS[track.slug];
+  project.brief = z(
+    `从零开始沿着 ${track.lessons.length} 节课程完成「${project.title.zh}」。先理解基础概念，再逐步建立实现、权限和交付边界；每节都有案例、动手任务与检查点，最后通过结课考试检验理解。`,
+    `Build “${project.title.en}” through ${track.lessons.length} lessons, starting with introductory concepts and progressing to implementation, permissions, and delivery. Each lesson includes a case, a practical task, and a checkpoint; finish with the final exam.`
+  );
+  project.milestones = track.lessons.map(lesson => lesson.summary);
+}
+
 export const LEARNING_GUIDES: Record<string, LearningGuide> = {
+  ...EXTRA_GUIDES,
   "agent/agent-vs-chat": {
     scenario: z("访客问：“这项功能在新版中还能用吗？”普通聊天可能直接给出一句猜测；证据助手必须先确认文档版本、查找资料，再决定回答还是承认不知道。", "A visitor asks, ‘Does this feature still work in the new version?’ A chat response might guess. The evidence assistant must identify the document version, look for sources, then answer or admit uncertainty."),
     steps: [

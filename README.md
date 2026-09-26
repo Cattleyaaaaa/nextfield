@@ -2,7 +2,9 @@
 
 一个持续生长的个人网站，收录项目、写作、视觉实验与学习内容。项目页以 [Neptune 多 Agent 工作空间](https://github.com/Cattleyaaaaa/Neptune-Multi-agent-Workspace)为重点作品，提供[项目网站](http://myneptune.tech/)和源码入口；其他项目方向仍在整理中。
 
-站内还有开放实验室、按文件夹生成相册的画廊、Field Radio，以及 FIELD SCHOOL：3 条学习路径、12 节双语课程、案例库、代码练习和结课考试。课程可直接阅读；GitHub 登录、跨设备进度、账户记录及正式考试依赖 Supabase。课程导师另需模型接口配置。
+站内还有开放实验室、按文件夹生成相册的画廊、Field Radio，以及 FIELD SCHOOL：3 条学习路径、32 节双语课程、四阶段课程目录、案例库、代码练习、免登录综合自测和正式结课考试。Agent 路径从概念与 LLM 开始，逐步进入工具、状态、RAG、多 Agent 与生产实践；全栈路径从 Web 原理、HTML、CSS、JavaScript 开始，进入 React、接口、数据库、GitHub 登录、测试和交付。课程可直接阅读；GitHub 登录、跨设备进度、账户记录及正式考试依赖 Supabase。课程导师另需模型接口配置。
+
+**V1.1.0** 重构了学习区，提供从入门到交付的课程路径。功能与验收清单见 [V1.1.0 说明](docs/v1.1.0-review.md)，版本更新见 [发布说明](docs/releases/V1.1.0.md)。正式考试每条路径 6 题，答对至少 5 题通过；开放自测每节课一道题，仅供复习，不上传成绩或生成正式记录。实践任务为学习者自查，不提供自动代码评分。
 
 网站入口:https://nextfield.top/
 

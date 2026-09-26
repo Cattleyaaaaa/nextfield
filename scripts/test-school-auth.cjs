@@ -34,7 +34,7 @@ async function main() {
         res.end(JSON.stringify({ id: "00000000-0000-4000-8000-000000000001", user_metadata: { user_name: "test-github-user" } }));
       } else { res.writeHead(401); res.end("{}"); }
     } else if (url.pathname === "/rest/v1/school_progress") {
-      const lessons = ["agent-vs-chat", "rag-pipeline", "tools-and-confirmation", "evaluation-and-recovery"];
+      const lessons = ["what-is-agent", "llm-basics", "agent-vs-chat", "prompt-contracts", "tool-schemas", "state-and-memory", "agent-loop", "rag-pipeline", "tools-and-confirmation", "multi-agent", "evaluation-and-recovery", "agent-production"];
       res.end(JSON.stringify(progressReady ? lessons.map(slug => ({ lesson_key: `agent/${slug}` })) : []));
     } else if (url.pathname === "/rest/v1/school_exam_attempts") {
       res.end(JSON.stringify(attempts));
@@ -96,7 +96,7 @@ async function main() {
     const lockedExam = await call("/api/school/exam?track=agent");
     const lockedBody = await lockedExam.json();
     assert.equal(lockedBody.eligible, false);
-    assert.equal(lockedBody.missing.length, 4);
+    assert.equal(lockedBody.missing.length, 12);
     assert.equal(lockedBody.questions.length, 0);
     const earlySubmit = await call("/api/school/exam", { method: "POST", headers: { origin: site, "Content-Type": "application/json" }, body: JSON.stringify({ track: "agent", answers: [0, 0, 0, 0, 0, 0] }) });
     assert.equal(earlySubmit.status, 403);

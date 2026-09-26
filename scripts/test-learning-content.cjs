@@ -2,12 +2,17 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const vm = require("node:vm");
 const ts = require("typescript");
+const path = require("node:path");
+const cache = new Map();
 
 function load(file) {
+  file = path.resolve(file);
+  if (cache.has(file)) return cache.get(file);
   const module = { exports: {} };
+  cache.set(file, module.exports);
   const source = fs.readFileSync(file, "utf8");
   const code = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText;
-  vm.runInNewContext(code, { module, exports: module.exports }, { filename: file });
+  vm.runInNewContext(code, { module, exports: module.exports, require: (name) => load(path.resolve(path.dirname(file), name) + ".ts") }, { filename: file });
   return module.exports;
 }
 
@@ -15,7 +20,12 @@ const { LEARNING_TRACKS } = load("lib/learn-data.ts");
 const { LEARNING_GUIDES, TRACK_PROJECTS } = load("lib/learn-guides.ts");
 const { LEARNING_CASES, LEARNING_GLOSSARY } = load("lib/learning-resources.ts");
 const expected = new Set();
+const counts = { agent: 12, fullstack: 14, product: 6 };
+const first = { agent: "what-is-agent", fullstack: "what-is-fullstack", product: "product-introduction" };
 for (const track of LEARNING_TRACKS) {
+  assert.equal(track.lessons.length, counts[track.slug]);
+  assert.equal(track.lessons[0].slug, first[track.slug]);
+  assert.equal(new Set(track.lessons.map(l => l.slug)).size, track.lessons.length);
   const project = TRACK_PROJECTS[track.slug];
   assert.ok(project, `Missing project for ${track.slug}`);
   assert.equal(project.milestones.length, track.lessons.length);
@@ -24,6 +34,10 @@ for (const track of LEARNING_TRACKS) {
     assert.ok(project.deliverable[locale].length > 20);
   }
   for (const lesson of track.lessons) {
+    assert.equal(lesson.number, String(track.lessons.indexOf(lesson) + 1).padStart(2, "0"));
+    assert.equal(lesson.challenge.options.filter(option => option.correct).length, 1);
+    assert.ok(lesson.concept.length >= 2);
+    assert.ok(lesson.code.trim().length > 20);
     const key = `${track.slug}/${lesson.slug}`;
     expected.add(key);
     const guide = LEARNING_GUIDES[key];

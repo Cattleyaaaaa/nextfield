@@ -1,4 +1,5 @@
 import type { LocalizedText } from "@/lib/editorial-data";
+import { COURSE_ORDER, EXTRA_LESSONS } from "./learning/extensions";
 
 export type LearningLesson = {
   slug: string;
@@ -27,7 +28,7 @@ const z = (zh: string, en: string): LocalizedText => ({ zh, en });
 export const LEARNING_TRACKS: LearningTrack[] = [
   {
     slug: "agent", number: "01", title: z("Agent 开发基础", "Agent Development Foundations"), shortTitle: z("Agent 开发", "Agent Development"),
-    summary: z("从模型调用走向可观察、可控制、可恢复的 Agent 工作流。", "Move from model calls to observable, controllable and recoverable Agent workflows."),
+    summary: z("从认识 Agent 与 LLM 开始，逐步学习提示词、工具、状态、RAG、多 Agent 协作与生产运行。", "Start with Agents and LLMs, then progress through prompts, tools, state, RAG, multi-Agent collaboration, and production operations."),
     outcome: z("完成后，你将能画出一个 Agent 状态机，并判断检索、工具调用和确认应该出现在哪里。", "You will be able to model an Agent state machine and place retrieval, tools and confirmation deliberately."),
     lessons: [
       { slug: "agent-vs-chat", number: "01", title: z("Agent 不只是聊天框", "An Agent is more than a chat box"), summary: z("用目标、状态、工具与循环重新理解 Agent。", "Understand Agents through goals, state, tools and loops."), minutes: 16,
@@ -74,7 +75,7 @@ export const LEARNING_TRACKS: LearningTrack[] = [
   },
   {
     slug: "fullstack", number: "02", title: z("全栈产品基础", "Full-stack Product Foundations"), shortTitle: z("全栈开发", "Full-stack Development"),
-    summary: z("从界面状态、API 和数据模型一路走到测试与部署。", "Move from interface state, APIs and data models to testing and deployment."),
+    summary: z("从 Web 原理、HTML、CSS 与 JavaScript 起步，逐步深入 React、服务端、API、数据库、登录、安全与部署。", "Begin with the Web, HTML, CSS, and JavaScript, then explore React, servers, APIs, databases, authentication, security, and deployment."),
     outcome: z("完成后，你将理解一个 Web 产品从浏览器到数据库再到生产环境的完整路径。", "You will understand the complete path of a web product from browser to database to production."),
     lessons: [
       { slug: "interface-state", number: "01", title: z("界面首先表达状态", "Interfaces express state first"), summary: z("把加载、成功、空数据、失败与恢复设计成明确状态。", "Design loading, success, empty, failure and recovery as explicit states."), minutes: 16,
@@ -167,6 +168,15 @@ export const LEARNING_TRACKS: LearningTrack[] = [
     ],
   },
 ];
+
+for (const track of LEARNING_TRACKS) {
+  const lessons = [...track.lessons, ...EXTRA_LESSONS[track.slug]];
+  track.lessons = COURSE_ORDER[track.slug].map((slug, index) => {
+    const lesson = lessons.find(item => item.slug === slug);
+    if (!lesson) throw new Error(`Missing curriculum lesson: ${track.slug}/${slug}`);
+    return { ...lesson, number: String(index + 1).padStart(2, "0") };
+  });
+}
 
 export function findLearningTrack(slug: string) { return LEARNING_TRACKS.find((track) => track.slug === slug); }
 export function findLearningLesson(track: LearningTrack, slug: string) { return track.lessons.find((lesson) => lesson.slug === slug); }

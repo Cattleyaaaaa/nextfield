@@ -23,7 +23,7 @@ function hueFor(value: string) {
 }
 
 /**
- * 黑胶唱片：整张盘（纹路/封面/中心孔）作为一层绕自己的中心匀速旋转。
+ * 黑胶唱片：整张盘（纹路与封面）作为一层绕自己的中心匀速旋转。
  * 播放时转、暂停就地停住（animation-play-state，不重置角度），尊重 reduced-motion。
  */
 export function RadioDisc({
@@ -74,8 +74,6 @@ export function RadioDisc({
             />
           )}
         </span>
-        {/* 中心孔也画在盘面里：整盘绕中心转，中心永远是同一个点 */}
-        <span className="absolute inset-[45%] rounded-full bg-white/70" />
       </div>
     </div>
   );

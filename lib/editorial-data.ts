@@ -13,6 +13,21 @@ export type EditorialArticle = {
 
 export const BUILD_LOG_ARTICLES: EditorialArticle[] = [
   {
+    slug: "v1-3-1-radio-in-motion", date: "2026 · 09 · 28", eyebrow: "Build log / V1.3.1", tags: ["Field Radio", "Web Audio", "Playback"], minutes: 4,
+    title: { zh: "让电台跟着音乐起伏", en: "Letting the radio move with the music" },
+    summary: { zh: "电台加入上一首、随机下一首和三种播放模式；均衡器读取真实音频频谱，声波圈随低音扩散。", en: "Field Radio gains previous and random next controls plus three playback modes. Its equalizer follows the live spectrum, while sound rings expand with the bass." },
+    sections: [
+      { heading: { zh: "让声音驱动画面", en: "Let sound drive the visuals" }, paragraphs: [
+        { zh: "此前均衡器柱和背景光环只按固定动画循环，与歌曲无关。现在播放器用 Web Audio API 分析本站直接播放的音频：频谱区间驱动均衡器柱高度，低频能量推动声波圈扩散。采样只在电台页面需要动效时开启，高频数据更新也不会触发 React 重绘。", en: "The equalizer and halo used to loop at fixed intervals, unrelated to the song. The player now analyses locally hosted audio through the Web Audio API: spectrum bands drive the bar heights, and low-frequency energy expands the sound rings. Sampling runs only when the radio page needs it, without high-rate React re-renders." },
+        { zh: "暂停时柱形回落、声波停止扩散；系统开启减少动态效果时，两种动效保持静止。外部平台播放的曲目不经过本站播放器，因此不参与分析。", en: "When playback pauses, the bars settle and the rings stop. Both effects stay still when reduced motion is enabled. Tracks played on external platforms do not pass through this player, so they are not analysed." },
+      ]},
+      { heading: { zh: "切歌与循环有了明确语义", en: "Clearer track and repeat controls" }, paragraphs: [
+        { zh: "控制顺序调整为上一首、播放/暂停、下一首。上一首回到实际听过的曲目；随机模式下下一首避开当前曲目，列表循环按曲库顺序前进。单曲循环在播放结束后重播当前歌曲，另外两种模式则按顺序或随机方式续播。播放模式保存在当前浏览器。", en: "The controls now read previous, play/pause, next. Previous returns to the last heard track; next avoids the current track in shuffle mode and follows library order in repeat-all mode. Repeat-one restarts the current song; the other modes continue sequentially or randomly. The selected mode is saved in the browser." },
+        { zh: "黑胶唱片去掉了中心白点，让封面保持完整；电台页标语换成“让旋律，接住此刻”。", en: "The white spindle dot was removed so the artwork stays unobstructed, and the radio page received a new line: “A soundtrack for this moment.”" },
+      ]},
+    ],
+  },
+  {
     slug: "v1-3-guestbook-and-two-languages", date: "2026 · 09 · 28", eyebrow: "Build log / V1.3.0", tags: ["Guestbook", "Supabase", "i18n"], minutes: 5,
     title: { zh: "让访客留下话，也让文章说两种语言", en: "A guestbook and writing in two languages" },
     summary: { zh: "顶栏常驻 GitHub 登录，新增可匿名的留言板；访客痕迹移至留言页，写作索引与 23 篇正文补齐英文。", en: "GitHub sign-in stays in the header, the guestbook allows anonymous display, the visitor trace moves beside it, and all 23 articles gain English versions." },

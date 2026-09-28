@@ -1,19 +1,21 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowUpRight, ChevronDown, ListMusic, Pause, Play, Quote, Radio, SkipForward, Volume2, X } from "lucide-react";
+import { ArrowUpRight, ChevronDown, ListMusic, Pause, Play, Quote, Radio, Repeat1, Repeat2, Shuffle, SkipBack, SkipForward, Volume2, X } from "lucide-react";
 import { RadioDisc } from "@/components/site/radio-disc";
 import { RadioLyrics } from "@/components/site/radio-lyrics";
 import { TransitionLink } from "@/components/site/transition-link";
 import { lyricsPathFor } from "@/lib/lrc";
 import { RADIO_TRACKS } from "@/lib/radio-data";
-import { RADIO_STATE_EVENT, RADIO_STATE_REQUEST_EVENT, RADIO_TIME_EVENT, type RadioSignal, type RadioTimeSignal } from "@/lib/radio-signal";
+import { isRadioAudioAnalysisRequested, RADIO_AUDIO_EVENT, RADIO_AUDIO_REQUEST_EVENT, RADIO_STATE_EVENT, RADIO_STATE_REQUEST_EVENT, RADIO_TIME_EVENT, type RadioAudioSignal, type RadioSignal, type RadioTimeSignal } from "@/lib/radio-signal";
 import { usePageTransition } from "@/components/site/page-transition-provider";
 
 const VOLUME_KEY = "nextfield-radio-volume-v2";
 const LEGACY_VOLUME_KEY = "nextfield-radio-volume";
 const DEFAULT_VOLUME = 0.3;
 const LYRICS_KEY = "nextfield-radio-lyrics";
+const PLAYBACK_MODE_KEY = "nextfield-radio-playback-mode";
+type PlaybackMode = "single" | "list" | "random";
 /** 访客主动停过一次音乐后写 1，之后不再自动起播。 */
 const SILENCE_KEY = "nextfield-radio-silence";
 /** 能解锁浏览器音频自动播放的手势：滚动不算，必须是点击/触摸/按键这一类。 */
@@ -29,9 +31,17 @@ function formatTime(seconds: number) {
 export function FieldRadio() {
   const { motionEnabled } = usePageTransition();
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const frequencyDataRef = useRef<Uint8Array<ArrayBuffer> | null>(null);
   const [open, setOpen] = useState(false);
   const [playing, setPlaying] = useState(false);
+  const [audioAnalysisRequested, setAudioAnalysisRequested] = useState(isRadioAudioAnalysisRequested);
   const [index, setIndex] = useState(0);
+  const indexRef = useRef(0);
+  const historyRef = useRef<number[]>([]);
+  const [canGoBack, setCanGoBack] = useState(false);
+  const [playbackMode, setPlaybackMode] = useState<PlaybackMode>("random");
   const [volume, setVolume] = useState(DEFAULT_VOLUME);
   const [volumeReady, setVolumeReady] = useState(false);
   const [current, setCurrent] = useState(0);
@@ -76,6 +86,46 @@ export function FieldRadio() {
     return () => window.removeEventListener(RADIO_STATE_REQUEST_EVENT, publish);
   }, [index, current]);
 
+  useEffect(() => {
+    const requestAnalysis = (event: Event) =>
+      setAudioAnalysisRequested(Boolean((event as CustomEvent<boolean>).detail));
+    window.addEventListener(RADIO_AUDIO_REQUEST_EVENT, requestAnalysis);
+    return () => window.removeEventListener(RADIO_AUDIO_REQUEST_EVENT, requestAnalysis);
+  }, []);
+
+  // 仅在电台页面需要动画时采样；高频更新通过事件传数组，不触发 React 重渲染。
+  useEffect(() => {
+    const analyser = analyserRef.current;
+    const data = frequencyDataRef.current;
+    if (!audioAnalysisRequested || !playing || !motionEnabled || !analyser || !data) return;
+
+    let animationFrame = 0;
+    let lastSample = 0;
+    const sample = (time: number) => {
+      animationFrame = window.requestAnimationFrame(sample);
+      if (time - lastSample < 1000 / 24) return;
+      lastSample = time;
+      analyser.getByteFrequencyData(data);
+
+      const bars = Array.from({ length: 24 }, (_, index) => {
+        const start = Math.max(1, Math.floor((index / 24) ** 2 * data.length));
+        const end = Math.max(start + 1, Math.floor(((index + 1) / 24) ** 2 * data.length));
+        let total = 0;
+        for (let bin = start; bin < Math.min(end, data.length); bin += 1) total += data[bin];
+        const average = total / Math.max(1, Math.min(end, data.length) - start);
+        return Math.min(1, average / 150);
+      });
+      const bassEnd = Math.min(9, data.length);
+      let bassTotal = 0;
+      for (let bin = 1; bin < bassEnd; bin += 1) bassTotal += data[bin];
+      const bass = Math.min(1, bassTotal / Math.max(1, bassEnd - 1) / 150);
+      window.dispatchEvent(new CustomEvent<RadioAudioSignal>(RADIO_AUDIO_EVENT, { detail: { bars, bass } }));
+    };
+
+    animationFrame = window.requestAnimationFrame(sample);
+    return () => window.cancelAnimationFrame(animationFrame);
+  }, [audioAnalysisRequested, playing, motionEnabled]);
+
   // 页面上的「点歌」按钮走 window 事件（和 field-radio:open 同一套约定）。
   // 用 state 承接请求而不是 ref：事件回调只在挂载时创建一次，闭包读不到最新的 index / play。
   // token 只是为了让「连点同一首」也产生新对象，从而再次触发下面的 effect。
@@ -94,8 +144,32 @@ export function FieldRadio() {
     const silent = silentPlayRef.current;
     silentPlayRef.current = false;
     setFailed(false);
+    let analysisReady: Promise<void> = Promise.resolve();
     try {
-      await audio.play();
+      // 仅分析本站直接播放的曲目；将音频送回同一个输出，保持正常可听。
+      if (typeof window !== "undefined" && window.AudioContext) {
+        let context = audioContextRef.current;
+        if (!context) {
+          context = new window.AudioContext();
+          const analyser = context.createAnalyser();
+          analyser.fftSize = 2048;
+          analyser.smoothingTimeConstant = 0.82;
+          const source = context.createMediaElementSource(audio);
+          source.connect(analyser);
+          analyser.connect(context.destination);
+          audioContextRef.current = context;
+          analyserRef.current = analyser;
+          frequencyDataRef.current = new Uint8Array(analyser.frequencyBinCount);
+        }
+        if (context.state === "suspended") analysisReady = context.resume().catch(() => undefined);
+      }
+    } catch {
+      // 音频分析不可用时继续正常播放，视觉动效保持静止。
+    }
+    try {
+      // 先同步调用 play()，保留浏览器对用户手势的判定；分析器恢复可与播放并行。
+      const playback = audio.play();
+      await Promise.all([analysisReady, playback]);
       setPlaying(true);
       if (!silent) window.dispatchEvent(new CustomEvent("nextfield:mission", { detail: "radio" }));
     } catch (error) {
@@ -127,9 +201,43 @@ export function FieldRadio() {
     void play();
   };
 
+  const selectTrack = (target: number, remember = true) => {
+    const previous = indexRef.current;
+    if (target === previous || target < 0 || target >= RADIO_TRACKS.length) return;
+    if (remember) {
+      historyRef.current = [...historyRef.current.slice(-99), previous];
+      setCanGoBack(true);
+    }
+    indexRef.current = target;
+    setIndex(target);
+  };
+
+  const previous = () => {
+    const target = historyRef.current.pop();
+    if (target === undefined) return;
+    setCanGoBack(historyRef.current.length > 0);
+    selectTrack(target, false);
+  };
+
+  const randomNext = () => {
+    const count = RADIO_TRACKS.length;
+    if (count < 2) return;
+    // 在剩余曲目中均匀抽取，避免连续两次播放同一首。
+    const offset = 1 + Math.floor(Math.random() * (count - 1));
+    selectTrack((indexRef.current + offset) % count);
+  };
+
   const next = () => {
-    if (RADIO_TRACKS.length === 0) return;
-    setIndex((value) => (value + 1) % RADIO_TRACKS.length);
+    if (playbackMode === "list") {
+      if (RADIO_TRACKS.length > 1) selectTrack((indexRef.current + 1) % RADIO_TRACKS.length);
+      return;
+    }
+    randomNext();
+  };
+
+  const changePlaybackMode = (mode: PlaybackMode) => {
+    setPlaybackMode(mode);
+    window.localStorage.setItem(PLAYBACK_MODE_KEY, mode);
   };
 
   const seek = (value: number) => {
@@ -164,6 +272,8 @@ export function FieldRadio() {
     if (audio) audio.volume = restored;
     setVolumeReady(true);
     if (window.localStorage.getItem(LYRICS_KEY) === "1") setLyricsVisible(true);
+    const savedMode = window.localStorage.getItem(PLAYBACK_MODE_KEY);
+    if (savedMode === "single" || savedMode === "list" || savedMode === "random") setPlaybackMode(savedMode);
     const openRadio = () => setOpen(true);
     // 曲目清单页点某一首：切到那一首并立刻开始播
     const playTrack = (event: Event) => {
@@ -180,6 +290,8 @@ export function FieldRadio() {
       window.removeEventListener("field-radio:open", openRadio);
       window.removeEventListener("field-radio:play", playTrack);
       audio?.pause();
+      if (audioContextRef.current && audioContextRef.current.state !== "closed")
+        void audioContextRef.current.close();
     };
   }, []);
 
@@ -248,7 +360,7 @@ export function FieldRadio() {
     if (handledRequestTokenRef.current === playRequest.token) return;
     handledRequestTokenRef.current = playRequest.token;
     if (playRequest.index !== index) {
-      setIndex(playRequest.index);
+      selectTrack(playRequest.index, !silentPlayRef.current);
       return;
     }
     void play();
@@ -261,10 +373,15 @@ export function FieldRadio() {
       <audio
         className="hidden"
         onEnded={() => {
-          // 自然播完 ⇒ 访客想继续听：切下一首并接着播（不看 playing，pause 事件时序不可靠）
+          // 自然播完后按所选模式继续；切歌时仍由 wantPlayRef 决定是否接着播。
           wantPlayRef.current = true;
-          if (RADIO_TRACKS.length > 1) next();
-          else pause();
+          if (RADIO_TRACKS.length === 0) pause();
+          else if (playbackMode === "single" || RADIO_TRACKS.length === 1) {
+            seek(0);
+            void play();
+          } else if (playbackMode === "list") {
+            selectTrack((indexRef.current + 1) % RADIO_TRACKS.length);
+          } else randomNext();
         }}
         onError={() => { setPlaying(false); setFailed(true); }}
         onLoadedMetadata={(event) => setDuration(event.currentTarget.duration)}
@@ -342,8 +459,9 @@ export function FieldRadio() {
             {failed ? <p className="mt-3 text-[11px] leading-5 text-red-300/90">这首放不出来：文件不存在，或是加密/非标准格式（如网易云 ncm），浏览器无法解码。</p> : null}
 
             <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2">
+              <button aria-label="上一首" className="grid size-9 place-items-center rounded-full border border-paper/15 text-paper/70 hover:border-liquid-foam hover:text-liquid-foam disabled:cursor-not-allowed disabled:opacity-40" disabled={!canGoBack} onClick={previous} type="button"><SkipBack className="size-4" /></button>
               <button aria-label={playing ? "暂停" : "播放"} className="grid size-11 place-items-center rounded-full bg-liquid-foam text-ink hover:scale-105 disabled:cursor-not-allowed disabled:opacity-40" disabled={!hasAudio} onClick={playing ? stopByUser : playByUser} type="button">{playing ? <Pause className="size-4" /> : <Play className="ml-0.5 size-4" />}</button>
-              <button aria-label="下一首" className="grid size-9 place-items-center rounded-full border border-paper/15 text-paper/70 hover:border-liquid-foam hover:text-liquid-foam disabled:cursor-not-allowed disabled:opacity-40" disabled={RADIO_TRACKS.length < 2} onClick={next} type="button"><SkipForward className="size-4" /></button>
+              <button aria-label={playbackMode === "list" ? "下一首" : "随机下一首"} className="grid size-9 place-items-center rounded-full border border-paper/15 text-paper/70 hover:border-liquid-foam hover:text-liquid-foam disabled:cursor-not-allowed disabled:opacity-40" disabled={RADIO_TRACKS.length < 2} onClick={next} type="button"><SkipForward className="size-4" /></button>
               {track?.href ? (
                 <a className="inline-flex items-center gap-1.5 rounded-full border border-paper/20 px-3 py-2 text-[11px] text-paper/75 transition-colors hover:border-liquid-foam hover:text-liquid-foam" href={track.href} rel="noreferrer" target="_blank">
                   {track.hrefLabel ?? "去平台收听"}<ArrowUpRight className="size-3" />
@@ -355,6 +473,24 @@ export function FieldRadio() {
                   <input aria-label="音量" className="radio-volume w-20" max="1" min="0" onChange={(event) => setVolume(Number(event.target.value))} step="0.01" type="range" value={volume} />
                 </>
               ) : null}
+            </div>
+
+            <div aria-label="播放模式" className="mt-3 flex flex-wrap gap-1.5" role="group">
+              {([
+                { value: "single", label: "单曲循环", Icon: Repeat1 },
+                { value: "list", label: "列表循环", Icon: Repeat2 },
+                { value: "random", label: "随机播放", Icon: Shuffle },
+              ] as const).map(({ value, label, Icon }) => (
+                <button
+                  aria-pressed={playbackMode === value}
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-[10px] transition-colors ${playbackMode === value ? "border-liquid-foam bg-liquid-foam/15 text-liquid-foam" : "border-paper/15 text-paper/55 hover:border-liquid-foam/60 hover:text-paper"}`}
+                  key={value}
+                  onClick={() => changePlaybackMode(value)}
+                  type="button"
+                >
+                  <Icon className="size-3" />{label}
+                </button>
+              ))}
             </div>
 
             <div className="mt-3 grid gap-2 border-t border-paper/10 pt-3">

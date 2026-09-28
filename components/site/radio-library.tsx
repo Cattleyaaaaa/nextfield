@@ -18,6 +18,7 @@ import { TransitionLink } from "@/components/site/transition-link";
 import { useLanguage } from "@/components/site/language-provider";
 import { usePageTransition } from "@/components/site/page-transition-provider";
 import { RADIO_TRACKS } from "@/lib/radio-data";
+import { RADIO_AUDIO_EVENT, setRadioAudioAnalysisRequested, type RadioAudioSignal } from "@/lib/radio-signal";
 import {
   RADIO_STATE_EVENT,
   RADIO_STATE_REQUEST_EVENT,
@@ -45,7 +46,7 @@ export function RadioPageFrame() {
         Field radio / 04
       </p>
       <h1 className="mt-6 max-w-5xl text-balance font-display text-[clamp(3rem,7vw,6rem)] leading-[0.92] tracking-[-0.06em]">
-        {locale === "zh" ? "声音不解释自己。" : "Let the sound speak."}
+        {locale === "zh" ? "让旋律，接住此刻。" : "A soundtrack for this moment."}
       </h1>
       <p className="mt-8 max-w-2xl text-lg leading-9 text-muted">
         {locale === "zh"
@@ -83,7 +84,11 @@ export function RadioLibrary() {
       setRadio((event as CustomEvent<RadioSignal>).detail);
     window.addEventListener(RADIO_STATE_EVENT, update);
     window.dispatchEvent(new Event(RADIO_STATE_REQUEST_EVENT));
-    return () => window.removeEventListener(RADIO_STATE_EVENT, update);
+    setRadioAudioAnalysisRequested(true);
+    return () => {
+      window.removeEventListener(RADIO_STATE_EVENT, update);
+      setRadioAudioAnalysisRequested(false);
+    };
   }, []);
 
   const artists = useMemo(
@@ -113,35 +118,39 @@ export function RadioLibrary() {
   const current = RADIO_TRACKS[radio?.index ?? 0];
 
   useGSAP(
-    () => {
+    (_, contextSafe) => {
       const bars =
         rootRef.current?.querySelectorAll<HTMLElement>("[data-radio-wave]");
       const halo =
         rootRef.current?.querySelector<HTMLElement>("[data-radio-halo]");
       if (!bars?.length) return;
-      gsap.set(bars, { scaleY: 0.28, transformOrigin: "center bottom" });
+      gsap.set(bars, { scaleY: 0.14, opacity: 0.45, transformOrigin: "center bottom" });
+      if (halo) gsap.set(halo, { scale: 0.9, opacity: 0.12 });
       if (!playing || !motionEnabled) return;
-      gsap.to(bars, {
-        scaleY: (index) => 0.55 + (index % 5) * 0.13,
-        duration: (index) => 0.48 + (index % 4) * 0.1,
-        stagger: { each: 0.035, from: "center" },
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
-      });
-      if (halo)
-        gsap.fromTo(
-          halo,
-          { scale: 0.88, opacity: 0.24 },
-          {
-            scale: 1.15,
-            opacity: 0.5,
-            duration: 2.2,
-            repeat: -1,
-            yoyo: true,
-            ease: "sine.inOut",
-          },
-        );
+      const updateFromAudio = (event: Event) => {
+        const { bars: levels, bass } = (event as CustomEvent<RadioAudioSignal>).detail;
+        bars.forEach((bar, index) => {
+          const level = levels[index] ?? 0;
+          gsap.to(bar, {
+            scaleY: 0.14 + level * 1.05,
+            opacity: 0.45 + level * 0.55,
+            duration: 0.1,
+            ease: "power2.out",
+            overwrite: true,
+          });
+        });
+        if (halo)
+          gsap.to(halo, {
+            scale: 0.9 + bass * 0.36,
+            opacity: 0.12 + bass * 0.46,
+            duration: 0.22,
+            ease: "sine.out",
+            overwrite: true,
+          });
+      };
+      const safeUpdateFromAudio = contextSafe?.(updateFromAudio) ?? updateFromAudio;
+      window.addEventListener(RADIO_AUDIO_EVENT, safeUpdateFromAudio);
+      return () => window.removeEventListener(RADIO_AUDIO_EVENT, safeUpdateFromAudio);
     },
     {
       scope: rootRef,

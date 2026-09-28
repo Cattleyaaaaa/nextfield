@@ -1,0 +1,83 @@
+---
+title: "Three CSS Pitfalls That Only Show Up in the Browser"
+date: "2026-09-23"
+category: "Frontend"
+tags: ["CSS", "Typography", "GSAP", "Debugging"]
+summary: "Replaced elements ignore stretching with inset, clipping needs room for descenders, and decorations must anchor to text. None throws an error."
+---
+
+The most deceptive moment in styling is not an error, but the absence of one. The page renders, the code looks reasonable, and only your eyes sense something is wrong. These three pitfalls came from a recent homepage rebuild. All passed static review; only measurement in a browser exposed them.
+
+## 1. Replaced elements do not stretch with `inset`
+
+The radio record needed a cover in its center. The first version looked like this:
+
+```jsx
+<div className="absolute inset-0 rounded-full">
+  <img className="absolute inset-[22%] rounded-full object-cover" src={cover} />
+</div>
+```
+
+The intent was to use four inset values to stretch the image into a centered circle. Instead it stuck to the upper-left and spilled outside the record.
+
+The specification explains it: a normal absolutely positioned element can stretch between `left` and `right` when `width: auto`, but **replaced elements such as `img` do not**. They use their intrinsic dimensions and the extra inset constraints are ignored. Tailwind preflight's `img { max-width: 100%; height: auto }` made the behavior even more reproducible.
+
+The fix is simple: **let a normal element position the content and let the image fill that element**.
+
+```jsx
+<span className="absolute inset-[22%] overflow-hidden rounded-full">
+  <img className="h-full w-full object-cover" src={cover} />
+</span>
+```
+
+For `inset-0` plus `object-cover`, insert an ordinary wrapper. The same consideration applies to video and iframe elements.
+
+## 2. Leave clipping room for descenders
+
+A per-letter entrance animation often uses an outer `overflow-hidden` mask and an inner letter rising from below with `yPercent`. The mask needs bottom padding so it does not cut the letter.
+
+A common value is `pb-[0.06em] -mb-[0.06em]`—the negative margin offsets the padding without changing layout height. That works for letters without descenders. But in Inter, the descenders of `y`, `g`, `p`, and `q` extend about **0.24em**. With only 0.06em, their tails look cut flat.
+
+Padding should follow the font's descender depth, not a guess. This project settled on 0.26em. With more bottom space, the entrance travel also needed increasing: `yPercent` rose from 118 to 140 so the letter did not peek out before the animation began.
+
+Use canvas font metrics to check instead of guessing from screenshots:
+
+```js
+const ctx = document.createElement("canvas").getContext("2d");
+ctx.font = `${weight} ${size} ${family}`;
+const m = ctx.measureText("y");
+const inkBottom = baseline + m.actualBoundingBoxDescent;
+```
+
+If the ink's lower edge is inside the clipping box, it will not be cut.
+
+## 3. Decorations must use the content's coordinate system
+
+The homepage slogan has large letters with floral and spring-like decorations. A spring was initially positioned using `right: 14%`.
+
+It lined up at one viewport width, then covered a letter at another. **The text scaled with `clamp(4rem, 14vw, 12.5rem)` while the percentage anchor scaled with the container.** Their ratios differed, so the decoration drifted.
+
+The fix was to give the decoration a better coordinate system: **shrink the line wrapper to the word's actual width, then anchor the decoration to its end**.
+
+```jsx
+<div className="relative inline-block">
+  {letters}
+  <svg className="absolute bottom-0 left-full w-[0.38em]" />
+</div>
+```
+
+Using `em` rather than `rem` lets the decoration scale with the lettering. To check overlap, compare rectangles:
+
+```js
+const overlap = !(decor.left >= letter.right || decor.right <= letter.left);
+```
+
+## A timing pitfall, too
+
+There was one more bug visible only at a particular moment: hovering before the entrance animation finished. The hover animation's `overwrite: "auto"` killed the entrance tween, freezing a letter halfway in.
+
+The solution was a gate, not another timing tweak. A ref records when entrance is complete; `timeline.eventCallback("onComplete")` sets it, and the hover handler returns early until then.
+
+## Conclusion
+
+All four issues came from rules that were only half right. Inset stretches ordinary elements. A little padding fits most letters. Percentages can align at one width. Overwrite is harmless after entrance. That is why the defense is to run the page and replace “looks about right” with measured rectangles, font metrics, and matrices.

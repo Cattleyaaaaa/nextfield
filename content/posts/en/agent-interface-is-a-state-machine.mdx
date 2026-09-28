@@ -1,0 +1,19 @@
+---
+title: "An Agent Interface Is a State Machine First"
+summary: "The chat box is only the entrance; the experience depends on how waiting, tool use, confirmation, failure, and recovery are shown."
+tags: ["Agent", "UX", "State design"]
+---
+
+Many Agent products begin with a chat box. What people actually experience, though, is how a task moves from one state to another.
+
+## What happens before the result
+
+An Agent task may involve understanding an intention, planning steps, calling tools, waiting for an external result, requesting confirmation, and producing a final answer. A spinning loader hides information that matters when people decide whether to trust the process.
+
+At a minimum, the interface should answer three questions: What is happening now? Do I need to step in? If something fails, where can I continue?
+
+## Give control back to the user
+
+Pause, cancel, retry, and edit input should not be exceptional paths. They are part of the experience of a long-running task, and they determine whether someone feels comfortable giving the system more complex work.
+
+> An Agent feels natural not because it speaks like a person, but because its behavior is clear, predictable, and recoverable.

@@ -1,0 +1,85 @@
+---
+title: "An Agent Is Not a Tool; It Is a Boundary"
+summary: "Treating agents as tools understates the real question: boundaries, and the judgments and responsibility beyond them."
+date: 2026-09-21
+tags: ["Agent", "Automation", "Ethics", "Design"]
+category: "Agent"
+---
+
+# An Agent Is Not a Tool; It Is a Boundary
+
+We are used to treating an agent as a more powerful tool.
+
+A tool accepts a goal and executes it; we assess the result. It does not question the goal or redefine the task. A hammer does not ask, “Are you sure you want to drive this nail?” A compiler does not say, “I misunderstood your intent.”
+
+But when we start using the word “agent,” we often understate the change. The real shift is not in capability, but in **where the boundary lies**.
+
+---
+
+## 1. A tool ends at its interface
+
+The relationship between a person and a tool is clear: inside the interface lies the tool's responsibility; outside is your world. You call it, it returns a result, and you judge that result from the outside.
+
+This clarity is comforting: **when something goes wrong, you know where to look for responsibility.**
+
+An agent is different. It gets a goal but not a specified route. It observes, decides, and acts within an environment, adjusting to feedback. The question becomes: where does its responsibility end?
+
+If it independently chooses an unexpected means to achieve your goal and that means has consequences, whose consequences are they?
+
+This is not hypothetical. An automation may restart a machine to “keep a service available” while an uninterruptible task is running on it. The interface did not change, but the boundary moved.
+
+---
+
+## 2. The defining trait is incomplete specification
+
+A more honest definition might be:
+
+> An agent is a system whose **behavior is not fully specified**, and which may decide how to act in pursuit of a given goal.
+
+The key phrase is “not fully specified.” Not “intelligent” or “autonomous,” but **incomplete specification**.
+
+Traditional software aims at a defined response to a given input. An agent has an open action space; we cannot enumerate everything it might do. We can constrain, guide, and monitor it, but not close every possibility before deployment.
+
+Introducing an agent thus opens a gap in the system—one that cannot be completely sealed in advance. That gap is where the new boundary lies.
+
+---
+
+## 3. The boundary lives in judgment, not just code
+
+If an agent's behavior cannot be fully specified, “write more rules” cannot be the only way to control it.
+
+What is needed is **judgment**: what may be done, what must not be done, what may happen independently, what requires permission, which errors can be tolerated, and which require stopping.
+
+These judgments depend on context and cannot be encoded exhaustively. Deleting a file may be harmless cache cleanup or destruction of evidence.
+
+Designing an agent system therefore means drawing boundaries around judgment:
+
+- Which decisions may the agent make alone?
+- Which must go back to a person?
+- Who is accountable when something fails, and how can the action be traced?
+- Where is its action space actually closed off?
+
+There is no single technical answer. These are design, organizational, and ethical questions.
+
+---
+
+## 4. We have been building agents all along
+
+Automation systems have long done agent-like work: schedulers choose which job runs first; recommendation systems choose what we see; fraud systems choose whether to block a transaction.
+
+Their behavior is not fully specified. They make decisions under goals and within boundaries, often boundaries discovered only **after an incident**.
+
+The popularity of “agent” may be less a technological leap than an admission: we have built such systems for years and called them “automation.” Now we are willing to face the boundary problems they create.
+
+---
+
+## 5. Conclusion
+
+Treating an agent as a tool means underestimating it. The question for a tool is “Can it do the job?” The question for an agent is “What did it do, and whose responsibility is that?”
+
+The first is an engineering question. The second is a boundary question. Code alone has never been enough to settle boundaries.
+
+---
+
+- For discussions of responsibility under incomplete specifications in automated systems, see research on AI ethics and accountability in automation.
+- For boundaries as a design and governance question rather than a purely technical one, see work in human–computer interaction and algorithmic governance.

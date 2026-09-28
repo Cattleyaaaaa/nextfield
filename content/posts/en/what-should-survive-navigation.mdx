@@ -1,0 +1,25 @@
+---
+title: "What Should Survive Navigation?"
+summary: "A player, draft, and preferences do not belong to one page; they belong to the visitor's ongoing activity."
+date: 2026-09-24
+category: "Frontend"
+tags: ["React", "Navigation", "State"]
+---
+
+A music player can stay fixed in the bottom-right corner and appear to be “site-wide.” But visual persistence is not lifecycle persistence. If every link causes a full-page load, the audio node is destroyed and the song stops.
+
+## Draw the boundary of state first
+
+Which state belongs to a page? An expanded accordion or a filter can usually disappear when the visitor leaves. Which state belongs to the whole site? Music playback, language preference, and a long unfinished task usually should not reset just because another page was opened.
+
+In a React application, this means placing cross-page state somewhere that does not unmount on route changes. The right component placement is not enough, though: internal links must use client-side navigation. A regular full-page jump recreates the entire component tree.
+
+## Preserving does not mean always resuming
+
+Refreshing the browser or leaving the site is a different boundary. We can save volume and the fact that a person paused deliberately, but should not restart audible playback without a new interaction. Being able to remember a timestamp does not mean the browser permits automatic sound.
+
+Continuity therefore has layers: keep in-site transitions as seamless as possible; restore only safe preferences after a full refresh; and acknowledge that sound may stop on external authorization or departure.
+
+## Test with the Back button
+
+Do not test a player only by clicking Play and Pause. Open an article, visit the login page, go back, change the language, and return to the track list. The real gaps tend to live where those routes intersect, not inside the player itself.

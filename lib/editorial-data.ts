@@ -13,6 +13,49 @@ export type EditorialArticle = {
 
 export const BUILD_LOG_ARTICLES: EditorialArticle[] = [
   {
+    slug: "v1-3-guestbook-and-two-languages", date: "2026 · 09 · 28", eyebrow: "Build log / V1.3.0", tags: ["Guestbook", "Supabase", "i18n"], minutes: 5,
+    title: { zh: "让访客留下话，也让文章说两种语言", en: "A guestbook and writing in two languages" },
+    summary: { zh: "顶栏常驻 GitHub 登录，新增可匿名的留言板；访客痕迹移至留言页，写作索引与 23 篇正文补齐英文。", en: "GitHub sign-in stays in the header, the guestbook allows anonymous display, the visitor trace moves beside it, and all 23 articles gain English versions." },
+    sections: [
+      { heading: { zh: "留言先有身份边界", en: "A clear identity boundary for messages" }, paragraphs: [
+        { zh: "留言必须先经 GitHub 和 Supabase 登录；匿名只影响公开署名，不等于绕开身份校验。服务端通过登录会话写入，数据库的行级安全策略限制只能为自己发言。公开列表只返回展示所需字段，不暴露内部用户 ID。", en: "Posting requires GitHub sign-in through Supabase. Anonymity changes only the public byline; it does not bypass identity checks. The server writes with the signed-in session, row-level security limits writes to the user's own identity, and the public feed omits internal user IDs." },
+        { zh: "访客痕迹从首页移到留言页。它与真正的留言不同：信号仅保存在当前浏览器，不上传身份或浏览记录。两种表达放在同一区域，但清楚区分持久化留言和本地状态。", en: "Visitor Trace moved from the homepage to the guestbook. Unlike a message, a signal remains in the current browser and uploads neither identity nor browsing history. Both forms of expression now share a place without pretending they have the same persistence." },
+      ]},
+      { heading: { zh: "英文不只是导航按钮", en: "English means more than translated navigation" }, paragraphs: [
+        { zh: "之前语言开关能改变导航和部分标题，却留下中文的访客痕迹与文章正文。现在写作列表从同一份文章元数据取英文标题、摘要和标签，每篇 MDX 另有英文正文；详情页随语言状态切换，并分别计算阅读时间。", en: "The language switch previously changed navigation and some headings but left Visitor Trace and article bodies in Chinese. The writing index now reads English titles, summaries and tags from article metadata; each MDX article has an English body, and detail pages switch with the same locale and estimate reading time separately." },
+      ]},
+      { heading: { zh: "发布前的边界", en: "Release boundaries" }, paragraphs: [
+        { zh: "留言表结构与匿名署名规则记录在 Supabase 迁移文件中。浏览器可见的公开键和服务端密钥分开配置；.env.local、Cloudflare 本地凭据及 public/audio 不进入 Git。上线前还需要确认数据库迁移已执行。", en: "Supabase migrations record the guestbook schema and anonymous byline rule. Browser-safe keys and server secrets are configured separately; .env.local, local Cloudflare credentials and public/audio stay out of Git. The database migrations must be applied before the new feature can work online." },
+      ]},
+    ],
+  },
+  {
+    slug: "v1-2-open-analytics", date: "2026 · 09 · 26", eyebrow: "Build log / V1.2.0", tags: ["Analytics", "Cloudflare", "Privacy"], minutes: 4,
+    title: { zh: "把访问趋势公开，但不公开访客", en: "Showing traffic trends without exposing visitors" },
+    summary: { zh: "新增独立统计页，读取 Cloudflare 的汇总趋势；只呈现聚合指标，不展示访客 IP 或个人明细。", en: "A standalone analytics page reads aggregated Cloudflare trends without publishing visitor IPs or personal records." },
+    sections: [
+      { heading: { zh: "真实数据与空状态", en: "Real data and honest empty states" }, paragraphs: [
+        { zh: "统计页提供多种时间范围、趋势图和汇总卡片。数据由服务端使用只读令牌向 Cloudflare 查询，浏览器拿不到令牌；接口不可用时显示明确的无数据状态，而不是填上看似真实的示例数字。", en: "The dashboard offers time ranges, trends and summary cards. A server endpoint queries Cloudflare with a read-only token that never reaches the browser. When the source is unavailable, the UI shows an explicit empty state rather than realistic-looking invented numbers." },
+      ]},
+      { heading: { zh: "公开的边界", en: "The public boundary" }, paragraphs: [
+        { zh: "导航为统计留了独立入口，不再塞进探索菜单。公开页面只展示全站聚合结果，不提供识别单个访客的明细；令牌权限维持只读。", en: "Analytics has its own main-navigation entry rather than another tile in Explore. The public page contains site-level aggregates, not individually identifying visitor details, and the token remains read-only." },
+      ]},
+    ],
+  },
+  {
+    slug: "v1-1-field-school", date: "2026 · 09 · 26", eyebrow: "Build log / V1.1.0", tags: ["Learning", "Supabase", "Curriculum"], minutes: 4,
+    title: { zh: "从课程列表到学习路径", en: "From a lesson list to learning paths" },
+    summary: { zh: "重构 FIELD SCHOOL：Agent、全栈与产品课程从概念逐步深入，并保留考试、练习和 GitHub 登录。", en: "FIELD SCHOOL grew into progressive Agent, full-stack and product tracks, while keeping exercises, exams and GitHub sign-in." },
+    sections: [
+      { heading: { zh: "先解释，再深入", en: "Explain first, then go deeper" }, paragraphs: [
+        { zh: "原有学习页内容不足以支撑连续学习。新版按主题组织课程，从基础概念走向实现与判断，并让练习、复习和考试成为同一条路径上的节点。", en: "The earlier learning page was too thin for sustained study. The new curriculum groups lessons by track, moving from foundational ideas to implementation and judgment, with practice, review and exams on the same path." },
+      ]},
+      { heading: { zh: "阅读开放，进度需要身份", en: "Open reading, signed-in progress" }, paragraphs: [
+        { zh: "课程可以直接阅读；登录后，进度与正式考试结果通过 Supabase 保存并跨设备同步。身份来自 GitHub OAuth，前端不保存服务端密钥。", en: "Lessons remain readable without signing in. With GitHub OAuth, progress and formal exam results are stored through Supabase and can sync across devices; server secrets stay out of client code." },
+      ]},
+    ],
+  },
+  {
     slug: "making-the-hero-move", date: "2026 · 09 · 23", eyebrow: "Build log / 01", tags: ["Motion", "GSAP", "Typography"], minutes: 5,
     title: { zh: "让首屏动起来，同时站得住", en: "Making the hero move without falling apart" },
     summary: { zh: "给标语加上悬停起伏、给弹簧线和花朵加上循环动效，并在过程中修掉两处只在浏览器里现形的排版问题。", en: "Hover waves for the headline, looping motion for the spring and the flower, plus two layout bugs that only surfaced in a real browser." },
@@ -121,6 +164,22 @@ export const BUILD_LOG_ARTICLES: EditorialArticle[] = [
 
 export const COLOPHON_ARTICLES: EditorialArticle[] = [
   {
+    slug: "data-identity-and-delivery", date: "2026 · 09 · 28", eyebrow: "Colophon / V1.3.0", tags: ["Architecture", "Privacy", "Cloudflare"], minutes: 5,
+    title: { zh: "公开内容与私人状态如何共存", en: "How public content and private state coexist" },
+    summary: { zh: "从 Cloudflare Worker、Supabase 登录到公开统计与留言板，解释动态能力的边界和密钥去向。", en: "Cloudflare Workers, Supabase sign-in, public analytics and the guestbook: where dynamic features end and secrets belong." },
+    sections: [
+      { heading: { zh: "静态内容，动态服务", en: "Static content, dynamic services" }, paragraphs: [
+        { zh: "文章、项目和课程内容由 Next.js 构建为可直接交付的页面；登录会话、学习进度、考试与留言需要请求时运行的 API。Cloudflare Worker 承担这些服务端路由，因而本站不是纯静态站。", en: "Next.js builds articles, projects and lessons into pages that can be served directly. Sign-in sessions, learning progress, exams and messages require request-time APIs. A Cloudflare Worker runs those server routes, so the site is no longer purely static." },
+      ]},
+      { heading: { zh: "公开键与私密令牌", en: "Public keys and private tokens" }, paragraphs: [
+        { zh: "Supabase 的公开项目地址与匿名键可供浏览器使用，但不能取代行级安全策略；Cloudflare 统计的只读令牌与任何服务端密钥只能留在服务端环境。仓库忽略 .env.local、.dev.vars 与本地音频目录，发布前还需核对实际部署环境的变量。", en: "The Supabase project URL and publishable key may be used by the browser, but they do not replace row-level security. The read-only Cloudflare analytics token and any server secrets belong only in server-side configuration. The repository ignores .env.local, .dev.vars and local audio; deployment variables still need checking before release." },
+      ]},
+      { heading: { zh: "匿名是一种展示选择", en: "Anonymity is a display choice" }, paragraphs: [
+        { zh: "留言者必须登录，才能提交内容；选择匿名后，公开记录显示匿名访客而不是 GitHub 昵称。访客痕迹与它不同，只写当前浏览器的本地存储。两者的说明都应把保存位置说清楚。", en: "A visitor must sign in to submit a message. Choosing anonymity replaces the GitHub byline in the public record. Visitor Trace is different: it writes only to local storage in that browser. Both interfaces should explain where their data lives." },
+      ]},
+    ],
+  },
+  {
     slug: "decoration-follows-content", date: "2026 · 09", eyebrow: "Colophon / 01", tags: ["Typography", "Motion"], minutes: 4,
     title: { zh: "装饰跟着内容走", en: "Decoration follows content" },
     summary: { zh: "花朵、弹簧线、唱片这些装饰都不能自己决定位置：它们的位置必须由文字、尺寸和状态推导出来。", en: "Flowers, springs and records never decide their own position: it is derived from the type, the size and the state they belong to." },
@@ -185,11 +244,11 @@ export const COLOPHON_ARTICLES: EditorialArticle[] = [
   {
     slug: "the-system-underneath", date: "2026 · 09", eyebrow: "Colophon / 06", tags: ["Stack", "Delivery"], minutes: 5,
     title: { zh: "界面下面的系统", en: "The system beneath the interface" },
-    summary: { zh: "从内容管线、设计令牌到静态交付，说明这个场域如何保持可维护。", en: "From content pipelines and design tokens to static delivery, this explains how the field stays maintainable." },
+    summary: { zh: "从内容管线、设计令牌到 Cloudflare 交付，说明这个场域如何保持可维护。", en: "From content pipelines and design tokens to Cloudflare delivery, this explains how the field stays maintainable." },
     sections: [
       { heading: { zh: "内容管线", en: "Content pipeline" }, paragraphs: [{ zh: "长文使用 MDX，项目、证据模块、图片档案、曲目清单与歌词使用结构化数据，页面组件不持有重复内容。新增文章、图片或曲目时，导航、列表和 sitemap 都从同一来源生成。", en: "Long-form writing uses MDX, while projects, evidence modules, the image archive, the track list and lyrics use structured data. Page components do not own duplicate content, so navigation, indexes and the sitemap all derive from the same sources." }]},
       { heading: { zh: "界面系统", en: "Interface system" }, paragraphs: [{ zh: "Next.js 和 React 负责结构，TypeScript 约束数据边界，Tailwind CSS 与设计令牌统一主题，GSAP 只处理需要明确编排的运动；声音交给浏览器原生 audio，不做任何绕过授权限制的处理。", en: "Next.js and React provide structure, TypeScript constrains data boundaries, Tailwind CSS and tokens unify themes, and GSAP handles only motion that needs explicit choreography. Sound uses the browser's native audio element, with nothing that would bypass licensing limits." }]},
-      { heading: { zh: "静态交付", en: "Static delivery" }, paragraphs: [{ zh: "站点以静态页面交付，核心内容不依赖服务器运行。构建过程同时验证类型、路由和内容入口，让发布结果可以被检查和复现。", en: "The site ships as static pages, so core content does not depend on a running server. The build validates types, routes and content entrances, keeping releases inspectable and reproducible." }]},
+      { heading: { zh: "混合交付", en: "Hybrid delivery" }, paragraphs: [{ zh: "文章等核心内容在构建时预渲染，登录、考试、留言与访问统计由 Cloudflare Worker 的服务端路由处理。构建过程验证类型、路由和内容入口；上线后仍需分别检查外部 API、密钥与数据库状态。", en: "Core content such as articles is prerendered at build time, while sign-in, exams, messages and analytics use server routes on a Cloudflare Worker. The build validates types, routes and content entrances; external APIs, secrets and database state still need separate checks after deployment." }]},
     ],
   },
 ];

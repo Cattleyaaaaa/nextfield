@@ -1,0 +1,19 @@
+---
+title: "How to Add Depth Without a Heavy 3D Scene"
+summary: "Use restrained perspective, Z-axis layers, and pointer feedback, while preserving a quiet version for touch and reduced motion."
+tags: ["GSAP", "3D", "Performance"]
+---
+
+A sense of space on the web does not require a complete WebGL scene. A few clear layers and a consistent direction of movement are often enough.
+
+## Depth comes from relative movement
+
+When a container tilts slightly with the pointer while its title, graphic, and shine occupy different positions on the Z axis, the brain reads the distance between them. The aim is not a larger angle; it is a stable relationship among the layers.
+
+## Animate composited properties
+
+High-frequency pointer feedback should change only `transform`, updating targets through reusable tweens. Repeatedly changing width, height, or layout position adds pressure to layout and painting.
+
+## Motion needs a still version
+
+Touch screens have no hover, and some people actively choose reduced motion. Once tilt is disabled, the card must still have complete layout, contrast, and interaction states. Motion should enhance the page, not be required to understand it.

@@ -1,0 +1,61 @@
+---
+title: "If It Looks Like a Bug, It Is a Bug"
+date: "2026-09-23"
+category: "Interaction"
+tags: ["Interaction", "Design judgment", "Debugging"]
+summary: "If visitors cannot tell a design choice from a broken interface, correct code is not enough; measure the result before shipping."
+---
+
+The code had no errors. Type checking passed, and nobody objected in review. Then a user sent a screenshot: “This letter looks wrong.”
+
+They were right. A decoration covered a letter, and the tails of two others were clipped. More revealingly, I had stared at the code for a long time and thought it was correct.
+
+## Intent must be visible, not explained
+
+An interface answers to the person in front of the screen, not the compiler. If a flower covers a letter, the viewer concludes that something is broken. Explaining that it was intentional decoration is beside the point: **the cost of explanation has already been passed to the user**.
+
+It is the visual counterpart of “it runs, so it is fine”:
+
+- A compiler may accept something a person does not.
+- Code may pass review but fail the eye test.
+- Clear explanations are weaker than a presentation that needs none.
+
+The standard changes from “Does the code follow conventions?” to “Does the screen communicate the intent?”
+
+## Correct is not necessarily readable
+
+These problems are rarely simple mistakes. More often, something is only half right.
+
+**Replaced elements do not stretch with `inset`.** Setting all four insets to make a centered circle works on a `div`, but not on an `img`. The image uses its intrinsic size and anchors at the upper-left; the surplus constraints are ignored. The cover ends up out of place.
+
+**Most letters fit the clipping space.** A per-letter entrance animation needs a clipping layer with some bottom padding. `0.06em` works for letters without descenders, but `y` and `g` extend about `0.24em` below the baseline. Their tails are cut flat.
+
+**A percentage can be exact at one width.** A decoration positioned with `right: 14%` may look perfect in one window. But the type scales with `clamp(4rem, 14vw, 12.5rem)` while the decoration scales with the container. Change the width and it drifts across another letter.
+
+**Animation overwrite is harmless most of the time.** Hover animation with `overwrite: "auto"` works after the entrance finishes. Trigger it earlier and it can kill the entrance tween, freezing a letter halfway in.
+
+All four fail only for particular inputs, sizes, or timings. Static review is unlikely to catch them.
+
+## Replace “looks about right” with numbers
+
+To check whether a decoration overlaps a letter, compare their rectangles:
+
+```js
+const overlap = !(decor.left >= letter.right || decor.right <= letter.left);
+```
+
+To check clipping, use canvas font metrics to calculate the ink's lower edge and compare it to the clipping box:
+
+```js
+const ctx = document.createElement("canvas").getContext("2d");
+ctx.font = `${weight} ${size} ${family}`;
+const inkBottom = baseline + ctx.measureText("y").actualBoundingBoxDescent;
+```
+
+To test whether animation still runs, read the transform matrix twice and compare the angle or length. The calculations are not hard; the habit is to measure when something merely “looks close.”
+
+## Treat confusion as a signal
+
+“Is this broken?” is valuable feedback. It means someone did the testing for you and found a problem. The first response should not be a defense of the intention. It should be recognition that the interface failed to convey it. Move the decoration, show the complete letters, and let the motion start and finish clearly.
+
+To a user, an interface that needs a manual to explain itself is not very different from one that is actually broken.

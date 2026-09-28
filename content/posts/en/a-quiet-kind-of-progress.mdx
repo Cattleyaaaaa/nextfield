@@ -1,0 +1,57 @@
+---
+title: "A Quiet Kind of Progress"
+date: "2026-09-20"
+category: "Design"
+tags: ["Engineering", "Process", "Retrospective"]
+summary: "Not every improvement is a new feature; clearer types, recoverable errors, and fewer stalls quietly change how a product earns trust."
+---
+
+Release notes usually list new features. But the work that truly changes a product is often the work that does not fit on that list.
+
+## Invisible work
+
+Three kinds of progress rarely appear under “What's new”:
+
+**Clearer types.** A field changes from `string` to a union type, or an optional argument becomes required. The feature looks identical, but the compiler now remembers assumptions that previously depended on a person's memory.
+
+**More recoverable errors.** Failed requests can be retried without duplicate writes. After an interruption, the user can return to the same place. People rarely notice until the one day something goes wrong.
+
+**One less stall.** The homepage loads without a blocking script, scrolling causes one less layout shift, and a slower device avoids a blank screen. Nobody sees a feature, yet the improvement happens every day.
+
+What they share is this: **people notice them mainly when they are missing**. Good work receives little praise; bad work draws complaints. So it is easy to defer them until “there is time.”
+
+## Why this work is undervalued
+
+It lacks an obvious artifact to show. A new feature can be photographed, demonstrated, and included in a weekly report. “Completed the error states” is difficult to demo unless you deliberately cut the connection—which can look like creating a problem for yourself.
+
+In planning, these tasks are at a disadvantage:
+
+- Stakeholders cannot see them, so they rarely request them.
+- Before a failure, there is little visible evidence of their importance.
+- After completion, they bring little immediate positive feedback.
+
+The way out is to **record stability as an output too**.
+
+## Keep a record of stability
+
+This site gives space to things that did not happen:
+
+- The **Build Log** records not just additions but complexity removed and why.
+- The **Failure Museum** collects abandoned approaches and the judgments they left behind.
+- Many **Writing** entries about pitfalls come from moments when a failure was almost allowed through.
+
+There are concrete benefits:
+
+1. The next similar problem has a reference; we need not rediscover it.
+2. We can see whether the system is improving rather than merely accumulating features.
+3. Stability work gains a visible outcome and is less likely to be deferred forever.
+
+## Another source of momentum
+
+If progress is measured only in features, it is possible to do a lot of work without knowing what got better. Try asking:
+
+- Which class of error can no longer occur after the last change?
+- Which assumption is now protected by a type or test instead of memory?
+- Which path used to get stuck but no longer does?
+
+If those questions have answers, progress is real. If not, a long feature list may still feel fragile. Quiet progress is not exciting, but it determines whether something can be trusted over time.

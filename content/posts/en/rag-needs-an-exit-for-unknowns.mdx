@@ -1,0 +1,27 @@
+---
+title: "RAG Needs a Way to Say ‘I Don't Know’"
+summary: "Retrieving text is not the same as finding an answer; the interface should let the system stop when evidence is missing."
+date: 2026-09-24
+category: "Agent"
+tags: ["RAG", "Retrieval", "Reliability"]
+---
+
+RAG is often drawn as a straight line: question, retrieval, generation, answer. The difficult moment is when the retrieved results look relevant but are insufficient to answer the question.
+
+## Similarity is not support
+
+If a user asks when a new contract takes effect, retrieval may return the date of an old contract and an introduction to the new one. Both snippets resemble the question, but neither supports a definite date. A model may combine them into an answer that sounds smooth and is dangerously wrong.
+
+After retrieval, a separate judgment is needed: Does the source contain the required fact? Does its version match? Does the citation actually support the conclusion? Adding “perhaps” to the answer does not resolve these questions.
+
+## Show what is missing
+
+Instead of a generic “insufficient information,” identify the gap: the effective date of the new version is absent, only old terms were found, or the current document has no publication date. The user can then add material or ask the responsible person.
+
+Such an interface does not hide failure. It separates **what can be answered** from **what remains unverified**, so the user knows what to do next.
+
+## A citation is a checkable promise
+
+A citation button should not be decorative. Opening it should lead to the specific document and passage. If the document changes or is withdrawn, the answer should warn that its basis may be stale. Once the chain of evidence breaks, the original confident tone is no longer justified.
+
+A system that can say, “I don't know because this evidence is missing,” is often more trustworthy than one that always produces a complete sentence.

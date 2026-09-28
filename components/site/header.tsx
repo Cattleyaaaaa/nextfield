@@ -5,14 +5,15 @@ import { ThemeToggle } from "@/components/site/theme-toggle";
 import { BackToTopButton } from "@/components/site/back-to-top-button";
 import { GlobalEffectsMenu } from "@/components/site/global-effects-menu";
 import { HeaderSpecularButton } from "@/components/site/header-specular-button";
+import { HeaderAccountControl } from "@/components/site/header-account-control";
 import { usePageTransition } from "@/components/site/page-transition-provider";
 import { TransitionLink } from "@/components/site/transition-link";
 import { useStudioBadgeDrop } from "@/components/visual/studio-badge-drop";
 import {
   BadgePlus,
-  Github,
   GraduationCap,
   ChartNoAxesCombined,
+  MessageCircle,
 } from "lucide-react";
 import {
   LanguageToggle,
@@ -110,18 +111,15 @@ export function Header() {
             <GraduationCap className="size-3.5" />
             <span className="hidden xl:inline">LEARN</span>
           </HeaderSpecularButton>
-          {pathname.startsWith("/learn") && (
-            <TransitionLink
-              href="/learn/login"
-              aria-label={locale === "zh" ? "GitHub 登录" : "GitHub sign-in"}
-              className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-2 text-xs text-ink hover:border-accent hover:text-accent"
-            >
-              <Github className="size-3.5" aria-hidden="true" />
-              <span className="hidden sm:inline">
-                {locale === "zh" ? "登录" : "Sign in"}
-              </span>
-            </TransitionLink>
-          )}
+          <HeaderSpecularButton
+            ariaLabel={locale === "zh" ? "留言板" : "Guestbook"}
+            title={locale === "zh" ? "留言板" : "Guestbook"}
+            className={pathname.startsWith("/messages") ? "header-specular-button--studio header-specular-button--active" : "header-specular-button--studio"}
+            href="/messages"
+          >
+            <MessageCircle className="size-3.5" />
+            <span className="hidden xl:inline">{locale === "zh" ? "留言" : "Messages"}</span>
+          </HeaderSpecularButton>
           <HeaderSpecularButton
             ariaLabel={locale === "zh" ? "访问统计" : "Analytics"}
             title={locale === "zh" ? "访问统计" : "Analytics"}
@@ -167,6 +165,8 @@ export function Header() {
             <GlobalEffectsMenu />
             <ThemeToggle />
           </div>
+          <span aria-hidden="true" className="mx-1 hidden h-6 border-l border-line sm:block" />
+          <HeaderAccountControl />
         </div>
       </div>
     </header>

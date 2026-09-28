@@ -70,5 +70,5 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 export function LanguageToggle({ footer = false }: { footer?: boolean }) {
   const { locale, toggle } = useContext(LanguageContext);
   if (footer) return <button className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-accent" onClick={toggle} type="button"><Languages className="size-3.5" />{locale === "zh" ? "EN" : "中文"}</button>;
-  return <HeaderSpecularButton ariaLabel={locale === "zh" ? "Switch site to English" : "将网站切换为中文"} className="header-specular-button--icon" onClick={toggle} title={locale === "zh" ? "English" : "中文"} type="button"><span className="font-mono text-[9px] font-semibold">{locale === "zh" ? "EN" : "中"}</span></HeaderSpecularButton>;
+  return <HeaderSpecularButton ariaLabel={locale === "zh" ? "Switch site to English" : "将网站切换为中文"} className="header-specular-button--icon" onClick={toggle} title={locale === "zh" ? "English" : "中文"} type="button"><span className="font-mono text-[9px] font-semibold">{locale === "zh" ? "EN" : "中文"}</span></HeaderSpecularButton>;
 }

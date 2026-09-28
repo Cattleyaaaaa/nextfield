@@ -10,6 +10,7 @@ export type PostMeta = {
   category: string;
   tags: string[];
   summary: string;
+  english: { title: string; summary: string; tags: string[]; minutes: number } | null;
   /** 由正文自动估算的阅读时长（分钟） */
   minutes: number;
   /** 标记为示例的文章会带一条醒目横幅，且不参与搜索引擎收录 */

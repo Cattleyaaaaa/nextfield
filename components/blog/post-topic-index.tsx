@@ -80,7 +80,7 @@ export function PostTopicIndex({ posts }: { posts: PostMeta[] }) {
       (post) =>
         (activeCategory === ALL || post.category === activeCategory) &&
         (!needle ||
-          `${post.title} ${post.summary} ${post.category} ${post.tags.join(" ")}`
+          `${post.title} ${post.summary} ${post.category} ${post.tags.join(" ")} ${post.english?.title || ""} ${post.english?.summary || ""} ${post.english?.tags.join(" ") || ""}`
             .toLocaleLowerCase()
             .includes(needle)),
     );
@@ -255,18 +255,18 @@ export function PostTopicIndex({ posts }: { posts: PostMeta[] }) {
                         </span>
                         <span className="min-w-0">
                           <strong className="block font-display text-xl font-normal leading-tight tracking-[-0.025em] group-hover:text-accent sm:text-2xl">
-                            {post.title}
+                            {locale === "en" ? post.english?.title || post.title : post.title}
                           </strong>
                           <span className="mt-2 block max-w-3xl text-sm leading-6 text-muted">
-                            {post.summary}
+                            {locale === "en" ? post.english?.summary || post.summary : post.summary}
                           </span>
                           <span className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[10px] text-muted">
                             <span>{post.date}</span>
                             <span>
-                              {post.minutes} {locale === "zh" ? "分钟" : "min"}
+                              {locale === "en" ? post.english?.minutes ?? post.minutes : post.minutes} {locale === "zh" ? "分钟" : "min"}
                             </span>
                             <span className="truncate">
-                              {post.tags.slice(0, 3).join(" / ")}
+                              {(locale === "en" ? post.english?.tags || post.tags : post.tags).slice(0, 3).join(" / ")}
                             </span>
                           </span>
                         </span>

@@ -1,0 +1,25 @@
+---
+title: "A Daily Image Is Not a Daily Update"
+summary: "Using the date to generate an image does not mean the page recalculates at midnight."
+date: 2026-09-24
+category: "Frontend"
+tags: ["Next.js", "Static pages", "Time"]
+---
+
+Hash a date, then use the result to arrange circles, colors, and angles, and you get a pattern that is the same within a day and different across days. The algorithm is sound, but it is easy to miss an earlier question: **When is the date read?**
+
+## Today's date at build time
+
+If the homepage is statically built, the date read during generation is baked into the output. The next day, visitors still receive that already-generated page. Refreshing the browser requests the same content; it does not rerun build-time code.
+
+“Daily” here describes the input rule, not the delivery frequency. The image changes with the calendar only after a rebuild, or by choosing a strategy such as request-time generation, client-side calculation, or daily revalidation.
+
+## A different strategy brings different questions
+
+Client-side calculation can follow the visitor's local date immediately, but it may disagree with the server's initial image. Request-time calculation can unify the result, but requires server participation. Daily cache updates are lighter, but need a defined timezone and refresh time.
+
+Set the product rule first: Which timezone counts? Must the image change exactly at midnight? Which day should appear offline? Choosing the rendering method after answering those questions is more reliable than starting with a randomizing function.
+
+## Be honest about the current version
+
+If the page still relies on a manual rebuild, its copy should not imply that it changes automatically at midnight. A tiny date-based illustration ultimately tests not the math, but the interface's honesty about how it runs.

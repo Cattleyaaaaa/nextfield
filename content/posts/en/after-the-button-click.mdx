@@ -1,0 +1,25 @@
+---
+title: "What Does the Interface Owe You After a Click?"
+summary: "A click is not the end of an interaction; waiting, success, failure, and undo are parts of the same action."
+date: 2026-09-24
+category: "Interaction"
+tags: ["State design", "Feedback", "Forms"]
+---
+
+Button labels usually use decisive verbs: “Save,” “Submit,” “Generate.” After clicking, however, the user faces a period of uncertainty. During that time, the interface must continue honoring the button's promise.
+
+## Show that the click was received
+
+The button can temporarily show a processing state with a note about what is happening. The key is not to make a second click seem like the only remedy. If an operation may take a while, let people leave the view and tell them where to find the result later.
+
+## Give success a destination
+
+“Success” by itself is not enough. Where is the saved content? Can a submission still be edited? How can a generated result be used? Feedback closer to the user's original goal needs less explanation.
+
+For example, showing a link to the saved draft is more useful than a green toast that quickly disappears. A state is not just a color; it is a route to the next step.
+
+## Failure must be recoverable
+
+Keep entered content when a request fails. Avoid creating duplicates on retry. If only half an operation succeeded, say which half took effect. Blaming a “network error” while clearing the form makes the user absorb the system's cost.
+
+Finally, there is undo. Reversible actions do not always need a heavy confirmation dialog; a clear undo path suits many everyday tasks. A button's true design scope begins with the click and ends when the user can continue working.

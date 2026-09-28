@@ -201,6 +201,25 @@ html.theme-transition * {
   opacity: 1;
 }
 
+@keyframes guestbook-entry-rise {
+  from { opacity: 0; transform: perspective(900px) translateY(18px) rotateX(3deg); }
+  to { opacity: 1; transform: perspective(900px) translateY(0) rotateX(0); }
+}
+
+.guestbook-entry {
+  animation: guestbook-entry-rise 650ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  transform-origin: top center;
+}
+
+.post-content--en,
+html[data-locale="en"] .post-content--zh {
+  display: none;
+}
+
+html[data-locale="en"] .post-content--en {
+  display: block;
+}
+
 @keyframes radio-signal {
   0%, 100% { transform: scaleY(0.28); opacity: 0.45; }
   50% { transform: scaleY(1); opacity: 1; }

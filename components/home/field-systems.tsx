@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { ArrowUpRight, Check, Fingerprint, Orbit, RadioTower } from "lucide-react";
+import { useMemo, useState } from "react";
+import { ArrowUpRight, Fingerprint, Orbit, RadioTower } from "lucide-react";
 import { TransitionLink } from "@/components/site/transition-link";
 import { usePageTransition } from "@/components/site/page-transition-provider";
 import { CAPABILITIES, FIELD_CHANNELS } from "@/lib/nextfield-data";
@@ -75,38 +75,6 @@ export function CapabilityMap() {
           {CAPABILITIES.map((item, index) => <button className={`absolute max-w-32 -translate-x-1/2 -translate-y-1/2 rounded-full border px-4 py-3 text-center text-xs shadow-lg ${active === index ? "border-accent bg-ink text-paper" : "border-line bg-paper text-ink hover:border-accent"}`} key={item.id} onClick={() => setActive(index)} style={{ left: `${item.x}%`, top: `${item.y}%` }} type="button">{item.label}</button>)}
         </div>
         <aside className="flex flex-col border-t border-line bg-paper p-6 lg:border-l lg:border-t-0"><Fingerprint className="size-5 text-accent" /><p className="mt-8 font-mono text-[10px] tracking-[0.18em] text-accent">EVIDENCE / {String(active + 1).padStart(2, "0")}</p><h3 className="mt-3 font-display text-3xl tracking-[-0.04em]">{selected.label}</h3><p className="mt-5 text-sm leading-7 text-muted">{selected.evidence}</p><div className="mt-auto space-y-2 pt-10">{selected.links.map((href, index) => <TransitionLink className="flex items-center justify-between border-t border-line py-3 text-xs hover:text-accent" href={href} key={href}>查看证据 {String(index + 1).padStart(2, "0")} <ArrowUpRight className="size-3.5" /></TransitionLink>)}</div></aside>
-      </div>
-    </section>
-  );
-}
-
-type Trace = { word: string; color: string; x: number; y: number };
-const WORDS = ["BUILDING", "CURIOUS", "LEARNING", "SHIPPING", "RESTING"];
-const COLORS = ["#9de5e2", "#e9bd63", "#ec8b78", "#9bb8ef"];
-const STARTER_TRACES: Trace[] = [{ word: "CURIOUS", color: COLORS[0], x: 18, y: 28 }, { word: "BUILDING", color: COLORS[1], x: 64, y: 19 }, { word: "LEARNING", color: COLORS[3], x: 78, y: 69 }];
-
-export function VisitorTrace() {
-  const [traces, setTraces] = useState<Trace[]>(STARTER_TRACES);
-  const [word, setWord] = useState(WORDS[0]);
-  const [color, setColor] = useState(COLORS[0]);
-  const [left, setLeft] = useState(false);
-  useEffect(() => {
-    const saved = window.localStorage.getItem("nextfield-visitor-traces");
-    if (saved) { try { setTraces([...STARTER_TRACES, ...JSON.parse(saved)]); setLeft(true); } catch {} }
-  }, []);
-  const leave = () => {
-    if (left) return;
-    const trace = { word, color, x: 14 + Math.random() * 72, y: 16 + Math.random() * 68 };
-    setTraces((current) => [...current, trace]);
-    window.localStorage.setItem("nextfield-visitor-traces", JSON.stringify([trace]));
-    window.dispatchEvent(new CustomEvent("nextfield:mission", { detail: "trace" }));
-    setLeft(true);
-  };
-  return (
-    <section className="border-y border-line bg-ink text-paper">
-      <div className="mx-auto grid max-w-site gap-10 px-5 py-24 sm:px-8 lg:grid-cols-[1fr_22rem] lg:px-12">
-        <div><p className="text-xs font-semibold uppercase tracking-[0.24em] text-liquid-foam">Visitor trace / 09</p><h2 className="mt-6 font-display text-[clamp(3rem,6vw,6rem)] leading-[0.88] tracking-[-0.06em]">LEAVE A<br />SMALL SIGNAL.</h2><div className="relative mt-10 min-h-[24rem] overflow-hidden rounded-[1.5rem] border border-paper/15 bg-[radial-gradient(circle_at_50%_50%,rgb(var(--liquid-mid)/.45),transparent_60%)]">{traces.map((trace, index) => <span className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full border px-3 py-1.5 font-mono text-[9px] tracking-[0.15em]" key={`${trace.word}-${index}`} style={{ borderColor: `${trace.color}77`, color: trace.color, left: `${trace.x}%`, top: `${trace.y}%`, boxShadow: `0 0 24px ${trace.color}33` }}>{trace.word}</span>)}</div></div>
-        <aside className="self-end rounded-[1.5rem] border border-paper/15 bg-paper/5 p-6"><p className="text-sm font-medium">你此刻处于什么状态？</p><div className="mt-5 flex flex-wrap gap-2">{WORDS.map((item) => <button className={`rounded-full border px-3 py-1.5 font-mono text-[9px] ${word === item ? "border-liquid-foam bg-liquid-foam text-ink" : "border-paper/15 text-paper/60"}`} key={item} onClick={() => setWord(item)} type="button">{item}</button>)}</div><p className="mt-6 text-xs text-paper/45">选择一个颜色</p><div className="mt-3 flex gap-3">{COLORS.map((item) => <button aria-label={`选择颜色 ${item}`} className={`size-7 rounded-full ${color === item ? "ring-2 ring-paper ring-offset-2 ring-offset-ink" : ""}`} key={item} onClick={() => setColor(item)} style={{ backgroundColor: item }} type="button" />)}</div><button className="mt-8 flex w-full items-center justify-center gap-2 rounded-full bg-paper px-4 py-3 text-sm text-ink disabled:opacity-50" disabled={left} onClick={leave} type="button">{left ? <><Check className="size-4" /> 信号已留下</> : "留下匿名信号"}</button><p className="mt-4 text-[10px] leading-5 text-paper/35">痕迹只保存在你的浏览器中，不上传身份或行为数据。</p></aside>
       </div>
     </section>
   );

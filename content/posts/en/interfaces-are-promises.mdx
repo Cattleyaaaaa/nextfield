@@ -1,0 +1,58 @@
+---
+title: "Interfaces Are Promises"
+date: "2026-09-21"
+category: "Interaction"
+tags: ["Interaction", "State design", "Product"]
+summary: "Buttons, progress bars, confirmations, and errors each promise how a system will act next; when the promise fails, trust fails too."
+---
+
+A button labeled “Save” promises that what you entered will not quietly disappear.
+
+A moving progress bar promises that the system knows how far the task has gone.
+
+A confirmation dialog promises that the final decision remains yours.
+
+Every interface state is a promise. Its creator may treat it as a visual element; its user reads it as a contract.
+
+## Every state sets an expectation
+
+Promises need not be spoken. They live in details:
+
+- **Disabled** promises, “You cannot act now, and the system knows why.”
+- **Loading** promises, “Processing has started; it has not frozen.”
+- **Success** promises, “The result is settled; you may safely leave.”
+- **Undo** promises, “You can still go back if you change your mind.”
+
+Missing a state makes a promise too: “I do not intend to tell you.” A button with no feedback leaves the user guessing whether the click registered.
+
+That is why “build the interaction first, add states later” often fails. If you do not know what state the system is in, you cannot know what to show or what to promise.
+
+## Failure is not the end of the promise
+
+A reliable interface must show more than success. It should answer four questions:
+
+1. **What failed?** Not just “an error,” but which step or field.
+2. **What already happened?** Were there side effects or partial writes?
+3. **Can I retry?** Is it safe, or would it repeat the action?
+4. **Who chooses the next step?** Will the system recover automatically, or does the user decide?
+
+“Operation failed” hands all four questions to the person with the least information. It appears efficient, but shifts the cost to the user.
+
+This is especially obvious in agent products. A model call can time out, a tool can return an unexpected shape, or context can run out. If the interface only says “Thinking,” users cannot know whether to wait or interrupt, or what interruption would do. **Draw the state machine first; then the interface has something real to promise.**
+
+## Promises should be verifiable
+
+Several checks are easy to miss:
+
+- Does the button label match its actual effect? Does “Save” truly persist data?
+- Is the progress bar tied to progress rather than a meaningless animation?
+- Does Undo restore the prior state, including invisible side effects?
+- Does an error message contain the information needed for the next step?
+
+These can be checked one by one. The harder part is admitting that **a beautiful interface that cannot keep its promises costs more than a plain, accurate one**.
+
+## Promise less, then deliver
+
+Interfaces often overpromise to feel smooth: a progress bar outruns the work; “success” appears before the write finishes; “automatic retry” masks a failure. It may feel better briefly but spends trust in the long run. Once people discover one fake progress bar, they question every other promise on screen.
+
+A steadier approach is to promise less and deliver each time. If progress is unknown, do not claim a percentage. If retry is unavailable, do not imply it. If an operation fails, explain the failure.

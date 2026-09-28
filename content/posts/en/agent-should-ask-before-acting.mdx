@@ -1,0 +1,27 @@
+---
+title: "When Should an Agent Ask First?"
+summary: "Make confirmation a boundary for action, not a popup at every step."
+date: 2026-09-24
+category: "Agent"
+tags: ["Agent", "Authorization", "Product design"]
+---
+
+An agent can carry out a sequence of tasks, which makes it tempting to treat asking fewer questions as progress. But when the next step changes the outside world, silence is not necessarily efficiency. It may quietly take a decision away from the person.
+
+## Look at consequences, not action names
+
+“Writing a file” sounds more dangerous than “reading a file,” but what matters is where the writing happens, whether it can be undone, and who is affected. Editing a temporary draft and overwriting a shared document are both writes with very different consequences.
+
+When designing a confirmation point, I ask three questions: Can this step be reversed? Does its impact leave the current user's private space? Could the user infer from the task goal that this step would happen? If the answers are “no,” “yes,” and “no,” confirmation should not be skipped.
+
+## Confirmation is more than “Continue?”
+
+A useful confirmation explains **what will happen, where the effects will reach, and how to recover if it fails**. Showing the recipient and message before sending is more helpful than merely asking, “Are you sure?” Confirmation belongs at the last reversible point, not at the start of a task where every possible risk is presented at once.
+
+Too many confirmations have a cost as well. If every step opens a dialog, people learn to click through. Low-risk, reversible actions can be authorized together; high-risk actions deserve separate confirmation. This makes the boundary recognizable.
+
+## Refusal is a normal outcome
+
+The confirmation interface must offer the agent a graceful exit. After a refusal, the system should explain which steps are complete and which were not run, while retaining editable intermediate work. “Denied” is not an error; it is evidence that the user remains in control.
+
+A good agent does not avoid interrupting people at all costs. It knows which judgments are not its own to make.

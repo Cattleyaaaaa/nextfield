@@ -5,6 +5,7 @@ import type { PostMeta } from "@/types/post";
 export type { PostMeta };
 
 const POSTS_DIR = path.join(process.cwd(), "content", "posts");
+const ENGLISH_POSTS_DIR = path.join(POSTS_DIR, "en");
 const POST_EXTENSION = ".mdx";
 
 type FrontmatterValue = string | string[];
@@ -73,6 +74,10 @@ function asString(value: FrontmatterValue | undefined, fallback = "") {
 function toMeta(slug: string, data: Frontmatter, content: string): PostMeta {
   const date = asString(data.date);
   const [year, month] = date.split("-");
+  const englishPath = path.join(ENGLISH_POSTS_DIR, slug + POST_EXTENSION);
+  const englishPost = fs.existsSync(englishPath)
+    ? parseFrontmatter(fs.readFileSync(englishPath, "utf8"))
+    : null;
   return {
     slug,
     title: asString(data.title, slug),
@@ -81,6 +86,12 @@ function toMeta(slug: string, data: Frontmatter, content: string): PostMeta {
     category: asString(data.category, "其他"),
     tags: Array.isArray(data.tags) ? data.tags : [],
     summary: asString(data.summary),
+    english: englishPost ? {
+      title: asString(englishPost.data.title, asString(data.title, slug)),
+      summary: asString(englishPost.data.summary, asString(data.summary)),
+      tags: Array.isArray(englishPost.data.tags) ? englishPost.data.tags : (Array.isArray(data.tags) ? data.tags : []),
+      minutes: estimateMinutes(englishPost.content),
+    } : null,
     minutes: estimateMinutes(content),
     sample: asString(data.sample) === "true",
   };
@@ -132,7 +143,9 @@ export function getPublishedPosts(): PostMeta[] {
 
 // webpack 会把这段模板字面量动态 import 编译成一个 context，
 // 匹配 content/posts 下的所有 .mdx —— 新增文章不需要改这里的代码。
-export async function loadPostComponent(slug: string) {
-  const mod = await import(`@/content/posts/${slug}.mdx`);
+export async function loadPostComponent(slug: string, locale: "zh" | "en" = "zh") {
+  const mod = locale === "en"
+    ? await import(`@/content/posts/en/${slug}.mdx`)
+    : await import(`@/content/posts/${slug}.mdx`);
   return mod.default;
 }

@@ -3,7 +3,7 @@ import { ZentryHome } from "@/components/home/zentry-home";
 import { ProjectConstellation } from "@/components/home/project-constellation";
 import { OpenExperiments } from "@/components/home/open-experiments";
 import { SelectedNotes } from "@/components/home/selected-notes";
-import { CapabilityMap, DailyField, FieldChannels, VisitorTrace } from "@/components/home/field-systems";
+import { CapabilityMap, DailyField, FieldChannels } from "@/components/home/field-systems";
 import { TransitionLink } from "@/components/site/transition-link";
 import { ArrowUpRight } from "lucide-react";
 import { IndexThemeInitializer } from "@/components/site/index-theme-initializer";
@@ -44,7 +44,6 @@ export default function HomePage() {
       <OpenExperiments />
       <CapabilityMap />
       <SelectedNotes posts={selectedPosts} />
-      <VisitorTrace />
       <section className="mx-auto max-w-site px-5 py-24 sm:px-8 lg:px-12">
         <div className="rounded-[2rem] bg-ink px-7 py-14 text-paper sm:px-12 sm:py-20">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-liquid-foam">Colophon / 07</p>

@@ -11,6 +11,13 @@ import { useMotionPreference } from "@/lib/use-motion-preference";
 // 颜色直接继承站点主题，确保首页首次加载的浅色模式不会被这一屏局部覆盖。
 
 const HERO_LINES = ["Create", "Anything"];
+const HERO_DEPTH_CONFIG = {
+  perspective: 1400,
+  maxRotateX: 2.4,
+  maxRotateY: 3.6,
+  duration: 0.7,
+  ease: "power3.out",
+} as const;
 const SPRING_PATH =
   "M28 8 C 62 16, 62 28, 28 36 C -2 44, -2 56, 28 64 C 62 72, 62 84, 28 92 C -2 100, -2 112, 28 120 C 62 128, 60 140, 34 150";
 
@@ -38,6 +45,7 @@ export function KineticHero() {
   const rootRef = useRef<HTMLElement>(null);
   const springRef = useRef<SVGPathElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
+  const heroPlaneRef = useRef<HTMLDivElement>(null);
   /** 入场完成前悬停会 overwrite 掉入场进度，把字母冻在半空——就绪前不响应悬停 */
   const heroReadyRef = useRef(false);
 
@@ -108,6 +116,39 @@ export function KineticHero() {
     });
   }, { scope: rootRef, dependencies: [reducedMotion] });
 
+  useGSAP(() => {
+    const root = rootRef.current;
+    const plane = heroPlaneRef.current;
+    if (!root || !plane || reducedMotion || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+
+    gsap.set(plane, {
+      transformPerspective: HERO_DEPTH_CONFIG.perspective,
+      transformStyle: "preserve-3d",
+      transformOrigin: "50% 50%",
+    });
+    const rotateXTo = gsap.quickTo(plane, "rotationX", { duration: HERO_DEPTH_CONFIG.duration, ease: HERO_DEPTH_CONFIG.ease });
+    const rotateYTo = gsap.quickTo(plane, "rotationY", { duration: HERO_DEPTH_CONFIG.duration, ease: HERO_DEPTH_CONFIG.ease });
+    const onMove = (event: PointerEvent) => {
+      if (event.pointerType !== "mouse") return;
+      const rect = root.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / rect.width - 0.5;
+      const y = (event.clientY - rect.top) / rect.height - 0.5;
+      rotateXTo(-y * HERO_DEPTH_CONFIG.maxRotateX * 2);
+      rotateYTo(x * HERO_DEPTH_CONFIG.maxRotateY * 2);
+    };
+    const onLeave = () => {
+      rotateXTo(0);
+      rotateYTo(0);
+    };
+
+    root.addEventListener("pointermove", onMove);
+    root.addEventListener("pointerleave", onLeave);
+    return () => {
+      root.removeEventListener("pointermove", onMove);
+      root.removeEventListener("pointerleave", onLeave);
+    };
+  }, { scope: rootRef, dependencies: [reducedMotion], revertOnUpdate: true });
+
   // 悬停逐字起伏：靠近指针的字母抬得高、邻座轻微带动，像被指尖推了一下。
   // 目标是 clip 层（cell）而不是内层字母——内层在自己的 overflow-hidden 里，转起来会被裁掉角。
   useEffect(() => {
@@ -171,7 +212,7 @@ export function KineticHero() {
     <section className="relative overflow-hidden bg-paper text-ink" ref={rootRef}>
       <AmbientGlow />
       <div className="relative mx-auto flex min-h-[calc(100svh-4rem)] max-w-site flex-col px-5 pb-12 pt-10 sm:px-8 lg:px-12">
-        <div className="relative my-auto">
+        <div className="relative my-auto" ref={heroPlaneRef}>
           {/* 左上花朵 */}
           <svg
             aria-hidden="true"

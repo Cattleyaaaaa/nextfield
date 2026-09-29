@@ -47,8 +47,9 @@ export function FieldRadio() {
   const [current, setCurrent] = useState(0);
   const [duration, setDuration] = useState(0);
   const [failed, setFailed] = useState(false);
-  // 拖动进度条时不能被 timeupdate 抢回原位，否则滑块会一直“弹回去”。
-  const [scrubbing, setScrubbing] = useState(false);
+  // 同步记录拖动状态，避免 pointerdown 后下一次 React 渲染前的 timeupdate 抢回滑块。
+  const scrubbingRef = useRef(false);
+  const scrubTimeRef = useRef(0);
   const [lyricsVisible, setLyricsVisible] = useState(false);
 
   const track = RADIO_TRACKS[index];
@@ -246,17 +247,22 @@ export function FieldRadio() {
     if (audio && Number.isFinite(value)) audio.currentTime = value;
   };
 
+  // 拖动中只预览进度；松手时才真正 seek，避免连续重载音频造成滑块卡顿。
   // 松手的位置可能在滑块外面，所以收尾监听挂在 window 上。
   useEffect(() => {
-    if (!scrubbing) return;
-    const stop = () => setScrubbing(false);
+    const stop = () => {
+      if (!scrubbingRef.current) return;
+      scrubbingRef.current = false;
+      const audio = audioRef.current;
+      if (audio && Number.isFinite(scrubTimeRef.current)) audio.currentTime = scrubTimeRef.current;
+    };
     window.addEventListener("pointerup", stop);
     window.addEventListener("pointercancel", stop);
     return () => {
       window.removeEventListener("pointerup", stop);
       window.removeEventListener("pointercancel", stop);
     };
-  }, [scrubbing]);
+  }, []);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -338,6 +344,8 @@ export function FieldRadio() {
   // 换曲目：重新加载并从头开始。正在播时才继续播，暂停状态切歌不会自动出声。
   useEffect(() => {
     const audio = audioRef.current;
+    scrubbingRef.current = false;
+    scrubTimeRef.current = 0;
     setCurrent(0);
     setDuration(0);
     setFailed(false);
@@ -389,7 +397,7 @@ export function FieldRadio() {
         onPlay={() => setPlaying(true)}
         // 真正开始播出时清掉历史错误：之前某次 play() 被 load 打断留下的提示不该一直挂着
         onPlaying={() => { setPlaying(true); setFailed(false); }}
-        onTimeUpdate={(event) => { if (!scrubbing) setCurrent(event.currentTarget.currentTime); }}
+        onTimeUpdate={(event) => { if (!scrubbingRef.current) setCurrent(event.currentTarget.currentTime); }}
         preload="none"
         ref={audioRef}
         src={track?.src}
@@ -438,8 +446,16 @@ export function FieldRadio() {
                   disabled={duration <= 0}
                   max={duration > 0 ? duration : 1}
                   min={0}
-                  onChange={(event) => seek(Number(event.target.value))}
-                  onPointerDown={() => setScrubbing(true)}
+                  onChange={(event) => {
+                    const value = Number(event.target.value);
+                    scrubTimeRef.current = value;
+                    if (scrubbingRef.current) setCurrent(value);
+                    else seek(value); // 键盘调整进度时立即生效。
+                  }}
+                  onPointerDown={(event) => {
+                    scrubTimeRef.current = Number(event.currentTarget.value);
+                    scrubbingRef.current = true;
+                  }}
                   step="1"
                   style={{ background: `linear-gradient(to right, rgb(var(--liquid-foam)) ${progressPercent}%, rgb(var(--paper) / 0.15) ${progressPercent}%)` }}
                   type="range"

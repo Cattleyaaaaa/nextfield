@@ -1,0 +1,42 @@
+---
+title: "Where Cancellation Leaves the Interface"
+date: "2026-10-03"
+tags: ["Cancellation", "Task state", "Feedback"]
+summary: "Cancelling, closing and leaving a page are different actions. Explain what stops, what remains and where to continue so users can control a long task."
+---
+
+A cancel button is easy to draw. Defining the resulting system state is harder. Has the request stopped when text stops growing? Does closing a panel leave background work active? Should reopening show the original task or a blank view?
+
+These questions concern the intent expressed by the action. The interface should explain what that intent can affect and provide an understandable result.
+
+## Distinguish closing from cancelling
+
+Closing a panel can mean temporarily not wanting to see it. A global player may continue playing and an assistant can retain its session. That behaviour is reasonable without labelling the close button as task cancellation.
+
+Cancellation should refer to particular work: stop a request, withdraw a pending operation or end generation. If external effects already occurred, explain which of them remain instead of suggesting every action can be undone.
+
+Leaving a page introduces another boundary. Internal navigation and closing the browser can have different lifecycles and persistence. Explicit distinctions reduce misunderstandings when people use similar gestures with different expectations.
+
+## Cancelling is a state
+
+For work involving an external service, pressing the button and confirming termination may be separate moments. The interface can disable further actions and show cancellation in progress before reaching a cancelled state.
+
+A frozen spinner leaves someone wondering whether to click again. Returning immediately to an untouched initial view can conceal completed work. A brief, explicit state is more informative.
+
+Cancellation can also fail. Present what is confirmed: which work stopped, which results completed and which state remains uncertain. A button need not promise reversal of every effect.
+
+## Preserve useful input
+
+Someone may cancel because waiting is excessive or because the question needs editing. Retaining the input supports both intentions better than clearing the whole panel.
+
+Completed history should not vanish with the current task. History, input and temporary output are different information. Cancelling changes the current task; clearing a conversation can be a separate explicit action.
+
+Partial output may remain with an incomplete label or be removed with a message. The choice depends on its usefulness and whether it can support later decisions. It should not enter completed history silently.
+
+## Make reopening understandable
+
+A reopened panel should not require memory to explain where the last task ended. A cancelled label, retained question or restart action can provide a recovery path.
+
+Read-only questions may need only their input and an explanation that no complete answer was produced. Tasks with external writes require clearer effect records.
+
+Cancellation is a set of boundaries: what stopped, what remains and what can happen next. Explaining those gives control back to the user.

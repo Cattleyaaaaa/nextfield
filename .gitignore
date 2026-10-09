@@ -13,6 +13,8 @@ out
 !.cache/typescript/
 !.cache/typescript/.gitkeep
 tmp/
+lib/generated/field-agent-content.json
+lib/generated/field-agent-signals.json
 .env*
 !.env.example
 

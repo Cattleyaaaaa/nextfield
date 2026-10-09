@@ -19,10 +19,10 @@ const steps = [
     link: { zh: "阅读设计取舍", en: "Read the design rationale" },
   },
   {
-    number: "03", icon: Sparkles, href: "/build-log/making-the-hero-move",
-    label: { zh: "实现", en: "Build" }, title: { zh: "让首屏真正动起来。", en: "Make the first screen move." },
-    copy: { zh: "把静态叙事做成可交互的首页，同时保留清楚的文字、导航和关闭动效的选择。", en: "Turn a static story into an interactive homepage while keeping readable text, navigation and a way to reduce motion." },
-    link: { zh: "阅读动效建造记录", en: "Read the motion build log" },
+    number: "03", icon: Sparkles, href: "/build-log/field-agent-from-chat-to-site-guide",
+    label: { zh: "实现", en: "Build" }, title: { zh: "让内容拥有一个向导。", en: "Give the content a guide." },
+    copy: { zh: "V2.0.0 的 Field Agent 把互动光柱、内容信号与问题种子连接到流式站内问答，保留来源、匿名额度和关闭动效的选择。", en: "Field Agent in V2.0.0 connects interactive columns, content signals and question seeds to streamed site answers, keeping sources, anonymous quotas and motion controls visible. Content discovery and sending questions remain separate actions." },
+    link: { zh: "阅读 Field Agent 开发纪事", en: "Read the Field Agent build log" },
   },
   {
     number: "04", icon: Check, href: "/systems",

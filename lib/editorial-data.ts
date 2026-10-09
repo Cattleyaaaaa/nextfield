@@ -13,6 +13,35 @@ export type EditorialArticle = {
 
 export const BUILD_LOG_ARTICLES: EditorialArticle[] = [
   {
+    slug: "field-agent-from-chat-to-site-guide", date: "2026 · 10 · 08", eyebrow: "Build log / Field Agent", tags: ["Field Agent", "DeepSeek", "Streaming", "Retrieval"], minutes: 6,
+    title: { zh: "让 Field Agent 成为站内向导", en: "Turning Field Agent into a site guide" },
+    summary: { zh: "V2.0.0 从真实流式问答走向可点击的全息信号矩阵：让项目、文章与随笔成为内容信号，再用问题种子连接站内问答。记录这一版的交互、资料与设计取舍。", en: "V2.0.0 connects real streamed answers with a clickable holographic signal matrix: projects, writing and essays become content signals, with question seeds leading into site-grounded chat. This records the release's interaction, sources and design choices." },
+    sections: [
+      { heading: { zh: "先让入口和状态可见", en: "Make entry points and state visible" }, paragraphs: [
+        { zh: "Field Agent 的入口放在顶部导航与左下角常驻按钮中，Command Field 也保留入口。桌面打开右侧助手面板，手机使用全屏布局。内容区单独滚动，输入区固定在底部；关闭面板或切换站内页面后，对话保留在当前页面会话，刷新后清空。", en: "Field Agent opens from the header, a persistent lower-left button or Command Field. It uses a right-side panel on desktop and a full-screen view on phones. The conversation scrolls separately from the fixed composer. Closing the panel or navigating within the site preserves the current page session; refreshing clears it." },
+        { zh: "面板把连接、查阅资料、生成回答、失败与额度用完分开显示。免登录意味着访客可以直接提问，但不意味着无限调用：第一版每 IP 每日 5 次，全站每日 100 次，共用网络可能共用额度。", en: "The panel distinguishes connecting, reading sources, writing, failure and exhausted quota. Visitors can ask without signing in, within limits of five requests per IP and 100 site-wide daily. People on a shared network may share the same quota." },
+      ]},
+      { heading: { zh: "让文字在生成时出现", en: "Show text as it is generated" }, paragraphs: [
+        { zh: "回答通过服务端连接 DeepSeek，随着模型返回的增量逐段显示。界面先呈现生成中的文字，完成后才把校验过的来源卡片和回答写入对话历史；连接中断或引用编号无效时，临时回答被移除，问题保留供重试。", en: "A server connection to DeepSeek delivers text incrementally. The interface shows the answer in progress, then commits it and the checked source cards to conversation history on completion. If the connection breaks or a citation ID is invalid, the temporary answer is removed and the question remains available for retry." },
+        { zh: "正文隐藏了原来的 [2] 一类引用标识，来源卡片只显示文章标题。引用编号仍在服务端参与检查。回答也不再统一压到 200 字：介绍、解释和推荐类问题在资料充分时展开到约 300–600 字，简单问题保持简短。", en: "Inline markers such as [2] are hidden, and source cards show article titles. Citation IDs remain part of server checks. Answers are no longer uniformly capped at 200 Chinese characters: introductions, explanations and recommendations aim for about 300–600 when the sources support that depth, while simple questions stay short." },
+      ]},
+      { heading: { zh: "两次拒答暴露了资料入口的问题", en: "Two refusals exposed missing source paths" }, paragraphs: [
+        { zh: "“介绍这个网站”属于本站问题，却被误判为资料不足。检索过滤了“介绍”“这个”“网站”等词，短问题又自动继承上一轮 Neptune 的关键词。修正后，网站概览直接读取首页配置和公开栏目说明，只有明确追问才借用上一轮关键词，并增强原话题标题的权重。", en: "“Introduce this website” was incorrectly refused. Retrieval filtered out common introduction and site terms, while short questions automatically inherited Neptune keywords from the previous turn. Site overview questions now read the homepage configuration and public navigation descriptions directly. Only explicit follow-ups reuse prior keywords, with stronger weighting for the original topic title." },
+        { zh: "“介绍作者”则暴露了另一处遗漏：索引只有“关于我”的入口说明，没有完整自述。现在构建过程从实际页面提取简介、Agent 工作流与全栈能力说明，并识别作者、站长、博主等问法。资料不足仍会说明；扩充回答不等于补写未经公开的履历。", en: "“Introduce the author” revealed another omission: the index contained the About navigation summary but not the biography. The build now extracts the actual profile, Agent workflow and full-stack capability descriptions and recognises author and site-owner questions. Missing information is still acknowledged; a fuller answer does not invent an unpublished biography." },
+      ]},
+      { heading: { zh: "把动效集中在控制台", en: "Concentrate motion in the console" }, paragraphs: [
+        { zh: "新版使用青紫光晕、7×7 全息信号矩阵、背景粒子与网格。待机光柱保持静止，鼠标指向的光柱及紧邻光柱才升起；选中光柱增加亮白顶面、发光描边与局部光晕，移开后平滑恢复，避免整片矩阵跟着运动。生成回答时，对话区出现缩小的波动矩阵。绘制限制为每秒 30 帧，页面隐藏或面板卸载时停止；关闭动效时保留静态画面和内容入口。", en: "The console combines cyan-and-violet glows, a 7×7 signal matrix, background particles and a grid. Idle columns stay still; only the pointed column and its immediate neighbors rise. A bright cap, illuminated edges and a local glow make selection visible, then settle smoothly on exit. A compact matrix pulses during answer generation. Rendering is capped at 30 frames per second and stops when hidden or unmounted. Disabling motion retains the static composition and content entry points." },
+      ]},
+      { heading: { zh: "让光柱成为内容入口", en: "Turn columns into content entry points" }, paragraphs: [
+        { zh: "矩阵分为项目、文章、建站纪事、制作说明与随笔五类颜色区域，首版每类接入两条真实站内内容。悬停显示主题，点击展开标题、简介和建议问题；卡片可以打开原文，也可以换一条同主题内容。标题、简介和站内地址从公开知识资料生成，不交给模型临时编造。", en: "The matrix has five color regions: projects, writing, build logs, colophon notes and essays, each initially containing two real site entries. Hover shows the topic; clicking opens a title, summary and suggested question. A card can open its source or show another entry in the same topic. Titles, summaries and internal addresses are generated from public site sources rather than invented by the model." },
+        { zh: "“问问 Field Agent”先把问题种子放进输入框，由访客确认发送。发现、切换或阅读内容卡片不调用模型，也不消耗提问次数。手机可以点光柱或使用主题按钮，键盘可以使用方向键与 Enter；关闭动效时这些入口仍然可用。", en: "Ask Field Agent fills a question seed into the composer for the visitor to send. Discovering, switching or reading cards makes no model request and consumes no quota. Phones can tap columns or topic buttons; keyboard users can use arrow keys and Enter. These entry points also work with motion disabled." },
+      ]},
+      { heading: { zh: "本地验证与上线状态", en: "Local verification and release status" }, paragraphs: [
+        { zh: "此前本地检修已覆盖真实 DeepSeek 流式问答、网站概览、作者介绍、连续追问、引用隐藏，以及断线、截断和服务商错误处理。此次将版本整理为 V2.0.0，同步双语纪事、制作说明、十月文章收录清单及部署文档。类型检查、Cloudflare 构建和 Worker 打包预演通过。正式问答使用服务端模型密钥与 Durable Object 共享额度，实际部署与验收结果在版本说明中单独保存。", en: "Earlier local checks covered real DeepSeek streaming, site and author introductions, follow-ups, hidden citations, interrupted and truncated streams and provider errors. This revision prepares V2.0.0 with bilingual editorial notes, an October article inclusion manifest and deployment documentation. TypeScript, Cloudflare build and Worker packaging checks pass. Public chat uses a server-side model secret and shared Durable Object quotas. Deployment records and review results are maintained separately in the release notes." },
+      ]},
+    ],
+  },
+  {
     slug: "v1-3-1-radio-in-motion", date: "2026 · 09 · 28", eyebrow: "Build log / V1.3.1", tags: ["Field Radio", "Web Audio", "Playback"], minutes: 4,
     title: { zh: "让电台跟着音乐起伏", en: "Letting the radio move with the music" },
     summary: { zh: "电台加入上一首、随机下一首和三种播放模式；均衡器读取真实音频频谱，声波圈随低音扩散。", en: "Field Radio gains previous and random next controls plus three playback modes. Its equalizer follows the live spectrum, while sound rings expand with the bass." },
@@ -179,6 +208,33 @@ export const BUILD_LOG_ARTICLES: EditorialArticle[] = [
 
 export const COLOPHON_ARTICLES: EditorialArticle[] = [
   {
+    slug: "field-agent-sources-streaming-and-limits", date: "2026 · 10 · 08", eyebrow: "Colophon / Field Agent", tags: ["Retrieval", "Streaming", "Privacy", "Motion"], minutes: 6,
+    title: { zh: "Field Agent 的资料、流式回答与使用边界", en: "Field Agent: sources, streaming and limits" },
+    summary: { zh: "说明内容信号与问题种子如何连接公开资料、站内检索和流式回答，以及匿名额度、键盘入口与动效生命周期怎样协作。对应 V2.0.0。", en: "How content signals and question seeds connect public sources, retrieval and streamed answers, alongside anonymous quotas, keyboard access and animation lifecycles. This describes V2.0.0." },
+    sections: [
+      { heading: { zh: "资料来自实际内容", en: "Sources come from actual content" }, paragraphs: [
+        { zh: "构建脚本读取站点配置、导航、项目介绍、建站纪事、制作说明、随笔、失败记录及已跟踪的非草稿、非示例文章，生成站内知识索引。此次新增的十三篇双语文章通过明确收录清单进入索引，清单不自动扩展到其他本地文件。作者资料从“关于我”的简介、Agent 与全栈能力区域提取；课程目前只收录入口说明。", en: "The build indexes site configuration, navigation, project descriptions, build logs, colophon notes, essays, failure records and tracked articles that are neither drafts nor samples. An explicit inclusion manifest adds this release's thirteen bilingual articles without automatically admitting other local files. Author sources come from the About biography and Agent and full-stack capability sections; courses currently contribute only their entry descriptions." },
+        { zh: "当前检索使用关键词与中文双字片段评分，结合标题、正文和语言筛选，并不是向量数据库检索。网站概览和作者介绍有明确资料入口；一般问题取最多五份不同页面的资料。只有明确的追问才使用上轮问题关键词。", en: "Retrieval scores keywords and Chinese character pairs against titles, bodies and locale; it is not a vector database search. Site and author introductions have explicit source paths. General questions receive up to five sources from distinct pages, and only explicit follow-ups reuse the previous question's keywords." },
+      ]},
+      { heading: { zh: "增量文字与最终来源分开处理", en: "Handle incremental text and final sources separately" }, paragraphs: [
+        { zh: "浏览器只请求本站 API，DeepSeek 密钥留在服务端。服务端解析模型的 SSE 文字增量，以 NDJSON 发送额度、文字、完成和错误事件。前端按增量更新临时回答，完成后再提交到历史；取消请求会中止上游连接。", en: "The browser calls only the site's API; the DeepSeek key stays on the server. The server parses the provider's SSE text deltas and sends quota, text, completion and error events as NDJSON. The client updates a temporary answer incrementally and commits it only after completion. Cancelling the request aborts the upstream connection." },
+        { zh: "服务端检查引用编号是否属于本次检索资料，拒绝模型自行生成的链接，来源卡片的地址由检索结果提供。正文不显示编号，流式分块中的未完成标识也会隐藏。编号校验能约束来源范围，但不等于自动证明每一句事实都被资料支持。", en: "The server checks that citation IDs belong to the retrieved sources, rejects model-generated links and takes source-card addresses from retrieval results. The body hides citation IDs, including partial markers across streaming chunks. ID validation constrains the source set; it does not automatically prove that every sentence is supported." },
+      ]},
+      { heading: { zh: "免登录的额度与数据去向", en: "Anonymous quotas and data flow" }, paragraphs: [
+        { zh: "每 IP 每日 5 次、全站每日 100 次，相邻请求至少间隔 5 秒，北京时间 00:00 重置；失败请求也计入额度。生产计数由 Cloudflare Durable Object 持久化事务保存，本地开发使用进程内计数。生产缺少对应绑定时拒绝提问。", en: "Limits are five requests per IP and 100 site-wide daily, at least five seconds apart, resetting at 00:00 UTC+8. Failed requests also count. Production counters use persistent Cloudflare Durable Object transactions; local development uses in-process counters. Production requests are rejected if the binding is missing." },
+        { zh: "限流存储使用经 HMAC 处理的访客标识，不保存原始 IP；这不代表共用网络中的每个人都有独立额度。问题、最近三轮对话和相关站内资料会发送至 DeepSeek。对话目前只保留在页面会话中，没有写入浏览器持久存储或本站数据库。", en: "Quota storage uses an HMAC-derived visitor identifier rather than retaining the raw IP. This does not give each person on a shared network a separate allowance. Questions, the last three conversation rounds and relevant site excerpts are sent to DeepSeek. Conversation state currently lives only in the page session, not persistent browser storage or the site's database." },
+      ]},
+      { heading: { zh: "界面、状态与动效的生命周期", en: "Interface, state and animation lifecycles" }, paragraphs: [
+        { zh: "全站会话与面板显示分开管理，因此关闭助手或站内导航不会清空对话。桌面面板不锁定背景页面，手机全屏面板管理焦点与页面滚动；两种布局都固定输入区，让长回答在内容区内滚动。", en: "The global session is separate from panel visibility, so closing it or navigating internally does not clear the conversation. The desktop panel leaves the background page available; the full-screen mobile dialog manages focus and page scrolling. Both keep the composer fixed while long answers scroll within the conversation." },
+        { zh: "GSAP 负责面板内容入场，CSS 负责光晕与卡片反馈，Canvas 绘制等距投影的信号矩阵。指针命中前方可见柱面，升起过程中保持选择稳定；局部影响有明确边界，待机不加入整片起伏。矩阵每秒最多 30 帧，页面隐藏、面板卸载时停止；关闭动效时静态矩阵仍可点击。此说明对应 V2.0.0 的实现。", en: "GSAP handles entrances, CSS handles glows and card feedback, and Canvas draws the isometric matrix. Pointer picking targets visible frontmost column faces and keeps selection stable as a column rises. Hover has a finite local boundary, and idle columns do not wave. Rendering is capped at 30 frames per second and stops when hidden or unmounted. The static matrix remains clickable with motion off. This describes the V2.0.0 implementation." },
+      ]},
+      { heading: { zh: "发现内容与发送问题分开", en: "Separate discovery from sending a question" }, paragraphs: [
+        { zh: "构建时从知识索引生成十条轻量双语内容信号，按五个主题映射到四十九根光柱；客户端只载入标题、简介、地址和问题种子，不需要带上完整问答语料。来源缺失时构建会报错，避免卡片悄悄指向不存在的内容。", en: "At build time, the knowledge index produces ten lightweight bilingual content signals mapped by five topics across forty-nine columns. The client loads titles, summaries, addresses and question seeds without the full question-answer corpus. Missing sources fail generation so cards cannot silently point to absent content." },
+        { zh: "点击光柱或主题按钮只改变本地卡片状态；“换一条”轮换同主题内容，“打开原文”使用实际站内地址。“问问 Field Agent”只预填问题，访客点击发送才进入服务端检索、模型调用与额度流程。额度用完时仍可以发现和阅读内容；键盘使用方向键选择光柱，Enter 打开卡片，关闭卡片后焦点返回矩阵。", en: "Column and topic clicks only change local card state. Another rotates within the topic, and Open source uses the actual site address. Ask Field Agent only fills the composer; sending starts server retrieval, model generation and quota handling. Discovery and reading still work when the quota is exhausted. Arrow keys select columns, Enter opens a card, and closing it returns focus to the matrix." },
+      ]},
+    ],
+  },
+  {
     slug: "data-identity-and-delivery", date: "2026 · 09 · 28", eyebrow: "Colophon / V1.3.0", tags: ["Architecture", "Privacy", "Cloudflare"], minutes: 5,
     title: { zh: "公开内容与私人状态如何共存", en: "How public content and private state coexist" },
     summary: { zh: "从 Cloudflare Worker、Supabase 登录到公开统计与留言板，解释动态能力的边界和密钥去向。", en: "Cloudflare Workers, Supabase sign-in, public analytics and the guestbook: where dynamic features end and secrets belong." },
@@ -288,6 +344,213 @@ export const COLOPHON_ARTICLES: EditorialArticle[] = [
 */
 
 export const ESSAY_ARTICLES: EditorialArticle[] = [
+{
+  "slug": "after-closing-the-laptop",
+  "date": "2026 · 10 · 08",
+  "eyebrow": "Essay / October",
+  "tags": [
+    "日常",
+    "注意力",
+    "边界"
+  ],
+  "minutes": 2,
+  "title": {
+    "zh": "合上电脑之后",
+    "en": "After Closing the Laptop"
+  },
+  "summary": {
+    "zh": "工作可以暂时结束，脑子里的窗口却不一定一起关闭。给一天安排一个小小的收尾，让未完成的事留在纸上，让自己回到眼前。",
+    "en": "Work can pause before the windows in the mind do. A small ending leaves unfinished tasks on paper and brings attention back to the room."
+  },
+  "sections": [
+    {
+      "heading": {
+        "zh": "屏幕暗下来",
+        "en": "The screen goes dark"
+      },
+      "paragraphs": [
+        {
+          "zh": "合上电脑之后，房间里的声音会慢慢变得清楚。窗外的车，桌上的杯子，椅子挪动时的一点响动，刚才都在那里，只是没有进入注意力。屏幕暗下来，好像也替这些普通的东西腾出了一点位置。",
+          "en": "After closing the laptop, the room becomes audible again: traffic outside, a cup on the desk, the chair moving. They were there all along, outside attention. The dark screen gives ordinary things a little more room."
+        },
+        {
+          "zh": "可脑子里的窗口不总会一起关闭。还有一段文字没有改好，一个问题没有弄明白，一个计划刚刚想到新的做法。人已经离开桌子，注意力却还留在另一处。",
+          "en": "The windows in the mind do not always close with it. A paragraph needs another edit, a question remains unresolved, a plan has just acquired a new possibility. The body leaves the desk while attention stays behind."
+        }
+      ]
+    },
+    {
+      "heading": {
+        "zh": "把下一步写下来",
+        "en": "Write down the next step"
+      },
+      "paragraphs": [
+        {
+          "zh": "有时候，我会先把下一步写在纸上。不是一张完整的任务清单，只留一句具体的话：明天先看哪个文件，先改哪一段，或者先确认什么。把它从脑子里挪出来之后，事情没有完成，却不必反复提醒自己别忘记。",
+          "en": "Sometimes I write one next step on paper. Not a complete task list, just a concrete sentence: which file to open, which paragraph to revise or what to confirm first. The work remains unfinished, but it no longer requires repeated mental reminders."
+        },
+        {
+          "zh": "这样的收尾很小，也不保证明天一定顺利。但它给今天划了一条线：我知道事情停在哪里，也知道回来时从哪里开始。休息因此不再像是突然丢下了一切。",
+          "en": "It is a small ending and no guarantee of a smooth tomorrow. It marks where today stops and where returning can begin. Rest feels less like abandoning everything without a trace."
+        }
+      ]
+    },
+    {
+      "heading": {
+        "zh": "回到眼前",
+        "en": "Return to what is here"
+      },
+      "paragraphs": [
+        {
+          "zh": "接下来可以倒一杯水，走到窗边，或者什么也不做。生活里这些没有进度条的时间，不需要另外找一个用途才能成立。看见天色变暗，听见一首歌结束，也是在认真过完一天。",
+          "en": "Then there can be water, a moment by the window or no activity at all. Time without a progress bar does not need an additional purpose. Noticing the evening darken or a song end is also a way to live the day attentively."
+        },
+        {
+          "zh": "电脑明天还会打开，事情也会继续。今晚先让它们留在那张纸上，让自己回到这个安静的房间。能够重新开始的人，也应该有一段不必继续的时间。",
+          "en": "The laptop will open tomorrow and the work will continue. Tonight it can remain on that page while attention returns to a quiet room. A person who can begin again should also have time when continuing is unnecessary."
+        }
+      ]
+    }
+  ]
+},
+{
+  "slug": "an-unfinished-afternoon",
+  "date": "2026 · 10 · 05",
+  "eyebrow": "Essay / October",
+  "tags": [
+    "时间",
+    "日常",
+    "未完成"
+  ],
+  "minutes": 2,
+  "title": {
+    "zh": "一个没有完成的下午",
+    "en": "An Unfinished Afternoon"
+  },
+  "summary": {
+    "zh": "有些下午没有交出计划中的成果，却留下了更清楚的问题。把没有完成与没有发生分开，也许能对自己的时间温和一点。",
+    "en": "Some afternoons leave a clearer question instead of the planned result. Distinguishing unfinished work from empty time can make us gentler with the day."
+  },
+  "sections": [
+    {
+      "heading": {
+        "zh": "计划里的下午",
+        "en": "The afternoon in the plan"
+      },
+      "paragraphs": [
+        {
+          "zh": "开始之前，一个下午总显得很完整。几小时可以读完几页，写好一段，再处理一些零碎的事情。把这些安排写下来时，它们之间没有缝隙，好像只要按顺序去做，时间就会自然变成成果。",
+          "en": "Before it begins, an afternoon looks complete. A few hours can hold some reading, a paragraph and several small tasks. On paper there are no gaps, as though following the sequence will turn time naturally into results."
+        },
+        {
+          "zh": "实际发生的下午却常常不同。一个句子卡住，一处细节需要重新确认，原本想快速跳过的问题，偏偏让人多看了很久。等到窗外的光变了，清单上的勾仍然不多。",
+          "en": "The actual afternoon often differs. A sentence resists, a detail needs checking, a supposedly simple question asks for another look. By the time the light changes, few boxes have been ticked."
+        }
+      ]
+    },
+    {
+      "heading": {
+        "zh": "没有完成的部分",
+        "en": "What remains unfinished"
+      },
+      "paragraphs": [
+        {
+          "zh": "我会下意识地把这样的时间称为浪费。后来又觉得，这个判断有点太快。有时正是因为没有顺利写下去，才发现自己对一个概念并不清楚；因为一个方案没做完，才看见它原来依赖那么多还没确定的条件。",
+          "en": "I am quick to call that time wasted. The judgment may be too quick. Difficulty writing can reveal an unclear concept; an unfinished approach can expose the unresolved assumptions supporting it."
+        },
+        {
+          "zh": "这些发现不容易展示，也没有一个漂亮的结束。但问题变得具体了，下一次回来时，至少不必从同一片模糊里重新出发。一个下午没有完成计划，也可能已经改变了计划。",
+          "en": "Those discoveries are hard to display and provide no neat ending. Yet the question becomes more specific. Returning need not begin in the same fog. An afternoon that did not complete the plan may have changed it."
+        }
+      ]
+    },
+    {
+      "heading": {
+        "zh": "留下一点余地",
+        "en": "Leave some room"
+      },
+      "paragraphs": [
+        {
+          "zh": "当然，也有真的没有做什么的时候。发呆，反复看消息，或者只是累了。我不想替每一分钟都找到一个成长理由。人可以有状态不好的下午，而不必把它包装成另一种收获。",
+          "en": "Some afternoons really contain little work: drifting, repeatedly checking messages or simply feeling tired. Every minute does not need a story about growth. A difficult day can remain difficult without being repackaged as a benefit."
+        },
+        {
+          "zh": "也许可以做的是更准确地说出这一天：有的事情没做完，有的地方想明白了一点，还有一些时间只是过去了。然后关掉清单，准备晚饭。明天还有新的下午，不必让今天替它们全部交出答案。",
+          "en": "Perhaps the task is to describe the day accurately: unfinished things, a little understanding and some time that simply passed. Then close the list and think about dinner. Tomorrow has another afternoon; today need not answer for all of them."
+        }
+      ]
+    }
+  ]
+},
+{
+  "slug": "an-evening-page",
+  "date": "2026 · 10 · 02",
+  "eyebrow": "Essay / October",
+  "tags": [
+    "写作",
+    "日常",
+    "慢下来"
+  ],
+  "minutes": 2,
+  "title": {
+    "zh": "把傍晚留给一页纸",
+    "en": "An Evening Page"
+  },
+  "summary": {
+    "zh": "不用写出一篇文章，也不用马上得到结论。把一天里还没有安顿好的念头写下来，一页纸就可以成为短暂的停靠。",
+    "en": "An evening page need not become an article or reach a conclusion. It can give the day’s unsettled thoughts somewhere to rest."
+  },
+  "sections": [
+    {
+      "heading": {
+        "zh": "不急着写成文章",
+        "en": "No need to make an article"
+      },
+      "paragraphs": [
+        {
+          "zh": "有时傍晚坐下来，想写一点东西，却又不知道标题应该是什么。白天发生的事情并不特别，几个念头也还没有形成清楚的关系。若一开始就要求它们成为文章，往往连第一句都很难留下。",
+          "en": "Sometimes I sit down in the evening wanting to write without knowing a title. Nothing dramatic happened; a few thoughts have not found their relationship. Requiring an article at once can prevent even the first sentence."
+        },
+        {
+          "zh": "所以先写一页纸。可以从一件很小的事开始：今天听见的一句话，路边多出来的一盆植物，或者某个一直没想明白的问题。它们不用立刻证明自己的价值，也不用排列成完整的论点。",
+          "en": "So begin with a page. A sentence heard, a new plant beside a path or an unresolved question is enough. None needs to prove its value immediately or form a complete argument."
+        }
+      ]
+    },
+    {
+      "heading": {
+        "zh": "写下来以后",
+        "en": "After putting it down"
+      },
+      "paragraphs": [
+        {
+          "zh": "写下来之后，念头会和刚才有一点不同。留在脑子里时，它们总是一起出现；变成几行字之后，哪些是事实，哪些只是担心，哪些还需要继续确认，反而更容易分开。",
+          "en": "Thoughts change a little on the page. In the mind they arrive together. In a few lines, facts, worries and things needing confirmation become easier to separate."
+        },
+        {
+          "zh": "纸也不会催着我立刻回答。写到一半停下来，第二天再看，或者一直没有继续，都可以。不是每段文字都要被发布，私人笔记可以保留它尚未整理好的样子。",
+          "en": "The page does not demand an immediate answer. Stopping halfway, returning tomorrow or never continuing are all possible. Not every passage needs publication; a private note can remain unarranged."
+        }
+      ]
+    },
+    {
+      "heading": {
+        "zh": "傍晚慢下来",
+        "en": "The evening slows"
+      },
+      "paragraphs": [
+        {
+          "zh": "写完抬头时，窗外通常又暗了一些。一页纸没有让生活变得井然有序，但它替那些反复出现的念头找到了一个位置。今晚不用继续把它们带到每一件事里。",
+          "en": "Looking up, the window is often darker. One page has not organised life, but it has given recurring thoughts a place. They need not accompany every remaining activity tonight."
+        },
+        {
+          "zh": "也许写作最轻的一种用处，就是这样：不急着说服别人，也不急着解释自己，只把眼前这一小段时间认真留住。明天再翻开时，那里会有一行字告诉我，曾经怎样度过这个傍晚。",
+          "en": "Perhaps this is writing at its lightest: neither persuading others nor explaining oneself, simply keeping a small stretch of time. Tomorrow a line can recall how this evening was lived."
+        }
+      ]
+    }
+  ]
+},
 {
   slug: "the-breeze-tonight",     
   date: "2026 · 09 · 20",

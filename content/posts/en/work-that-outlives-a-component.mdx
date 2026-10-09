@@ -1,0 +1,42 @@
+---
+title: "Work That Outlives a Component"
+date: "2026-10-02"
+tags: ["React", "Lifecycle", "Cleanup"]
+summary: "A disappearing component may leave its work behind. Give animation frames, listeners, observers and requests an owner and an ending condition."
+---
+
+Closing a panel makes the screen look quiet. Its animation frames, listeners and pending requests may nevertheless continue. The DOM has disappeared while the work remains.
+
+These issues often appear after repeated opening, closing and navigation rather than the first successful render. An interface needs a lifecycle longer than a single demonstration.
+
+## Start by identifying the owner
+
+A component may create timelines, listeners, observers, timers, graphics contexts and requests. Being invisible does not automatically end all of them.
+
+For each beginning, record its corresponding end: where a listener is removed, a frame cancelled, an observer disconnected or a request aborted. Establish ownership before deciding which lifecycle performs cleanup.
+
+Returning a cleanup function is not sufficient by itself. Callbacks can retain old state, other scopes can restart work and dependency changes can repeat initialisation. Creation and release need to concern the actual objects involved.
+
+## Hiding differs from unmounting
+
+A panel that unmounts can release its internal animation and graphics resources. A player that must survive navigation needs a longer-lived owner instead of being destroyed with a particular page.
+
+Keeping global conversation state separate from its visual panel lets closing stop the display without erasing the session. Visualisation can stop drawing without destroying state belonging to the whole site.
+
+Page visibility creates another boundary. The component still exists in a hidden tab, but frequent drawing provides little value. Stop its loop while hidden and restart it when visible, avoiding an accumulated time jump on return.
+
+## Resize handling leaves work too
+
+A Canvas often observes container dimensions. That observer should belong to the container instead of being repeatedly added on render. Update the drawing area on resize and disconnect on unmount.
+
+Listeners also require matching targets, event types and callback references when removed. Otherwise cleanup may execute without removing the listener that was originally registered.
+
+These details determine whether a component can safely be reused. The more often it appears, the more valuable explicit lifecycle boundaries become.
+
+## Stopping can preserve an image
+
+Disabling motion need not leave a blank region. Draw a static state, then stop the loop. The interface can retain its identity without continuous work; static graphics and animation are separate capabilities.
+
+Likewise, ending a request need not erase its input or completed history. Finish the work it owns without clearing unrelated information. Cleanup should be precise as well as complete.
+
+A component's quality includes what happens after its attractive opening. Give resources clear owners and beginnings appropriate endings so the interface can survive repeated use.

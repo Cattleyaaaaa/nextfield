@@ -4,6 +4,7 @@ import { FieldRadio } from "@/components/site/field-radio";
 import { ClickFireworks } from "@/components/site/click-fireworks";
 import { GlobalEffectsProvider } from "@/components/site/global-effects-provider";
 import { NextfieldOS } from "@/components/site/nextfield-os";
+import { FieldAgentDock } from "@/components/site/field-agent-dock";
 import { FieldAtmosphere } from "@/components/site/field-atmosphere";
 import { InkDrift } from "@/components/site/ink-drift";
 import { MissionTracker } from "@/components/evidence/local-systems";
@@ -51,6 +52,7 @@ export default function RootLayout({
                   <ClickFireworks />
                   <FieldRadio />
                   <NextfieldOS />
+                  <FieldAgentDock />
                   <MissionTracker />
                   <div className="relative flex min-h-screen flex-col">
                     <Header />

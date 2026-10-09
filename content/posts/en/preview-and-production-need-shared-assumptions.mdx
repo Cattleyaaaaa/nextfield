@@ -1,0 +1,42 @@
+---
+title: "Preview and Production Need Shared Assumptions"
+date: "2026-10-05"
+tags: ["Deployment", "Configuration", "Verification"]
+summary: "Local success covers a particular path. Map configuration, runtime, persistence and asset delivery to understand what each check actually establishes."
+---
+
+When a feature works locally and fails on the published domain, “the environments differ” is a reasonable observation but an incomplete action plan.
+
+Configuration, runtime capabilities, asset responses, account callbacks and persistent storage can each change the result of the same interface code. Begin by identifying which path the successful check covered.
+
+## The address is a condition of a check
+
+A development address exercises a development service; a public domain exercises deployment, routing and real resource delivery. Shared source code does not guarantee identical execution. Working local audio seeking does not prove the production Range response is correct.
+
+Calling a server function directly checks parsing and business logic without necessarily covering HTTP routing or production bindings. The result remains useful when its scope is stated.
+
+Record the address, runtime and configuration alongside “passed.” A later regression can then be located in an already checked path or in a newly introduced environment layer.
+
+## Disabled is a configuration state
+
+A locally enabled feature with production disabled is a valid development state. The interface, documentation and server switch should describe it accurately rather than treat a finished button as a public release.
+
+A switch cannot replace dependencies. A missing key or quota binding should still prevent requests after enabling the feature. Explicit failure is clearer than silently falling back to an unlimited mode.
+
+Build-time values and request-time secrets also have different roles. A configuration table should explain when each applies, or something “already configured” may remain unavailable.
+
+## Local substitutes need scope
+
+In-process counters make quota behaviour easy to inspect locally. They disappear on restart and cannot replace counters shared by production instances. Checking the local flow and persistent production counts establishes different guarantees.
+
+Example data can check a layout without proving an analytics connection. Simulated errors exercise failure branches; a real request covers the external connection. Label each substitute's purpose.
+
+Isolating verification also prevents a model check from consuming the visitor allowance currently being used. The production policy still needs its own runtime verification.
+
+## Shared caches are shared environment
+
+Starting another development service does not automatically isolate it. Two ports can still write the same compilation directory. Different listening addresses do not separate filesystem state.
+
+Before running parallel previews, inspect build directories, temporary files and resource locations. Use independent directories when isolation is necessary; when it is not, checking the existing service is simpler.
+
+A release involves determining content scope, building, configuring dependencies, deploying and checking critical paths at the actual address. Let each step state its evidence so the distance between local success and online availability contains fewer guesses.

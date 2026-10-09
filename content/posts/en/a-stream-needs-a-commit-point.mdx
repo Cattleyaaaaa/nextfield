@@ -1,0 +1,44 @@
+---
+title: "A Stream Needs a Commit Point"
+date: "2026-10-03"
+tags: ["Streaming", "State management", "Recovery"]
+summary: "The first visible text does not make an answer complete. Separate a preview from committed history to handle interruptions, truncation, source checks and retries."
+---
+
+Streaming lets someone begin reading sooner. Waiting becomes visible content rather than a spinner. But appending every incoming fragment directly to chat history also turns an unfinished result into something the system has already saved as an answer.
+
+A connection can fail midway through a response. Generation can hit a length limit. A source ID may fail its final check. Text that has appeared on screen and text that is complete enough to support the next question need different states.
+
+## Seeing a result and committing it
+
+Treat the answer in progress as a preview. Someone can read it, but the system is still receiving content and has not completed its checks. A final answer means the request ended normally and satisfied the product's basic result constraints.
+
+This distinction changes more than variable names. If temporary text enters committed history, the next model request may use a half-finished answer as context. Missing conclusions, citations or qualifications then lose their unfinished status and can be carried into subsequent responses.
+
+Field Agent updates a temporary answer first. On normal completion, it adds the question, final text and source cards to the current session. That commit point gives history a clear meaning: it contains completed exchanges, not every character that has ever appeared.
+
+## Text does not arrive in sentences
+
+Network chunks do not match language boundaries. A character's encoded bytes may cross chunks, and an event can span several reads. Parsing each received chunk as a complete message creates intermittent failures that a smooth connection may conceal.
+
+The reader must distinguish byte decoding, event framing and text content. A streaming decoder handles bytes; incomplete events remain buffered; only complete messages contribute text deltas. Each layer should make decisions about boundaries it can actually observe.
+
+The interface has smaller boundaries too. A source marker can arrive as an opening bracket, then a number, then a closing bracket. Removing only complete markers lets unfinished fragments flash briefly. Display rules need to consider the moment before a marker has fully arrived.
+
+## What completion guarantees
+
+A closed connection is not necessarily a successful result. It can close after a network error or before the provider sends its normal ending signal. The client needs to distinguish a complete answer from the absence of more data.
+
+In this implementation, quota, text deltas, completion and errors are separate events. Quota can update early, deltas drive the preview, and completion carries the final answer and sources. Normal model termination, answer length and citation IDs participate in deciding whether to commit. The client also checks that it received a final result.
+
+Source checks have limits of their own. An ID check establishes that a citation belongs to the current retrieval results. It does not automatically prove every sentence is supported. Keeping those guarantees distinct makes room for further quality improvements without overstating what a technical check establishes.
+
+## What survives failure?
+
+The question remains useful even if the temporary answer fails. Retaining it makes retry a concrete action. Clearing it forces someone to reconstruct the question before deciding whether to continue.
+
+Field Agent currently removes an unfinished answer and shows an error. Another product may retain partial text, but it should label that text as incomplete and decide whether it can enter later context. No single presentation policy fits every task; the important part is matching the state to the actual guarantee.
+
+Streaming does not reduce the need for completion conditions. It makes those conditions more important because someone begins reading while the result is still changing. The system must distinguish content that is taking shape from content that can serve as a basis for the next step.
+
+Related: [Field Agent: sources, streaming and limits](/colophon/field-agent-sources-streaming-and-limits).

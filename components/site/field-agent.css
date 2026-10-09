@@ -1,0 +1,227 @@
+.field-agent-dock {
+  color-scheme: dark;
+  outline: none;
+  animation: field-agent-reveal 240ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  background-image: linear-gradient(145deg, #0c1830, #080e19 55%, #161128);
+}
+
+.field-agent-dock * {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(103, 232, 249, 0.2) transparent;
+}
+
+.field-agent-dock textarea {
+  caret-color: #67e8f9;
+}
+
+.field-agent-stream-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 4px;
+  vertical-align: -2px;
+  background: #67e8f9;
+  box-shadow: 0 0 8px #67e8f966;
+  animation: field-agent-cursor-blink 0.9s steps(2, jump-none) infinite;
+}
+@keyframes field-agent-cursor-blink { to { opacity: 0.2; } }
+
+.field-agent-ambient {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.field-agent-glow {
+  position: absolute;
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  will-change: transform;
+  animation: field-agent-glow-drift 12s ease-in-out infinite alternate;
+}
+
+.field-agent-glow-cyan {
+  top: -90px;
+  right: -130px;
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.3), transparent 68%);
+}
+
+.field-agent-glow-indigo {
+  bottom: 18%;
+  left: -180px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.25), transparent 68%);
+  animation-duration: 16s;
+  animation-direction: alternate-reverse;
+}
+
+.field-agent-particles { position: absolute; inset: 0; opacity: 0.7; }
+.field-agent-grid {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(103,232,249,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(103,232,249,0.045) 1px, transparent 1px);
+  background-size: 36px 36px;
+  mask-image: linear-gradient(#000, transparent 80%);
+}
+.field-agent-core {
+  display: block;
+  position: relative;
+  width: min(240px, 70vw);
+  aspect-ratio: 1;
+  margin: 4px auto 8px;
+  isolation: isolate;
+}
+button.field-agent-core {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: default;
+}
+button.field-agent-core[data-signal-hover="true"] { cursor: pointer; }
+button.field-agent-core:focus-visible {
+  outline: 1px solid rgba(103,232,249,0.7);
+  outline-offset: -10px;
+  border-radius: 16px;
+}
+.field-agent-signal-topic[aria-pressed="true"] {
+  color: #cffafe;
+  border-color: #67e8f966;
+  background: #67e8f914;
+}
+.field-agent-signal-card {
+  animation: field-agent-signal-reveal 220ms ease-out both;
+}
+.field-agent-signal-action { transition: background-color 150ms ease; }
+@keyframes field-agent-signal-reveal {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.field-agent-core-compact {
+  width: 88px;
+  flex: 0 0 88px;
+  margin: -12px 0;
+}
+.field-agent-core-aura {
+  position: absolute;
+  inset: 17%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 30% 40%, rgba(34,211,238,0.19), rgba(139,92,246,0.1) 52%, transparent 75%);
+  filter: blur(16px);
+  animation: field-agent-core-breathe 6s ease-in-out infinite alternate;
+}
+.field-agent-core-base {
+  position: absolute;
+  bottom: 24%;
+  left: 17%;
+  right: 17%;
+  height: 8%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(103,232,249,0.3), rgba(167,139,250,0.08) 55%, transparent 75%);
+  filter: blur(8px);
+  opacity: 0.6;
+}
+@keyframes field-agent-core-breathe {
+  from { opacity: 0.65; }
+  to { opacity: 1; }
+}
+.field-agent-suggestion { position: relative; overflow: hidden; }
+.field-agent-suggestion::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 2px;
+  background: linear-gradient(#67e8f9, #a78bfa);
+  opacity: 0.7;
+}
+.field-agent-suggestion:nth-child(2) .field-agent-card-number { color: #c4b5fd; border-color: #a78bfa44; background: #a78bfa15; }
+.field-agent-dock header { background: linear-gradient(100deg, #101e33e6, #17142be6); border-bottom-color: #67e8f933; }
+.field-agent-dock footer { box-shadow: 0 -12px 32px #080e1970; }
+
+@keyframes field-agent-glow-drift {
+  from { transform: translate3d(-14px, -18px, 0) scale(0.94); }
+  to { transform: translate3d(22px, 34px, 0) scale(1.08); }
+}
+
+.field-agent-launcher::before {
+  content: "";
+  position: absolute;
+  inset: -30% auto -30% 0;
+  width: 35%;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(103,232,249,0.18), transparent);
+  animation: field-agent-launcher-shine 7s ease-in-out infinite;
+}
+
+@keyframes field-agent-launcher-shine {
+  0%, 65% { transform: translateX(-300%) skewX(-18deg); }
+  100% { transform: translateX(500%) skewX(-18deg); }
+}
+
+.field-agent-suggestion, .field-agent-source, .field-agent-send, .field-agent-launcher {
+  transition-duration: 180ms;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .field-agent-suggestion:not(:disabled):hover, .field-agent-source:hover {
+    transform: translateX(3px);
+  }
+  .field-agent-launcher:hover { transform: translateY(-2px); }
+  .field-agent-send:not(:disabled):hover svg { transform: translate(1px,-1px); }
+}
+
+.field-agent-send svg { transition: transform 180ms ease; }
+.field-agent-send:not(:disabled):active, .field-agent-launcher:active { transform: scale(0.96); }
+
+.field-agent-composer[data-busy="true"]::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 45%;
+  height: 2px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, #67e8f9, transparent);
+  animation: field-agent-working 1.6s ease-in-out infinite;
+}
+
+@keyframes field-agent-working {
+  from { transform: translateX(-100%); opacity: 0.35; }
+  to { transform: translateX(320%); opacity: 1; }
+}
+
+.field-agent-dock[data-motion="off"],
+.field-agent-dock[data-motion="off"] *,
+.field-agent-dock[data-motion="off"] *::before,
+.field-agent-dock[data-motion="off"] *::after,
+.field-agent-launcher[data-motion="off"],
+.field-agent-launcher[data-motion="off"]::before {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+}
+
+@keyframes field-agent-reveal {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@media (max-width: 639px) {
+  .field-agent-dock {
+    height: 100dvh;
+    animation-name: field-agent-mobile-reveal;
+  }
+  @keyframes field-agent-mobile-reveal {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .field-agent-dock, .field-agent-dock *, .field-agent-dock *::before, .field-agent-dock *::after,
+  .field-agent-launcher, .field-agent-launcher::before {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}

@@ -10,6 +10,9 @@ import type { PostMeta } from "@/types/post";
 
 const ALL = "all";
 const TOPICS = [
+  { key: "技术", label: { zh: "技术", en: "Technology" }, summary: { zh: "接口、协议与系统边界", en: "APIs, protocols and system boundaries" } },
+  { key: "工程", label: { zh: "工程", en: "Engineering" }, summary: { zh: "配置、交付与真实环境", en: "Configuration, delivery and real environments" } },
+  { key: "产品", label: { zh: "产品", en: "Product" }, summary: { zh: "默认选择与使用路径", en: "Default choices and usage paths" } },
   {
     key: "Agent",
     label: { zh: "Agent", en: "Agent" },

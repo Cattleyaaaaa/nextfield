@@ -1,0 +1,42 @@
+---
+title: "Context Is Not a Second Source"
+date: "2026-10-01"
+tags: ["Context", "Retrieval", "Conversation"]
+summary: "History can explain what a pronoun refers to without becoming evidence for the next answer. Separate references, current sources and completed history to prevent errors from accumulating."
+---
+
+A first question names its subject; the next may say only “it.” In a site assistant, that small omission requires remembering the topic, understanding a new request and deciding which earlier information remains reliable.
+
+Continuous conversation involves more than sending every previous message again. History contains intentions, answers, mistakes and possibly outdated statements. These help interpret the exchange without having equal authority as facts.
+
+## Context establishes the subject
+
+After a question about Neptune, history can resolve “What does it focus on?” to that project. What needs to survive is the topic, not every sentence of the earlier answer. The project page should still provide the evidence.
+
+“Introduce this website” can be equally short while starting a different topic. Length alone cannot establish a follow-up. Explicit references, requests to continue and newly named objects should participate in the decision.
+
+Where two possible subjects would change the answer, a brief clarification is preferable to choosing invisibly. Smooth conversation can include an honest treatment of ambiguity.
+
+## An earlier answer is not a knowledge base
+
+A sentence in model history establishes that the sentence appeared, not that it is correct. Treating it as fresh evidence lets a small error gain confidence with each follow-up.
+
+History can explain intention while current retrieval supports factual claims. Both may enter generation, but their roles need to remain distinct. The model should organise its answer from the current pages rather than repeat a claim because it said it earlier.
+
+Refusals belong to history too. An earlier refusal may reflect a real boundary or a retrieval omission. Once evidence becomes available, the next question deserves a new decision.
+
+## Retain the necessary rounds
+
+More history can reduce forgetting while also adding unrelated topics, errors and repetition. A bounded recent window is often easier to explain for read-only site guidance than an indefinitely growing conversation.
+
+Important information outside that window can be restated or preserved in an explicit task summary. Such a summary must still distinguish user goals from confirmed facts rather than promote compressed model text into evidence.
+
+Field Agent currently sends the last three conversation rounds, retains the page session across panel closing and internal navigation, and clears it on refresh. That supports a current exploration session without claiming permanent visitor memory.
+
+## Check changes of subject
+
+Conversation checks should cover more than resolving “it.” Change projects, ask about the author, ask something outside the site and return to an earlier subject. The system should continue where appropriate and stop inheriting irrelevant information.
+
+The useful questions are which subject the answer addresses, where its facts come from and which history merely helps interpret the request. Preserving those relationships makes conversation a practical reading path.
+
+Related: [A Stream Needs a Commit Point](/blog/a-stream-needs-a-commit-point).

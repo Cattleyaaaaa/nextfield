@@ -1,6 +1,7 @@
 "use client";
 
 import { useTheme } from "next-themes";
+import { usePageTransition } from "@/components/site/page-transition-provider";
 import SpecularButton, { type SpecularButtonProps } from "@/components/visual/SpecularButton";
 
 // Shared header settings. Colors match the light/dark tokens in app/globals.css.
@@ -30,6 +31,7 @@ type HeaderSpecularButtonProps = Omit<SpecularButtonProps, keyof typeof HEADER_S
 
 export function HeaderSpecularButton({ className = "", ...props }: HeaderSpecularButtonProps) {
   const { resolvedTheme } = useTheme();
+  const { motionEnabled } = usePageTransition();
   const colors = HEADER_SPECULAR_COLORS[resolvedTheme === "dark" ? "dark" : "light"];
 
   return (
@@ -37,6 +39,7 @@ export function HeaderSpecularButton({ className = "", ...props }: HeaderSpecula
       {...HEADER_SPECULAR_CONFIG}
       {...colors}
       {...props}
+      disableEffects={!motionEnabled || props.disableEffects}
       className={`header-specular-button ${className}`.trim()}
     />
   );

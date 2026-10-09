@@ -1,0 +1,42 @@
+---
+title: "Error Responses Are Part of the API"
+date: "2026-10-06"
+tags: ["API", "Error handling", "Contracts"]
+summary: "Different failures require different recovery paths. Distinguish invalid input, exhausted quota, upstream interruption and incomplete generation while keeping internal details private."
+---
+
+Successful responses usually receive early attention: fields, presentation and the next action. Errors often begin as one fallback message until the client discovers that failures are not interchangeable.
+
+A site question can fail through invalid input, exhausted quota, an unavailable provider or incomplete generation. The available user action differs, so the response should differ too.
+
+## Explain what remains possible
+
+Long input can be shortened; rapid requests can wait; a daily cap requires waiting for reset; an interrupted service may warrant retrying later. One generic error obscures these recovery paths.
+
+The response need not expose every internal category, but it should provide stable semantics. Remaining quota, reset time and an appropriate waiting interval help someone decide what to do.
+
+These values must remain consistent. If failures consume quota, an unanswered request should still update the count. Success and failure should reflect the same real counter.
+
+## Control the public message
+
+Provider errors and internal exceptions may include configuration, request details or paths. Serialising them directly mixes debugging information with visitor-facing explanations.
+
+Distinguish internal causes from controlled public messages. Someone needs to know a connection failed and can be retried, not see credentials, raw request content or a stack trace. Changing providers should not unexpectedly change the public data boundary.
+
+Useful causes can be retained through appropriate server observation, with a separate decision about what to log. A browser response is not a log, and logging is not a reason to retain every personal question indefinitely.
+
+## Failure can follow a started response
+
+Streaming can fail after headers and text have already reached the client. The server cannot pretend to start a wholly new ordinary response at that point.
+
+An explicit error event lets the client stop its preview, show an explanation and preserve appropriate state. Completion and error are different outcomes. Connection closure also requires checking whether normal completion arrived.
+
+Visible text alone is insufficient. A plausible partial answer may lack its conclusion or sources. Readability and completion need separate decisions.
+
+## Document failure branches
+
+An API description should cover invalid input, disabled service, quota limits, upstream failure and interruption. The client can then implement states without guessing from an incidental message.
+
+Wording can become friendlier while semantics stay stable. Editing a sentence should not alter retry rules or quota accounting. Fields, states and messages each have a responsibility.
+
+Success tells someone what the system can do; failure tells them how to proceed at a boundary. Designing both makes the interface support a complete usage path.

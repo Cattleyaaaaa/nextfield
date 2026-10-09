@@ -1,0 +1,48 @@
+---
+title: "Let Particles Move Around the Reading Path"
+date: "2026-10-08"
+tags: ["Particles", "Readability", "Motion"]
+summary: "A technology console can be more expressive while still supporting reading. Consider the visual centre, status feedback, long text and animation lifecycles together."
+---
+
+There is no single parameter separating “the motion is barely visible” from “the interface is too noisy.” More particles and brighter glows make a change easier to notice. If they continually cross the text, however, every sentence requires the reader to filter the background again.
+
+Field Agent moved from restrained flowing light to a more expressive console: cyan and violet, a central holographic signal matrix, drifting particles, a grid and themed cards. The change involved deciding where attention should go, as well as adding visual effects.
+
+## Give the opening a clear centre
+
+Before a conversation starts, the panel must explain what it can do. A central signal matrix can establish visual focus; the title identifies the assistant, an introduction establishes scope and suggested questions provide a first action. Together, those elements create an opening.
+
+If every card, title and input glows or rotates at once, the centre disappears. There is plenty of activity without a clear starting point. Concentrating the strongest feedback around the current interaction makes the visual treatment more noticeable while retaining hierarchy.
+
+This matrix limits feedback to the pointed column and its immediate neighbors. The selected column rises visibly, with a brighter cap and illuminated edges; other columns stay still. Removing whole-matrix tilt and spreading ripples keeps the feedback expressive within a clear boundary.
+
+Columns also become content entry points. Five colors identify projects, writing, build logs, colophon notes and essays. Clicking opens a real source card that can take the visitor to the original page or fill a question seed into the composer. Discovery and sending are separate: discovery makes no model call and consumes no quota, while the visitor confirms sending the question.
+
+That opening should not dominate every state. Once a conversation begins, attention moves to questions and answers, the welcome area leaves and content becomes the panel's subject. The design must accommodate that change rather than arrange every future message around a decoration.
+
+## State changes communicate more than constant motion
+
+Appearing text, a waiting status and arriving sources all communicate task progress. Drifting background particles primarily create atmosphere. Both can coexist without receiving equal attention.
+
+A short entrance can help someone notice a new answer; composer feedback can show that a request is active. A background loop does not need to announce itself repeatedly or resemble a real task being executed. Different rhythms help distinguish atmosphere from status.
+
+The same principle applies to card hover effects. A change should confirm that the card is actionable, not move the target so far that the pointer has to chase it. Feedback can be expressive while the interaction remains stable.
+
+## Give long answers a quiet container
+
+When answers grow from two sentences to several paragraphs, the layout faces new demands. Text needs line spacing, paragraph separation and a distinguishable background. Source cards should remain separate from the body, and long content should not push the composer out of view.
+
+The panel therefore keeps scrolling within the conversation and fixes the composer below it. The desktop side panel retains the site as a reference; the full-screen phone view gives its space to the current conversation. The same function does not require an identical spatial relationship at every size.
+
+Particles should form an environment around the text rather than compete with it. Assessing that means reading a real, long answer and noticing whether moving lights draw attention away. An empty-panel screenshot can conceal interference that only appears once content fills the space.
+
+## Motion has a beginning and an end
+
+Mounting an effect should not mean it runs unconditionally forever. Closing the panel, hiding the page and disabling motion are states that need handling. The signal matrix caps its frame rate and stops at the appropriate lifecycle boundaries. Background components must also release resources and listeners they create.
+
+Reduced motion does not require hiding everything. A static signal matrix, glow and grid can preserve the interface's identity while text, buttons and layout continue to work. Motion should enhance understanding rather than become its only route.
+
+This console is part of V2.0.0. Phones can discover content by tapping columns or topic buttons; keyboard users can select with arrow keys and Enter. Cards and question seeds remain available with motion disabled. Future iterations still need review of real answers at different screen sizes alongside focus, scrolling and input visibility. A noticeable visual change is a first step. Being comfortable to keep using is the result that deserves closer examination.
+
+Related: [Turning Field Agent into a site guide](/build-log/field-agent-from-chat-to-site-guide), [Decoration follows content](/colophon/decoration-follows-content).

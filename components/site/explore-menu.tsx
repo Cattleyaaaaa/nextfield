@@ -5,13 +5,15 @@ import { usePathname } from "next/navigation";
 import { ArrowUpRight, ChevronDown, Compass, X } from "lucide-react";
 import { TransitionLink } from "@/components/site/transition-link";
 import { fieldSections, navSections } from "@/lib/nav";
+import { useLanguage } from "@/components/site/language-provider";
 
 export function ExploreMenu() {
   const [open, setOpen] = useState(false);
+  const { locale } = useLanguage();
   const pathname = usePathname();
   const rootRef = useRef<HTMLDivElement>(null);
   // 底部快捷入口（首页在 JSX 里单独写，所以计数要 +1）。数字从数据推出来，加一项不用手改。
-  const quickLinks = navSections.slice(0, 3);
+  const quickLinks = [...navSections.slice(0, 3), { label: "留言板", href: "/messages" }, { label: "访问统计", href: "/analytics" }];
   const entryCount = fieldSections.length + quickLinks.length + 1;
 
   useEffect(() => setOpen(false), [pathname]);
@@ -25,15 +27,15 @@ export function ExploreMenu() {
   }, [open]);
 
   return (
-    <div className="relative" ref={rootRef}>
-      <button aria-expanded={open} aria-haspopup="dialog" className={`inline-flex h-9 items-center gap-2 rounded-full border px-3 font-mono text-[10px] font-semibold tracking-[0.1em] transition-colors ${open ? "border-accent bg-accent text-white" : "border-line bg-paper/70 hover:border-accent hover:text-accent"}`} onClick={() => setOpen((value) => !value)} type="button">
+    <div className="static" ref={rootRef}>
+      <button aria-label={locale === "zh" ? "浏览全站导航" : "Explore site navigation"} aria-controls="header-explore" aria-expanded={open} aria-haspopup="dialog" className={`inline-flex h-9 items-center gap-2 rounded-full border px-3 font-mono text-[10px] font-semibold tracking-[0.1em] transition-colors ${open ? "border-accent bg-accent text-white" : "border-line bg-paper/70 hover:border-accent hover:text-accent"}`} onClick={() => setOpen((value) => !value)} type="button">
         {open ? <X className="size-3.5" /> : <Compass className="size-3.5" />}
-        <span className="hidden sm:inline">EXPLORE</span>
-        <ChevronDown className={`hidden size-3 transition-transform sm:block ${open ? "rotate-180" : ""}`} />
+        <span className="hidden lg:inline">EXPLORE</span>
+        <ChevronDown className={`hidden size-3 transition-transform lg:block ${open ? "rotate-180" : ""}`} />
       </button>
 
       {open ? (
-        <div aria-label="全站探索菜单" className="fixed inset-x-3 top-[4.5rem] z-50 max-h-[calc(100svh-5.25rem)] overflow-y-auto rounded-[1.5rem] border border-line bg-paper/95 p-3 shadow-2xl backdrop-blur-xl sm:absolute sm:inset-x-auto sm:right-0 sm:top-12 sm:w-[42rem]" role="dialog">
+        <div id="header-explore" aria-label={locale === "zh" ? "全站探索菜单" : "Site navigation"} className="fixed inset-x-3 top-[4.5rem] z-50 max-h-[calc(100svh-5.25rem)] overflow-y-auto rounded-[1.5rem] border border-line bg-paper/95 p-3 shadow-2xl backdrop-blur-xl sm:absolute sm:inset-x-auto sm:right-6 sm:top-[4.5rem] sm:w-[min(42rem,calc(100vw-3rem))]" role="dialog">
           <div className="flex items-center justify-between px-3 py-3">
             <div><p className="font-mono text-[9px] uppercase tracking-[0.18em] text-accent">Field map</p><p className="mt-1 text-xs text-muted">从任何页面进入正在发生的工作与证据。</p></div>
             <span className="rounded-full border border-line px-2.5 py-1 font-mono text-[8px] tracking-[0.12em] text-muted">{entryCount} ENTRIES</span>
@@ -48,7 +50,7 @@ export function ExploreMenu() {
 
           <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 border-t border-line px-3 pb-2 pt-4 text-xs text-muted">
             <TransitionLink className="hover:text-accent" href="/" onClick={() => setOpen(false)}>首页</TransitionLink>
-            {quickLinks.map((item) => <TransitionLink className="hover:text-accent" href={item.href} key={item.href} onClick={() => setOpen(false)}>{item.label}</TransitionLink>)}
+            {quickLinks.map((item) => <TransitionLink className="hover:text-accent" href={item.href} key={item.href} onClick={() => setOpen(false)}>{locale === "zh" ? item.label : ({"关于我":"About","项目":"Projects","写作":"Writing","留言板":"Messages","访问统计":"Analytics"} as Record<string,string>)[item.label] ?? item.label}</TransitionLink>)}
           </div>
         </div>
       ) : null}

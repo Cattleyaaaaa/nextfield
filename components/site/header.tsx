@@ -1,172 +1,62 @@
 "use client";
 
+import type { MouseEvent } from "react";
 import { usePathname } from "next/navigation";
+import { House, MessageCircle, ChartNoAxesCombined } from "lucide-react";
 import { ThemeToggle } from "@/components/site/theme-toggle";
-import { BackToTopButton } from "@/components/site/back-to-top-button";
-import { GlobalEffectsMenu } from "@/components/site/global-effects-menu";
-import { HeaderSpecularButton } from "@/components/site/header-specular-button";
-import { HeaderAccountControl } from "@/components/site/header-account-control";
-import { usePageTransition } from "@/components/site/page-transition-provider";
 import { TransitionLink } from "@/components/site/transition-link";
-import { useStudioBadgeDrop } from "@/components/visual/studio-badge-drop";
-import {
-  BadgePlus,
-  GraduationCap,
-  ChartNoAxesCombined,
-  MessageCircle,
-} from "lucide-react";
-import {
-  LanguageToggle,
-  useLanguage,
-} from "@/components/site/language-provider";
+import { useLanguage } from "@/components/site/language-provider";
+import { usePageTransition } from "@/components/site/page-transition-provider";
+import { HeaderSpecularButton } from "@/components/site/header-specular-button";
 import { ExploreMenu } from "@/components/site/explore-menu";
+import { HeaderSettings } from "@/components/site/header-settings";
 import { headerSections } from "@/lib/nav";
 import { siteConfig } from "@/site.config";
+import { FieldAgentLauncher } from "@/components/site/field-agent-launcher";
+import "./header.css";
 
-// 首页已经是门户，站内导航全部走真实路由：
-// /about（九屏自述）、/projects、/blog。不再依赖切屏事件。
 export function Header() {
   const { locale } = useLanguage();
-  const { dropBadge } = useStudioBadgeDrop();
-  const { navigate } = usePageTransition();
+  const { navigate, motionEnabled } = usePageTransition();
   const pathname = usePathname();
-
+  const zh = locale === "zh";
+  const active = (href: string) => href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
+  const follow = (href: string) => (event: MouseEvent<HTMLAnchorElement>) => {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    navigate(href, { x: event.clientX, y: event.clientY });
+  };
   return (
-    <header className="sticky top-0 z-40 border-b border-line/60 bg-paper/80 backdrop-blur-xl">
-      <div className="mx-auto flex min-h-16 max-w-site items-center justify-between gap-3 px-5 py-2 sm:px-8 lg:px-12">
-        <TransitionLink
-          className="group flex shrink-0 items-center gap-3"
-          href="/"
-        >
-          <span className="grid size-7 place-items-center rounded-full bg-ink text-[10px] font-bold text-paper transition-transform duration-300 group-hover:rotate-12">
-            N
-          </span>
-          <span className="hidden text-sm font-semibold tracking-[-0.02em] sm:inline">
-            {siteConfig.name}
-          </span>
+    <header data-motion={motionEnabled ? "on" : "off"} className="site-header sticky top-0 z-40 border-b border-line/60 bg-paper/90 backdrop-blur-xl">
+      <div className="relative mx-auto flex h-16 max-w-site items-center gap-1.5 px-3 sm:gap-3 sm:px-6 lg:gap-5 lg:px-8">
+        <TransitionLink className="group flex shrink-0 items-center gap-2.5" href="/" aria-label={`${siteConfig.name} ${zh ? "首页" : "home"}`}>
+          <span className="grid size-7 place-items-center rounded-full bg-ink text-[10px] font-bold text-paper transition-transform duration-300 group-hover:rotate-12">N</span>
+          <span className="hidden text-sm font-semibold tracking-[-0.02em] md:inline">{siteConfig.name}</span>
         </TransitionLink>
-        <div className="flex min-w-0 flex-wrap items-center justify-end gap-1 sm:gap-2 xl:gap-4">
-          <nav
-            aria-label="主导航"
-            className="hidden items-center gap-1 lg:flex xl:gap-3"
-          >
-            {headerSections.map((section) => {
-              // 首页的 href 是 "/"，startsWith 会误判所有路由，根路径要特判成全等。
-              const active =
-                section.href === "/"
-                  ? pathname === "/"
-                  : pathname === section.href ||
-                    pathname.startsWith(`${section.href}/`);
-              return (
-                <HeaderSpecularButton
-                  className={
-                    active
-                      ? "header-specular-button--nav header-specular-button--active"
-                      : "header-specular-button--nav"
-                  }
-                  href={section.href}
-                  key={section.href}
-                  onLinkClick={(event) => {
-                    if (
-                      event.button !== 0 ||
-                      event.metaKey ||
-                      event.ctrlKey ||
-                      event.shiftKey ||
-                      event.altKey
-                    )
-                      return;
-                    event.preventDefault();
-                    navigate(section.href, {
-                      x: event.clientX,
-                      y: event.clientY,
-                    });
-                  }}
-                >
-                  {section.eyebrow}
-                </HeaderSpecularButton>
-              );
-            })}
-          </nav>
-          <HeaderSpecularButton
-            ariaLabel="进入 FIELD SCHOOL"
-            className={
-              pathname.startsWith("/learn")
-                ? "header-specular-button--studio header-specular-button--active"
-                : "header-specular-button--studio"
-            }
-            href="/learn"
-            onLinkClick={(event) => {
-              if (
-                event.button !== 0 ||
-                event.metaKey ||
-                event.ctrlKey ||
-                event.shiftKey ||
-                event.altKey
-              )
-                return;
-              event.preventDefault();
-              navigate("/learn", { x: event.clientX, y: event.clientY });
-            }}
-          >
-            <GraduationCap className="size-3.5" />
-            <span className="hidden xl:inline">LEARN</span>
+        <nav aria-label={zh ? "主导航" : "Main navigation"} className="ml-auto flex shrink-0 items-center gap-1.5 rounded-full lg:bg-panel/70 lg:p-1">
+          {headerSections.map(section => {
+            const home = section.href === "/";
+            const label = zh ? section.label : home ? "Home" : section.eyebrow;
+            return <div key={section.href} className={home ? "block" : "hidden lg:block"}>
+              <HeaderSpecularButton href={section.href} title={label} ariaLabel={label} ariaCurrent={active(section.href) ? "page" : undefined} onLinkClick={follow(section.href)} className={`site-header-nav header-specular-button--nav ${home ? "site-header-home" : ""} ${active(section.href) ? "header-specular-button--active" : ""}`}>
+                {home && <House aria-hidden="true" className="size-3.5" />}
+                <span className={home ? "hidden lg:inline" : "inline"}>{label}</span>
+              </HeaderSpecularButton>
+            </div>;
+          })}
+          <HeaderSpecularButton href="/messages" ariaCurrent={active("/messages") ? "page" : undefined} title={zh ? "留言板" : "Guestbook"} ariaLabel={zh ? "留言板" : "Guestbook"} onLinkClick={follow("/messages")} className={`site-header-utility header-specular-button--studio ${active("/messages") ? "header-specular-button--active" : ""}`}>
+            <MessageCircle aria-hidden="true" className="size-3.5" /><span className="hidden xl:inline">{zh ? "留言" : "Messages"}</span>
           </HeaderSpecularButton>
-          <HeaderSpecularButton
-            ariaLabel={locale === "zh" ? "留言板" : "Guestbook"}
-            title={locale === "zh" ? "留言板" : "Guestbook"}
-            className={pathname.startsWith("/messages") ? "header-specular-button--studio header-specular-button--active" : "header-specular-button--studio"}
-            href="/messages"
-          >
-            <MessageCircle className="size-3.5" />
-            <span className="hidden xl:inline">{locale === "zh" ? "留言" : "Messages"}</span>
+          <HeaderSpecularButton href="/analytics" ariaCurrent={active("/analytics") ? "page" : undefined} title={zh ? "访问统计" : "Analytics"} ariaLabel={zh ? "访问统计" : "Analytics"} onLinkClick={follow("/analytics")} className={`site-header-utility header-specular-button--studio ${active("/analytics") ? "header-specular-button--active" : ""}`}>
+            <ChartNoAxesCombined aria-hidden="true" className="size-3.5" /><span className="hidden xl:inline">{zh ? "统计" : "Analytics"}</span>
           </HeaderSpecularButton>
-          <HeaderSpecularButton
-            ariaLabel={locale === "zh" ? "访问统计" : "Analytics"}
-            title={locale === "zh" ? "访问统计" : "Analytics"}
-            className={
-              pathname.startsWith("/analytics")
-                ? "header-specular-button--studio header-specular-button--active"
-                : "header-specular-button--studio"
-            }
-            href="/analytics"
-            onLinkClick={(event) => {
-              if (
-                event.button !== 0 ||
-                event.metaKey ||
-                event.ctrlKey ||
-                event.shiftKey ||
-                event.altKey
-              )
-                return;
-              event.preventDefault();
-              navigate("/analytics", { x: event.clientX, y: event.clientY });
-            }}
-          >
-            <ChartNoAxesCombined className="size-3.5" />
-            <span className="hidden xl:inline">
-              {locale === "zh" ? "统计" : "Analytics"}
-            </span>
-          </HeaderSpecularButton>
+        </nav>
+        <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+          <span aria-hidden="true" className="mx-1 hidden h-5 border-l border-line sm:block" />
+          <FieldAgentLauncher compact iconOnlyOnSmall />
           <ExploreMenu />
-          <HeaderSpecularButton
-            ariaLabel="DROP ID · 掉落工牌"
-            className="header-specular-button--studio"
-            onClick={dropBadge}
-            type="button"
-          >
-            <BadgePlus className="size-3.5" />{" "}
-            <span className="hidden xl:inline">DROP ID</span>
-          </HeaderSpecularButton>
-          <div className="flex items-center gap-1 sm:gap-2">
-            <LanguageToggle />
-            <div className="hidden sm:block">
-              <BackToTopButton />
-            </div>
-            <GlobalEffectsMenu />
-            <ThemeToggle />
-          </div>
-          <span aria-hidden="true" className="mx-1 hidden h-6 border-l border-line sm:block" />
-          <HeaderAccountControl />
+          <div className="hidden md:block"><ThemeToggle /></div>
+          <HeaderSettings />
         </div>
       </div>
     </header>

@@ -33,11 +33,13 @@ export interface SpecularButtonProps {
   followMouse?: boolean;
   proximity?: number;
   autoAnimate?: boolean;
+  disableEffects?: boolean;
   disabled?: boolean;
   onClick?: MouseEventHandler<HTMLButtonElement>;
   onLinkClick?: MouseEventHandler<HTMLAnchorElement>;
   href?: string;
   ariaLabel?: string;
+  ariaCurrent?: 'page';
   ariaPressed?: boolean;
   title?: string;
   className?: string;
@@ -140,11 +142,13 @@ const SpecularButton = ({
   followMouse = true,
   proximity = 250,
   autoAnimate = false,
+  disableEffects = false,
   disabled = false,
   onClick,
   onLinkClick,
   href,
   ariaLabel,
+  ariaCurrent,
   ariaPressed,
   title,
   className = '',
@@ -161,7 +165,7 @@ const SpecularButton = ({
   useEffect(() => {
     const btn = btnRef.current;
     const fx = fxRef.current;
-    if (!btn || !fx || !finePointer || reducedMotion) return;
+    if (!btn || !fx || !finePointer || reducedMotion || disableEffects) return;
 
     const dpr = window.devicePixelRatio || 1;
     let renderer: Renderer;
@@ -298,7 +302,7 @@ const SpecularButton = ({
       if (gl.canvas.parentNode === fx) fx.removeChild(gl.canvas);
       gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
-  }, [finePointer, reducedMotion]);
+  }, [finePointer, reducedMotion, disableEffects]);
 
   const style = {
     '--sb-radius': `${radius}px`,
@@ -316,7 +320,7 @@ const SpecularButton = ({
   );
 
   if (href) {
-    return <a ref={btnRef as RefObject<HTMLAnchorElement>} href={href} onClick={onLinkClick} aria-label={ariaLabel} title={title} className={classes} style={style}>{content}</a>;
+    return <a ref={btnRef as RefObject<HTMLAnchorElement>} href={href} onClick={onLinkClick} aria-label={ariaLabel} aria-current={ariaCurrent} title={title} className={classes} style={style}>{content}</a>;
   }
 
   return <button ref={btnRef as RefObject<HTMLButtonElement>} type={type} disabled={disabled} onClick={onClick} aria-label={ariaLabel} aria-pressed={ariaPressed} title={title} className={classes} style={style}>{content}</button>;

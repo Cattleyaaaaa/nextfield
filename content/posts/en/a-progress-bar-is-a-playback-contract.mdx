@@ -1,0 +1,42 @@
+---
+title: "A Progress Bar Is a Playback Contract"
+date: "2026-10-01"
+tags: ["Audio", "Interaction state", "Cloudflare"]
+summary: "A slider that jumps back after release may be failing beyond the slider itself. Follow seeking across preview state, actual playback and audio delivery."
+---
+
+A progress bar appears to do two things: display the current position and let someone choose another one. When it jumps back after release, however, we discover that it connects gestures, component state, an audio element and file delivery. The few lines visible in the interface are only one part of that chain.
+
+The useful observation is not merely “the slider moved back.” It is “the music also returned to its original position.” That moves the investigation from visual synchronisation to actual playback. Making the displayed number more stable cannot fix audio that never moved.
+
+## Who controls the position during a drag?
+
+During normal playback, the audio element reports changes and the interface follows. When dragging starts, control temporarily moves to the user: the pointer position becomes a preview, and ordinary playback updates should not repeatedly overwrite it. On release, the target is passed to the player.
+
+It helps to distinguish three values: the confirmed playback position, the position being previewed and the requested seek target awaiting confirmation. They often coincide, but they mean different things. Combining them in one variable makes it easy for an old playback event to overwrite a newly requested position.
+
+Ending the preview does not establish that seeking has completed. The component must accept subsequent feedback rather than immediately treating an old time as the latest result. It must also avoid locking the target forever: if seeking fails, the interface should reflect the audio element's actual state.
+
+## One song, two positions
+
+A useful starting question is whether the progress bar controls the same audio element that is producing sound. If a page maintains one state and the global player maintains another, changing one may leave the other untouched.
+
+Navigation can make this split worse. A player that looks fixed in a corner does not necessarily have a lifecycle that survives page changes. If visiting the guestbook creates a new audio element, the saved position may no longer correspond to the active player. Persistent placement needs support from component ownership and navigation behaviour.
+
+The progress bar should therefore read confirmed state from the shared player and send seeking actions to that player. The page handles interaction; the player handles playback. Clear responsibility is easier to maintain than two components independently trying to correct the time.
+
+## Check how the file reaches the browser
+
+Being able to assign a target time does not mean the browser has received audio near that time. For MP3 files served directly by this site, the production response belongs in the investigation too. A feature that works locally but fails on the published domain may be encountering a different delivery path.
+
+The site's Worker wrapper handles audio Range requests explicitly, returning the requested byte portion and its range information. The repair can then address how the browser obtains the target audio, rather than merely keeping the slider in place for a moment.
+
+This is also a reason not to dismiss an issue because it cannot be reproduced locally. The deployment platform, asset responses and browser together form the environment people actually use. Different verification addresses may exercise different parts of the system.
+
+## Turn vague feedback into observations
+
+“Dragging is broken” can become several concrete questions. Does it happen during the drag or after release? Does the music move back too? Does it affect every track or only one? Is the address local or published? Does the issue change after navigation? Each answer removes some guesses.
+
+A reliable progress bar promises more than accepting a gesture. It promises that the requested position can become the real playback position, and that an unsuccessful attempt will be represented honestly. Following that promise through state, object ownership and data delivery is usually more useful than repeatedly adjusting slider handlers.
+
+Related: [Radio controls and audio motion](/build-log/v1-3-1-radio-in-motion), [What Should Survive Navigation](/blog/what-should-survive-navigation).

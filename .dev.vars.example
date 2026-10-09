@@ -1,0 +1,6 @@
+# Local Workers preview only. Copy to .dev.vars and fill in the key locally.
+# Production values must be configured as Cloudflare Secrets instead.
+DEEPSEEK_API_KEY=
+DEEPSEEK_MODEL=deepseek-flash
+FIELD_AGENT_ENABLED=false
+SITE_URL=http://localhost:8787

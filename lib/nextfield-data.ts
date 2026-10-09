@@ -10,11 +10,12 @@ export const CAPABILITIES = [
   { id: "agent", label: "Agent Architecture", x: 25, y: 37, evidence: "工作流、工具调用、状态管理与可恢复任务。", links: ["/projects", "/blog/agent-interface-is-a-state-machine"] },
   { id: "evaluation", label: "Evaluation", x: 75, y: 37, evidence: "把输出质量、运行轨迹和失败路径变成可观察信号。", links: ["/projects", "/failures"] },
   { id: "interface", label: "Interface Design", x: 20, y: 72, evidence: "让等待、确认、错误与结果拥有清晰的界面状态。", links: ["/gallery", "/blog/agent-interface-is-a-state-machine"] },
-  { id: "engineering", label: "Production Engineering", x: 52, y: 86, evidence: "以类型、性能、可访问性和静态部署约束完成交付。", links: ["/build-log", "/colophon"] },
+  { id: "engineering", label: "Production Engineering", x: 52, y: 86, evidence: "以类型、性能、可访问性和服务端运行边界完成交付。", links: ["/build-log", "/colophon"] },
   { id: "motion", label: "Spatial Motion", x: 82, y: 72, evidence: "用克制的 transform 与反馈建立空间感，而不是堆叠特效。", links: ["/gallery", "/blog/depth-without-weight"] },
 ] as const;
 
 export const FAILURE_ITEMS = [
+  { number: "F–08", title: "把入口说明当作完整知识", tried: "为助手收录导航与文章，以为“关于我”的入口说明足以回答网站和作者介绍。", failed: "网站概览的关键词被过滤，作者自述没有完整进入索引；上一轮项目话题又干扰了新问题，导致本站问题也被拒答。", survived: "为网站概览和作者介绍建立明确资料入口，从实际页面提取自述和能力说明；只在明确追问时继承上一轮关键词。", tag: "Retrieval" },
   { number: "F–01", title: "两个 Hero 抢着开场", tried: "连续使用两块满屏巨幅标题，希望加强叙事力度。", failed: "两个区域承担了相同任务，访问者需要穿过两次序言才能抵达内容。", survived: "保留第一屏作为宣言，把第二屏改造成可更新的 Now 状态。", tag: "Information architecture" },
   { number: "F–02", title: "让每一张卡片都动起来", tried: "为所有内容同时加入悬浮、扫光、位移和旋转。", failed: "反馈失去优先级，页面持续要求注意力，低性能设备也会更吃力。", survived: "只让关键入口拥有空间反馈，滚动动效使用一次性入场。", tag: "Motion" },
   { number: "F–03", title: "把聊天框当作 Agent 产品", tried: "先完成对话界面，再考虑工具调用过程如何呈现。", failed: "用户看不到任务状态，也无法判断何时需要介入或如何恢复。", survived: "先画状态机，再决定聊天框在其中扮演什么角色。", tag: "Agent UX" },
@@ -27,5 +28,5 @@ export const FAILURE_ITEMS = [
 export const STUDIO_LOG = [
   { status: "active", label: "Building", title: "NEXTFIELD OS", detail: "把内容、声音、导航和探索方式连接成一个系统。" },
   { status: "testing", label: "Testing", title: "Visitor traces", detail: "验证本地优先的数据痕迹在隐私和参与感之间的平衡。" },
-  { status: "queued", label: "Next", title: "Field Agent", detail: "数字分身接口已保留，等待内容与模型配置成熟后接入。" },
+  { status: "active", label: "V2.0.0", title: "Field Agent", detail: "全息信号矩阵连接内容发现与问题种子，真实流式站内问答保留来源和匿名额度。" },
 ] as const;

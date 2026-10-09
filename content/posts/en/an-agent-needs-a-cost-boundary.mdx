@@ -1,0 +1,42 @@
+---
+title: "An Agent Needs a Cost Boundary"
+date: "2026-10-05"
+tags: ["Cost control", "Quotas", "Agent"]
+summary: "Inputs, outputs, retries and long-running requests all contribute to model work. Design quotas, timeouts, context windows and recovery together so an open entry remains sustainable."
+---
+
+After connecting a model API, answer quality and waiting time are easy to notice first. Cost becomes a practical constraint once requests keep arriving. An anonymous entry is especially exposed: visitors do not need an account, but each call still asks the service to perform work.
+
+Cost control belongs in the initial design. It shapes how often people can ask, how long answers can be, how failures are retried and what state the server needs to retain.
+
+## Start with the contents of a call
+
+A request may include recent conversation, system instructions and retrieved sources as well as the latest question. More detailed answers also produce more output. Two requests counted as one question each may involve very different amounts of work.
+
+Before expanding context, ask whether it helps the current question. Before increasing answer length, check whether the sources support more detail. A bounded history, relevant excerpts and appropriate answer depth improve reading while reducing unrelated material.
+
+Each constraint needs a purpose. Too little context loses the subject of a follow-up; too little output reduces an introduction to a slogan. Concentrate work on the task rather than pursuing the shortest possible exchange.
+
+## Quotas describe opportunities to use the service
+
+A visitor allowance limits repeated calls, while a site-wide allowance bounds their combined volume. Both matter: many different visitors can produce substantial work even when each has a small individual allowance.
+
+This site's first version allows five requests per IP and 100 site-wide daily. That is a usage policy, not exact cost measurement. People on a shared network may share an allowance, so the interface should explain how it is counted.
+
+Request counts cannot replace input and output limits. A long conversation and a short question may each count once while requiring different work. Managing content size separately makes the policy more representative of actual operation.
+
+## Failure may follow work already performed
+
+An incomplete answer does not establish that no model work occurred. A request can reach the provider and produce partial content before a connection breaks or generation is truncated. Whether failures consume quota needs an explicit product decision.
+
+Field Agent currently counts failed requests and returns the remaining allowance. Because retrying can use another opportunity, the explanation should be accessible. A retry should not be presented as having no consequence.
+
+A short interval between requests reduces rapid duplicates. Retaining the input after a real failure helps someone decide whether another attempt is worthwhile. Frequency control and recovery should be considered together.
+
+## Give waiting an ending condition
+
+Timeouts, cancellation and output limits bound a single task. They prevent indefinite waiting and let the interface return to an actionable state when work cannot finish.
+
+Production counters must also survive instance changes. In-process state can disappear on restart or differ between instances. The current production design uses shared persistent counters, while local development uses a simpler in-process substitute. Documentation should distinguish their guarantees.
+
+A sustainable open entry should explain how much work a request can perform, who receives how many opportunities, what failure leaves behind and what ends the task. Establishing those boundaries early makes cost a product condition that can be discussed and adjusted.

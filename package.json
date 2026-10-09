@@ -1,6 +1,6 @@
 {
   "name": "nextfield-personal-site",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "private": true,
   "scripts": {
     "field-agent:index": "node scripts/build-field-agent-index.mjs",

@@ -1,4 +1,4 @@
-# NEXTFIELD / 下一场域 · V2.1.1
+# NEXTFIELD / 下一场域 · V2.1.2
 
 [在线体验](https://nextfield.top/)
 
@@ -7,6 +7,13 @@
 站内还有开放实验室、按文件夹生成相册的画廊、Field Radio，以及 FIELD SCHOOL：3 条学习路径、32 节双语课程、四阶段课程目录、案例库、代码练习、免登录综合自测和正式结课考试。Agent 路径从概念与 LLM 开始，逐步进入工具、状态、RAG、多 Agent 与生产实践；全栈路径从 Web 原理、HTML、CSS、JavaScript 开始，进入 React、接口、数据库、GitHub 登录、测试和交付。课程可直接阅读；GitHub 登录、跨设备进度、账户记录及正式考试依赖 Supabase。课程导师另需模型接口配置。
 
 FIELD SCHOOL 提供从入门到交付的课程路径。功能与验收清单见 [V1.1.0 说明](docs/v1.1.0-review.md)，版本更新见 [发布说明](docs/releases/V1.1.0.md)。正式考试每条路径 6 题，答对至少 5 题通过；开放自测每节课一道题，仅供复习，不上传成绩或生成正式记录。实践任务为学习者自查，不提供自动代码评分。
+
+## V2.1.2 更新
+
+- **语言切换**：将语言按钮放在顶栏日间 / 夜间切换旁，设置面板不再重复显示。
+- **首页双语修正**：精选笔记、实验类型标签及 Magnetic Type 说明会随语言切换。
+
+[在线体验](https://nextfield.top/) · [V2.1.2 发布说明](docs/releases/V2.1.2.md) · [完整更新记录](CHANGELOG.md)
 
 ## V2.1.1 更新
 
@@ -21,7 +28,7 @@ FIELD SCHOOL 提供从入门到交付的课程路径。功能与验收清单见 
 - **双语技术文章**：发布 MCP 协议介绍的中英文版本。
 - **限流运行时修正**：Field Agent 的 Cloudflare Durable Object 正式继承平台基类，保持生产限额存储可用。
 
-[在线体验](https://nextfield.top/) · [V2.1.1 发布说明](docs/releases/V2.1.1.md) · [完整更新记录](CHANGELOG.md)
+[V2.1.1 发布说明](docs/releases/V2.1.1.md) · [完整更新记录](CHANGELOG.md)
 
 ## Field Agent（当前版本）
 
@@ -34,7 +41,7 @@ FIELD SCHOOL 提供从入门到交付的课程路径。功能与验收清单见 
 - 生产使用 Cloudflare Durable Object 持久化额度；本地开发使用进程内计数。
 - 知识索引来自公开页面、Git 跟踪的非草稿与非示例文章，以及 `content/field-agent-posts.json` 明确收录的十三篇双语新文章；其他本地文件不自动进入索引，课程暂只提供入口说明。
 
-在 `.env.local` 中配置 `DEEPSEEK_API_KEY`、`DEEPSEEK_MODEL`，在本地进程启用 `FIELD_AGENT_ENABLED=true` 后运行开发服务即可体验。功能、数据去向与预览步骤见 [Field Agent 说明](docs/field-agent-plan.md)，当前部署记录见 [V2.1.1 发布说明](docs/releases/V2.1.1.md)。
+在 `.env.local` 中配置 `DEEPSEEK_API_KEY`、`DEEPSEEK_MODEL`，在本地进程启用 `FIELD_AGENT_ENABLED=true` 后运行开发服务即可体验。功能、数据去向与预览步骤见 [Field Agent 说明](docs/field-agent-plan.md)，当前部署记录见 [V2.1.2 发布说明](docs/releases/V2.1.2.md)。
 
 ## Analytics（V1.2.0）
 

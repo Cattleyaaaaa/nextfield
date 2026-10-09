@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { House, MessageCircle, ChartNoAxesCombined } from "lucide-react";
 import { ThemeToggle } from "@/components/site/theme-toggle";
 import { TransitionLink } from "@/components/site/transition-link";
-import { useLanguage } from "@/components/site/language-provider";
+import { LanguageToggle, useLanguage } from "@/components/site/language-provider";
 import { usePageTransition } from "@/components/site/page-transition-provider";
 import { HeaderSpecularButton } from "@/components/site/header-specular-button";
 import { ExploreMenu } from "@/components/site/explore-menu";
@@ -55,7 +55,8 @@ export function Header() {
           <span aria-hidden="true" className="mx-1 hidden h-5 border-l border-line sm:block" />
           <FieldAgentLauncher compact iconOnlyOnSmall />
           <ExploreMenu />
-          <div className="hidden md:block"><ThemeToggle /></div>
+          <ThemeToggle />
+          <LanguageToggle />
           <HeaderSettings />
         </div>
       </div>

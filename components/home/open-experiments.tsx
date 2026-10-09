@@ -5,6 +5,7 @@ import { ArrowUpRight, Magnet, Rotate3D, SlidersHorizontal, Sparkles } from "luc
 import ParticleText from "@/components/visual/ParticleText";
 import { TiltSurface } from "@/components/motion/tilt-surface";
 import { TransitionLink } from "@/components/site/transition-link";
+import { useLanguage } from "@/components/site/language-provider";
 import { useMotionPreference } from "@/lib/use-motion-preference";
 
 /**
@@ -14,6 +15,7 @@ import { useMotionPreference } from "@/lib/use-motion-preference";
  */
 function MagneticType() {
   const reducedMotion = useMotionPreference();
+  const { locale } = useLanguage();
   const wordRef = useRef<HTMLDivElement>(null);
   const centersRef = useRef<number[]>([]);
 
@@ -62,9 +64,13 @@ function MagneticType() {
       <div className="flex items-center gap-2">
         <Magnet className="size-5 text-accent" />
         <h3 className="font-display text-2xl">Magnetic Type</h3>
-        <span className="ml-auto font-mono text-[10px] uppercase tracking-[0.16em] text-muted">Type / pointer</span>
+        <span className="ml-auto font-mono text-[10px] uppercase tracking-[0.16em] text-muted">{locale === "zh" ? "类型 / 指针" : "Type / pointer"}</span>
       </div>
-      <p className="mt-2 max-w-xl text-xs leading-5 text-muted">指针从左到右掠过，字母会被抬起并放大——距离越近，反应越强。移除指针后回到静止。</p>
+      <p className="mt-2 max-w-xl text-xs leading-5 text-muted">
+        {locale === "zh"
+          ? "指针从左到右掠过，字母会被抬起并放大——距离越近，反应越强。移除指针后回到静止。"
+          : "Move your pointer across the word to lift and enlarge each letter. The closer you get, the stronger the response. Move away to let it settle."}
+      </p>
       <div className="mt-8 flex flex-wrap items-baseline font-display text-[clamp(2.25rem,7vw,4.5rem)] leading-none tracking-[-0.04em]" ref={wordRef}>
         {"MAGNETIC".split("").map((char, index) => (
           <span className="inline-block origin-bottom px-[0.01em] transition-[transform,opacity] duration-200 ease-out" key={`${char}-${index}`}>{char}</span>

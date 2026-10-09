@@ -15,14 +15,14 @@ export const CAPABILITIES = [
 ] as const;
 
 export const FAILURE_ITEMS = [
-  { number: "F–08", title: "把入口说明当作完整知识", tried: "为助手收录导航与文章，以为“关于我”的入口说明足以回答网站和作者介绍。", failed: "网站概览的关键词被过滤，作者自述没有完整进入索引；上一轮项目话题又干扰了新问题，导致本站问题也被拒答。", survived: "为网站概览和作者介绍建立明确资料入口，从实际页面提取自述和能力说明；只在明确追问时继承上一轮关键词。", tag: "Retrieval" },
-  { number: "F–01", title: "两个 Hero 抢着开场", tried: "连续使用两块满屏巨幅标题，希望加强叙事力度。", failed: "两个区域承担了相同任务，访问者需要穿过两次序言才能抵达内容。", survived: "保留第一屏作为宣言，把第二屏改造成可更新的 Now 状态。", tag: "Information architecture" },
-  { number: "F–02", title: "让每一张卡片都动起来", tried: "为所有内容同时加入悬浮、扫光、位移和旋转。", failed: "反馈失去优先级，页面持续要求注意力，低性能设备也会更吃力。", survived: "只让关键入口拥有空间反馈，滚动动效使用一次性入场。", tag: "Motion" },
-  { number: "F–03", title: "把聊天框当作 Agent 产品", tried: "先完成对话界面，再考虑工具调用过程如何呈现。", failed: "用户看不到任务状态，也无法判断何时需要介入或如何恢复。", survived: "先画状态机，再决定聊天框在其中扮演什么角色。", tag: "Agent UX" },
-  { number: "F–04", title: "等待完整内容再发布", tried: "计划一次性准备所有项目案例、长文和视觉素材。", failed: "网站长期停留在‘快完成了’，也失去了记录过程的价值。", survived: "建立 Notes、Experiments 和 Build Log，让不同完成度的内容都有位置。", tag: "Publishing" },
-  { number: "F–05", title: "用百分比给装饰定位", tried: "首页弹簧线按容器的 right-[14%] 摆放，以为比例关系稳定。", failed: "标语按 clamp(4rem, 14vw, 12.5rem) 缩放，装饰按容器缩放，两者比例不同；换个窗口宽度，弹簧线就压到字母上，看起来像渲染错误。", survived: "行容器收缩到文字实际宽度，装饰锚在最后一个字母右侧，尺寸改用 em 跟随字号。", tag: "Typography" },
-  { number: "F–06", title: "裁切层沿用通用留白", tried: "逐字入场动画的裁切层统一给 pb-[0.06em]，沿用常见写法。", failed: "对没有下伸部的字母够用，却把 y 和 g 的尾巴切平——0.06em 远小于字体约 0.24em 的 descender 深度。", survived: "留白按字体 descender 深度给（0.26em），入场的 yPercent 同步加大，避免动画开始前露出字头。", tag: "CSS" },
-  { number: "F–07", title: "悬停动效不管入场进度", tried: "标语的悬停起伏直接在 pointerover 上触发，认为随时可用。", failed: "入场还没播完时划过，overwrite 会覆盖入场进度，字母冻在半空成一排高低不齐的字。", survived: "用入场 onComplete 置位的 ready 标记做守门，并让悬停只动 scale、循环动画只动 rotate，两者互不打断。", tag: "Motion" },
+  { number: "F–08", date: "2026 · 10 · 09", title: "把入口说明当作完整知识", tried: "为助手收录导航与文章，以为“关于我”的入口说明足以回答网站和作者介绍。", failed: "网站概览的关键词被过滤，作者自述没有完整进入索引；上一轮项目话题又干扰了新问题，导致本站问题也被拒答。", survived: "为网站概览和作者介绍建立明确资料入口，从实际页面提取自述和能力说明；只在明确追问时继承上一轮关键词。", tag: "Retrieval" },
+  { number: "F–01", date: "2026 · 09 · 22", title: "两个 Hero 抢着开场", tried: "连续使用两块满屏巨幅标题，希望加强叙事力度。", failed: "两个区域承担了相同任务，访问者需要穿过两次序言才能抵达内容。", survived: "保留第一屏作为宣言，把第二屏改造成可更新的 Now 状态。", tag: "Information architecture" },
+  { number: "F–02", date: "2026 · 09 · 22", title: "让每一张卡片都动起来", tried: "为所有内容同时加入悬浮、扫光、位移和旋转。", failed: "反馈失去优先级，页面持续要求注意力，低性能设备也会更吃力。", survived: "只让关键入口拥有空间反馈，滚动动效使用一次性入场。", tag: "Motion" },
+  { number: "F–03", date: "2026 · 09 · 22", title: "把聊天框当作 Agent 产品", tried: "先完成对话界面，再考虑工具调用过程如何呈现。", failed: "用户看不到任务状态，也无法判断何时需要介入或如何恢复。", survived: "先画状态机，再决定聊天框在其中扮演什么角色。", tag: "Agent UX" },
+  { number: "F–04", date: "2026 · 09 · 22", title: "等待完整内容再发布", tried: "计划一次性准备所有项目案例、长文和视觉素材。", failed: "网站长期停留在‘快完成了’，也失去了记录过程的价值。", survived: "建立 Notes、Experiments 和 Build Log，让不同完成度的内容都有位置。", tag: "Publishing" },
+  { number: "F–05", date: "2026 · 09 · 24", title: "用百分比给装饰定位", tried: "首页弹簧线按容器的 right-[14%] 摆放，以为比例关系稳定。", failed: "标语按 clamp(4rem, 14vw, 12.5rem) 缩放，装饰按容器缩放，两者比例不同；换个窗口宽度，弹簧线就压到字母上，看起来像渲染错误。", survived: "行容器收缩到文字实际宽度，装饰锚在最后一个字母右侧，尺寸改用 em 跟随字号。", tag: "Typography" },
+  { number: "F–06", date: "2026 · 09 · 24", title: "裁切层沿用通用留白", tried: "逐字入场动画的裁切层统一给 pb-[0.06em]，沿用常见写法。", failed: "对没有下伸部的字母够用，却把 y 和 g 的尾巴切平——0.06em 远小于字体约 0.24em 的 descender 深度。", survived: "留白按字体 descender 深度给（0.26em），入场的 yPercent 同步加大，避免动画开始前露出字头。", tag: "CSS" },
+  { number: "F–07", date: "2026 · 09 · 24", title: "悬停动效不管入场进度", tried: "标语的悬停起伏直接在 pointerover 上触发，认为随时可用。", failed: "入场还没播完时划过，overwrite 会覆盖入场进度，字母冻在半空成一排高低不齐的字。", survived: "用入场 onComplete 置位的 ready 标记做守门，并让悬停只动 scale、循环动画只动 rotate，两者互不打断。", tag: "Motion" },
 ] as const;
 
 export const STUDIO_LOG = [

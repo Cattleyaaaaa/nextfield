@@ -187,15 +187,17 @@ export function FieldAgent({ session, locale, onClose, onNavigate }: {
         </div>
       </header>
 
-      <div ref={log} className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-6 sm:px-6" role="log" aria-label={zh ? "Field Agent 对话" : "Field Agent conversation"} aria-live="polite" aria-relevant="additions">
+      <div ref={log} className={`relative flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-5 py-6 sm:px-6 ${empty ? "justify-center" : ""}`} role="log" aria-label={zh ? "Field Agent 对话" : "Field Agent conversation"} aria-live="polite" aria-relevant="additions">
+      <section className="field-agent-discovery-dock relative z-10 shrink-0 border-b border-cyan-300/10 bg-[#0b1627] px-5 py-2 sm:px-6" data-state={empty ? "welcome" : "conversation"} aria-label={zh ? "全息内容信号矩阵" : "Holographic content signals"}>
+        <FieldAgentDiscovery animated={motionEnabled} locale={locale} canAsk={canSend} onNavigate={onNavigate} onAsk={question => { session.setPrompt(question); document.getElementById("field-agent-prompt")?.focus({ preventScroll: true }); }} />
+      </section>
+
         {!session.turns.length && !session.busy ? (
-          <div className="flex min-h-full flex-col justify-center pb-3">
+          <div className="flex flex-col justify-center pb-3">
             <div data-agent-welcome-enter className="field-agent-hero relative mb-6 text-center">
               <span className="field-agent-console-label relative inline-flex items-center gap-2 font-mono text-[9px] tracking-[0.22em] text-cyan-200"><span className="size-1.5 rounded-full bg-cyan-300" /> NEXTFIELD / KNOWLEDGE CONSOLE</span>
-              <FieldAgentDiscovery animated={motionEnabled} locale={locale} canAsk={canSend} onNavigate={onNavigate} onAsk={question => { session.setPrompt(question); document.getElementById("field-agent-prompt")?.focus({ preventScroll: true }); }}>
               <h3 className="relative text-[clamp(1.65rem,5vw,2rem)] font-medium leading-[1.3] tracking-[-0.04em]">{zh ? "你好，我是" : "Hello, I'm"}<span className="ml-2 bg-gradient-to-r from-cyan-200 via-sky-300 to-violet-300 bg-clip-text text-transparent">Field Agent</span></h3>
               <p className="relative mx-auto mt-3 max-w-xs text-xs leading-6 text-slate-400">{zh ? "从一个问题开始，探索项目、文章与灵感。每个答案，都能追溯到本站资料。" : "Explore projects, articles and ideas. Every answer connects you to this site's sources."}</p>
-              </FieldAgentDiscovery>
             </div>
             <p data-agent-welcome-enter className="mb-3 font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">{zh ? "从这里开始 / START HERE" : "START HERE"}</p>
             <div data-agent-welcome-enter className="space-y-2">
@@ -216,9 +218,9 @@ export function FieldAgent({ session, locale, onClose, onNavigate }: {
         <form data-busy={session.busy} onSubmit={session.submit} className="field-agent-composer relative overflow-hidden rounded-2xl border border-cyan-300/40 bg-[#101c30] p-3 shadow-[0_0_24px_rgba(34,211,238,0.12)] transition focus-within:border-cyan-300/80 focus-within:shadow-[0_0_25px_rgba(34,211,238,0.22)]">
           <label htmlFor="field-agent-prompt" className="sr-only">{zh ? "你的问题" : "Your question"}</label>
           <textarea id="field-agent-prompt" value={session.prompt} onChange={event => session.setPrompt(event.target.value)} maxLength={1500} rows={2} disabled={!canSend} placeholder={zh ? "有什么想了解的？" : "What would you like to know?"} className="block max-h-32 w-full resize-none bg-transparent text-base leading-6 text-slate-100 outline-none placeholder:text-slate-500 disabled:opacity-50 sm:text-sm" />
-          <div className="mt-2 flex items-center justify-between gap-3"><span className="text-[10px] text-slate-500">{session.remaining === null ? (zh ? "每日 5 次 · 仅限本站内容" : "5 questions daily · Site sources only") : (zh ? `今日剩余 ${session.remaining} 次` : `${session.remaining} remaining today`)}</span><button type="submit" aria-label={zh ? "发送问题" : "Send question"} disabled={!canSend || !session.prompt.trim()} className="field-agent-send grid size-8 shrink-0 place-items-center rounded-xl bg-cyan-200 text-[#09111c] shadow-[0_0_16px_rgba(103,232,249,0.2)] transition hover:bg-cyan-100 disabled:bg-slate-700 disabled:text-slate-500 disabled:shadow-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300"><Send className="size-3.5" /></button></div>
+          <div className="mt-2 flex items-center justify-between gap-3"><span className="text-[10px] text-slate-500">{session.remaining === null ? (zh ? "每日 15 次 · 仅限本站内容" : "15 questions daily · Site sources only") : (zh ? `今日剩余 ${session.remaining} 次` : `${session.remaining} remaining today`)}</span><button type="submit" aria-label={zh ? "发送问题" : "Send question"} disabled={!canSend || !session.prompt.trim()} className="field-agent-send grid size-8 shrink-0 place-items-center rounded-xl bg-cyan-200 text-[#09111c] shadow-[0_0_16px_rgba(103,232,249,0.2)] transition hover:bg-cyan-100 disabled:bg-slate-700 disabled:text-slate-500 disabled:shadow-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300"><Send className="size-3.5" /></button></div>
         </form>
-        <details className="mt-3 text-[10px] text-slate-500"><summary className="w-fit cursor-pointer transition hover:text-slate-300">{zh ? "关于回答、数据与额度" : "About answers, data and limits"}</summary><p className="mt-2 max-h-24 overflow-y-auto leading-5">{zh ? "回答附来源，资料不足时会说明。问题、近期对话及相关站内资料会发送至 DeepSeek，请勿输入密钥或敏感信息。每 IP 每日 5 次，全站每日 100 次；失败请求也计入额度，共用网络可能共用额度。北京时间 00:00 重置。" : "Answers include sources. Your question, recent conversation and site excerpts are sent to DeepSeek. Avoid secrets or sensitive information. Limits: 5 per IP and 100 site-wide daily, including failures. Shared networks share a quota. Reset: 00:00 UTC+8."}</p></details>
+        <details className="mt-3 text-[10px] text-slate-500"><summary className="w-fit cursor-pointer transition hover:text-slate-300">{zh ? "关于回答、数据与额度" : "About answers, data and limits"}</summary><p className="mt-2 max-h-24 overflow-y-auto leading-5">{zh ? "回答附来源，资料不足时会说明。问题、近期对话及相关站内资料会发送至 DeepSeek，请勿输入密钥或敏感信息。每 IP 每日 15 次，全站每日 300 次；失败请求也计入额度，共用网络可能共用额度。北京时间 00:00 重置。" : "Answers include sources. Your question, recent conversation and site excerpts are sent to DeepSeek. Avoid secrets or sensitive information. Limits: 15 per IP and 300 site-wide daily, including failures. Shared networks share a quota. Reset: 00:00 UTC+8."}</p></details>
       </footer>
     </div>
   );

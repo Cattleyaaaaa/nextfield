@@ -7,6 +7,7 @@ import {
   Clock3,
   Database,
   Eye,
+  MapPin,
   RefreshCw,
   ShieldCheck,
   Users,
@@ -188,7 +189,10 @@ export function AnalyticsDashboard() {
           result.range !== range ||
           !result.totals ||
           !Array.isArray(result.daily) ||
-          !Array.isArray(result.hourly)
+          !Array.isArray(result.hourly) ||
+          !Array.isArray(result.countries) ||
+          typeof result.countryFrom !== "string" ||
+          typeof result.countryTo !== "string"
         ) {
           setError("invalid_response");
           return;
@@ -500,6 +504,49 @@ export function AnalyticsDashboard() {
                 ))}
             </div>
           </section>
+          <section className="mt-10 rounded-3xl border border-line bg-panel/70 p-5 sm:p-7">
+            <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <MapPin className="size-4 text-accent" aria-hidden="true" />
+                <div>
+                  <h2 className="font-display text-2xl">{zh ? "热门国家 / 地区" : "Top countries / regions"}</h2>
+                  <p className="mt-1 text-xs text-muted">
+                    {zh ? "按 Cloudflare 汇总访问次数排序" : "Ranked by aggregated Cloudflare visits"}
+                  </p>
+                </div>
+              </div>
+              <span className="font-mono text-[10px] text-muted">{availableData.countryFrom} — {availableData.countryTo} UTC</span>
+            </div>
+            {availableData.countries.length ? (
+              <ol className="grid gap-x-8 gap-y-5 md:grid-cols-2">
+                {availableData.countries.map((country, index) => {
+                  const maxVisits = Math.max(1, ...availableData.countries.map((item) => item.visits));
+                  let name = country.countryCode;
+                  if (country.countryCode === "XX" || country.countryCode === "ZZ") name = zh ? "未知地区" : "Unknown region";
+                  else {
+                    try { name = new Intl.DisplayNames([locale], { type: "region" }).of(country.countryCode) ?? country.countryCode; } catch { /* use the code when region names are unavailable */ }
+                  }
+                  return (
+                    <li key={country.countryCode} className="min-w-0">
+                      <div className="mb-2 flex items-center gap-3">
+                        <span className="w-5 shrink-0 font-mono text-[10px] text-muted">{String(index + 1).padStart(2, "0")}</span>
+                        <span className="min-w-0 flex-1 truncate text-sm">{name}</span>
+                        <span className="font-mono text-xs tabular-nums">{formatMetric(country.visits, "visitors", locale)}</span>
+                      </div>
+                      <div className="ml-8 h-1.5 overflow-hidden rounded-full bg-line/70">
+                        <div className="h-full rounded-full bg-accent/80 transition-[width]" style={{ width: String(Math.max(3, country.visits / maxVisits * 100) + "%") }} />
+                      </div>
+                    </li>
+                  );
+                })}
+              </ol>
+            ) : (
+              <p className="py-6 text-sm text-muted">{zh ? "所选时间范围内暂无可展示的地区汇总。" : "No country aggregates are available for this range."}</p>
+            )}
+            <p className="mt-5 border-t border-line pt-4 text-[10px] leading-5 text-muted">
+              {zh ? "访问次数按 Cloudflare visits 口径汇总，不等于独立访客人数；仅显示地区聚合，不包含个人明细。" : "Visits follow Cloudflare's visit metric and are not unique people. Only regional aggregates are shown, without individual records."}
+            </p>
+          </section>
           <DataTable data={availableData} locale={locale} />
         </>
       ) : (
@@ -543,8 +590,8 @@ export function AnalyticsDashboard() {
           </h2>
           <p className="mt-4 text-sm leading-7 text-paper/70">
             {zh
-              ? "缓存命中率按请求量加权，零请求时显示「—」。独立访问按所选周期查询去重，不能相加每日或每小时值。接口缓存约 5 分钟，源数据可能延迟；1 年等范围是否可查取决于套餐。"
-              : "Cache hit rate is request-weighted and shown as “—” with no requests. Period uniques are queried separately and cannot be summed across daily or hourly buckets. Responses are cached for about five minutes; source reporting can lag, and ranges such as one year depend on the plan."}
+              ? "缓存命中率按请求量加权，零请求时显示「—」。独立访问按所选周期查询去重，不能相加每日或每小时值。地区排名按 Cloudflare 访问次数统计（不代表独立人数）；1 年视图的地区榜单使用最近 30 天数据。接口缓存约 5 分钟，源数据可能延迟。"
+              : "Cache hit rate is request-weighted and shown as “—” with no requests. Period uniques are queried separately and cannot be summed across daily or hourly buckets. Country rankings use Cloudflare visits (not unique people), and the one-year view uses the latest 30 days for this dataset. Responses are cached for about five minutes; source reporting can lag."}
           </p>
           <p className="mt-4 font-mono text-[10px] text-paper/50">
             {availableData

@@ -1,5 +1,5 @@
-const USER_LIMIT = 5;
-const SITE_LIMIT = 100;
+const USER_LIMIT = 15;
+const SITE_LIMIT = 300;
 
 export class FieldAgentLimiter {
   constructor(ctx) { this.ctx = ctx; }

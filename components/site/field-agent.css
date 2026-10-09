@@ -97,6 +97,85 @@ button.field-agent-core:focus-visible {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
+/* Center discovery on welcome; keep it pinned above the conversation after the first question. */
+.field-agent-discovery-dock {
+  position: sticky;
+  top: 0;
+  margin: 0 -20px 12px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+.field-agent-discovery-dock::before {
+  content: "";
+  position: absolute;
+  top: -24px;
+  left: 0;
+  right: 0;
+  height: 24px;
+  background: #0b1627;
+  pointer-events: none;
+}
+.field-agent-discovery-dock[data-state="welcome"] {
+  margin-bottom: 32px;
+  border-bottom-color: transparent;
+}
+.field-agent-discovery-dock[data-state="welcome"] + div .field-agent-console-label {
+  display: none;
+}
+.field-agent-discovery-dock[data-state="welcome"] .field-agent-discovery {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.field-agent-discovery-dock[data-state="welcome"] .field-agent-core {
+  width: min(220px, 52vw, 25dvh);
+}
+.field-agent-discovery-dock[data-state="welcome"] .field-agent-signal-hint {
+  min-height: 0;
+  margin: 0 0 4px;
+  text-align: center;
+}
+.field-agent-discovery-dock[data-state="welcome"] [role="group"] {
+  justify-content: center;
+}
+.field-agent-discovery-dock[data-state="conversation"] {
+  margin-bottom: 36px;
+}
+.field-agent-discovery-dock[data-state="conversation"] .field-agent-discovery {
+  display: grid;
+  grid-template-columns: min(156px, 20dvh) minmax(0, 1fr);
+  column-gap: 12px;
+  align-items: center;
+}
+.field-agent-discovery-dock[data-state="conversation"] .field-agent-core {
+  grid-column: 1;
+  grid-row: 1 / 3;
+  width: 100%;
+  margin: 0;
+}
+.field-agent-discovery-dock[data-state="conversation"] .field-agent-signal-hint {
+  grid-column: 2;
+  align-self: end;
+  margin: 0 0 8px;
+  text-align: left;
+}
+.field-agent-discovery-dock[data-state="conversation"] [role="group"] {
+  grid-column: 2;
+  align-self: start;
+  justify-content: flex-start;
+  margin-top: 0;
+}
+.field-agent-discovery-dock .field-agent-signal-card {
+  position: absolute;
+  top: calc(100% - 4px);
+  left: 12px;
+  right: 12px;
+  z-index: 20;
+  max-height: min(420px, 50dvh);
+  margin-top: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
 .field-agent-core-compact {
   width: 88px;
   flex: 0 0 88px;

@@ -34,10 +34,18 @@ export function analyticsQuery(
   const filter = `date_geq: ${JSON.stringify(window.from)}, date_leq: ${JSON.stringify(window.to)}`;
   const metrics =
     "sum { requests pageViews bytes cachedRequests } uniq { uniques }";
+  const countryDays = Math.min(range, 30);
+  const countryFrom = new Date(
+    Date.parse(window.to + "T00:00:00Z") - (countryDays - 1) * 86400000,
+  ).toISOString().slice(0, 10);
+  const countryToExclusive = new Date(
+    Date.parse(window.to + "T00:00:00Z") + 86400000,
+  ).toISOString();
   return `query { viewer { zones(filter: { zoneTag: ${JSON.stringify(zone)} }) {
     totals: httpRequests1dGroups(limit: 1, filter: { ${filter} }) { ${metrics} }
     daily: httpRequests1dGroups(limit: 366, orderBy: [date_ASC], filter: { ${filter} }) { dimensions { date } ${metrics} }
     hourly: httpRequests1hGroups(limit: 73, orderBy: [datetime_ASC], filter: { datetime_geq: ${JSON.stringify(window.hourlyFrom)}, datetime_lt: ${JSON.stringify(window.asOf)} }) { dimensions { datetime } ${metrics} }
+    countries: httpRequestsAdaptiveGroups(limit: 10, orderBy: [sum_visits_DESC], filter: { datetime_geq: ${JSON.stringify(countryFrom + "T00:00:00Z")}, datetime_lt: ${JSON.stringify(countryToExclusive)}, requestSource: "eyeball" }) { count sum { visits } dimensions { clientCountryName } }
   } } }`;
 }
 export async function readAnalytics(
@@ -119,12 +127,36 @@ export async function readAnalytics(
       bytes: total.bytes,
       cachedRequests: total.cachedRequests,
     };
+    const countryGroups = Array.isArray(zone.countries) ? zone.countries : [];
+    if (countryGroups.length > 10)
+      throw new Error("Too many country aggregates");
+    const countries = countryGroups.map((group: {
+      count?: unknown;
+      sum?: { visits?: unknown };
+      dimensions?: { clientCountryName?: unknown };
+    }) => {
+      const code = group.dimensions?.clientCountryName;
+      const visits = group.sum?.visits;
+      const requests = group.count;
+      if (typeof code !== "string" || !/^[A-Z0-9]{2,3}$/.test(code)
+        || typeof visits !== "number" || !Number.isFinite(visits) || visits < 0
+        || typeof requests !== "number" || !Number.isFinite(requests) || requests < 0)
+        throw new Error("Invalid country aggregate");
+      return { countryCode: code, visits, requests };
+    });
+    const countryDays = Math.min(range, 30);
+    const countryFrom = new Date(
+      Date.parse(window.to + "T00:00:00Z") - (countryDays - 1) * 86400000,
+    ).toISOString().slice(0, 10);
     const date = response.headers.get("date");
     return {
       mode: "live",
       range,
       from: window.from,
       to: window.to,
+      countryFrom,
+      countryTo: window.to,
+      countries,
       updatedAt:
         date && Number.isFinite(Date.parse(date))
           ? new Date(date).toISOString()

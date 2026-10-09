@@ -31,7 +31,8 @@ CLOUDFLARE_ANALYTICS_API_TOKEN=你的专用只读令牌
 
 - 数据源是 Zone HTTP Analytics，不是 Workers 调用统计，也不是额外部署的客户端 Web Analytics beacon。
 - Zone 数据涵盖该 Zone 的代理主机；如果域名还承载其他子域应用，不能声称仅对应本站页面。
-- API 查询 `httpRequests1dGroups` 和 `httpRequests1hGroups`。套餐、数据集权限和保留期限可能限制 14/30/365 天或小时范围；不可用时显示明确状态，不缩短范围后假称完整周期。
+- API 查询 `httpRequests1dGroups` 和 `httpRequests1hGroups`；国家/地区榜使用 `httpRequestsAdaptiveGroups`，仅纳入 `requestSource: eyeball` 的汇总访问，并取前十名。该数据集至少保留 31 天，因此 365 天视图仍只展示最近 30 天的地区排名。套餐和数据集权限可能限制其他趋势范围；不可用时显示明确状态，不缩短范围后假称完整周期。
+- Cloudflare `visits` 是访问次数口径，不等于去重访客人数；地区结果只展示聚合数据。
 - 周期独立访问单独查询无时间维度的聚合，不将每日或每小时 uniques 相加；该指标不等于经过验证的人数。
 - 页面浏览遵循 Cloudflare 数据集定义，不是 Next.js 客户端导航点击计数。
 - 缓存命中率为缓存请求数 / 总请求数，不平均各小时百分比；零请求时显示未定义符号。

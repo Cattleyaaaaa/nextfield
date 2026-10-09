@@ -4,12 +4,20 @@ import { retrieveFieldAgentSources } from "@/lib/field-agent-retrieval";
 export const maxDuration = 60;
 const json = (body: unknown, status = 200, headers: Record<string, string> = {}) => Response.json(body, { status, headers: { "Cache-Control": "no-store", ...headers } });
 export async function GET() {
-    return json({ enabled: process.env.FIELD_AGENT_ENABLED === "true" && Boolean(process.env.DEEPSEEK_API_KEY && process.env.DEEPSEEK_MODEL), userDailyLimit: 5, siteDailyLimit: 100 });
+    return json({ enabled: process.env.FIELD_AGENT_ENABLED === "true" && Boolean(process.env.DEEPSEEK_API_KEY && process.env.DEEPSEEK_MODEL), userDailyLimit: 15, siteDailyLimit: 300 });
 }
 export async function POST(request: Request) {
     let remaining: number | undefined;
     try {
-        if (request.headers.get("origin") !== new URL(request.url).origin)
+        const origin = request.headers.get("origin");
+        const requestUrl = new URL(request.url);
+        // Next dev can normalize request.url to localhost even when the browser
+        // uses 127.0.0.1. Match the actual Host only for local development.
+        const host = request.headers.get("host");
+        const localOrigin = process.env.NODE_ENV === "development" && host
+            && /^(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/i.test(host)
+            ? new URL(requestUrl.protocol + "//" + host).origin : null;
+        if (!origin || (origin !== requestUrl.origin && origin !== localOrigin))
             return json({ error: "请求来源无效。" }, 403);
         if (process.env.FIELD_AGENT_ENABLED !== "true" || !process.env.DEEPSEEK_API_KEY || !process.env.DEEPSEEK_MODEL)
             return json({ error: "Field Agent 尚未开启，请稍后再来。" }, 503);

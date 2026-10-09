@@ -8,11 +8,15 @@ export type AnalyticsPoint = {
   bytes: number;
   cachedRequests: number;
 };
+export type CountryAnalytics = { countryCode: string; visits: number; requests: number };
 export type AnalyticsSnapshot = {
   mode: "live" | "demo";
   range: AnalyticsRange;
   from: string;
   to: string;
+  countryFrom: string;
+  countryTo: string;
+  countries: CountryAnalytics[];
   updatedAt: string;
   totals: Omit<AnalyticsPoint, "time">;
   daily: AnalyticsPoint[];
@@ -117,6 +121,15 @@ export function demoAnalytics(
     from: window.from,
     to: window.to,
     updatedAt: window.asOf,
+    countryFrom: window.from,
+    countryTo: window.to,
+    countries: [
+      { countryCode: "US", visits: 1280, requests: 3460 },
+      { countryCode: "HK", visits: 940, requests: 2210 },
+      { countryCode: "JP", visits: 730, requests: 1980 },
+      { countryCode: "GB", visits: 510, requests: 1320 },
+      { countryCode: "SG", visits: 380, requests: 910 },
+    ],
     totals,
     daily,
     hourly,

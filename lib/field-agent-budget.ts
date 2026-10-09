@@ -15,7 +15,7 @@ type Limiter = {
 };
 let localCount = 0;
 let localDay = "";
-let localLast = 0;
+const localVisitors = new Map<string, { count: number; last: number }>();
 export async function reserveFieldAgentBudget(request: Request, apiKey: string): Promise<Budget> {
     let limiter: Limiter | undefined;
     try {
@@ -43,14 +43,18 @@ export async function reserveFieldAgentBudget(request: Request, apiKey: string):
     if (day !== localDay) {
         localDay = day;
         localCount = 0;
-        localLast = 0;
+        localVisitors.clear();
     }
     const resetAt = Date.parse(day + "T00:00:00Z") + 16 * 60 * 60 * 1000;
-    if (localCount >= 5)
-        return { allowed: false, remaining: 0, resetAt, retryAfter: Math.ceil((resetAt - now) / 1000) };
-    if (now - localLast < 5000)
-        return { allowed: false, remaining: 5 - localCount, resetAt, retryAfter: 5 };
+    const visitorId = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || new URL(request.url).hostname;
+    const visitor = localVisitors.get(visitorId) ?? { count: 0, last: 0 };
+    if (localCount >= 300 || visitor.count >= 15)
+        return { allowed: false, remaining: Math.max(0, 15 - visitor.count), resetAt, retryAfter: Math.ceil((resetAt - now) / 1000) };
+    if (now - visitor.last < 5000)
+        return { allowed: false, remaining: 15 - visitor.count, resetAt, retryAfter: 5 };
+    visitor.count += 1;
+    visitor.last = now;
+    localVisitors.set(visitorId, visitor);
     localCount += 1;
-    localLast = now;
-    return { allowed: true, remaining: 5 - localCount, resetAt };
+    return { allowed: true, remaining: 15 - visitor.count, resetAt };
 }

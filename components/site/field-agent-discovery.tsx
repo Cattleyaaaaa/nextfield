@@ -1,17 +1,16 @@
 "use client";
 
-import { useId, useRef, useState, type ReactNode } from "react";
+import { useId, useRef, useState } from "react";
 import { ArrowUpRight, RefreshCw, Sparkles, X } from "lucide-react";
 import { FIELD_AGENT_SIGNALS, SIGNAL_TOPICS, type SignalTopic } from "@/lib/field-agent-signals";
 import { FieldAgentCore } from "./field-agent-core";
 
-export function FieldAgentDiscovery({ animated, locale, canAsk, onAsk, onNavigate, children }: {
+export function FieldAgentDiscovery({ animated, locale, canAsk, onAsk, onNavigate }: {
   animated: boolean;
   locale: "zh" | "en";
   canAsk: boolean;
   onAsk: (question: string) => void;
   onNavigate: (href: string) => void;
-  children?: ReactNode;
 }) {
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -35,7 +34,6 @@ export function FieldAgentDiscovery({ animated, locale, canAsk, onAsk, onNavigat
     <p className="field-agent-signal-hint mb-3 min-h-5 font-mono text-[10px] leading-5 text-cyan-200/80" aria-hidden="true">
       {hovered ? `${SIGNAL_TOPICS[hovered.topic].label[locale]} · ${zh ? "点击发现内容" : "Click to discover"}` : zh ? "点亮一根光柱，发现一条本站内容" : "Pick a column to discover site content"}
     </p>
-    {children}
     <div className="mt-4 flex flex-wrap justify-center gap-1.5" role="group" aria-label={zh ? "按主题发现内容" : "Discover by topic"}>
       {(Object.keys(SIGNAL_TOPICS) as SignalTopic[]).map(topic => <button key={topic} type="button" aria-pressed={selected?.topic === topic} onClick={() => setSelectedId(FIELD_AGENT_SIGNALS.find(signal => signal.topic === topic)!.id)} className="field-agent-signal-topic inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.035] px-2.5 py-1.5 text-[10px] text-slate-400 transition hover:border-cyan-300/40 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300">
         <span aria-hidden="true" className="size-1 rounded-full" style={{ backgroundColor: `rgb(${SIGNAL_TOPICS[topic].color.join(",")})` }} />{SIGNAL_TOPICS[topic].label[locale]}

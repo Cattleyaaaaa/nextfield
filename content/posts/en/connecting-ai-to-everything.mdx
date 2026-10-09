@@ -1,0 +1,55 @@
+---
+title: "MCP Explained: The USB-C Interface for AI Applications"
+date: "2026-09-29"
+category: "Technology"
+tags: ["MCP", "AI", "Protocol", "Anthropic"]
+summary: "MCP is an open standard designed to solve the fragmentation problem of integrating AI models with external data sources and tools. It is aptly described as the USB-C interface for AI applications."
+---
+
+MCP (Model Context Protocol) is an **open standard** introduced by Anthropic, designed to solve the fragmentation problem of integrating AI models with external data sources and tools. It is aptly described as the **"USB-C interface for AI applications,"** providing a standardized way for AI to connect to and invoke external capabilities.
+
+## 🎯 The Core Problem: The N×M Integration Paradox
+
+Before MCP, every AI application (such as IDEs and chat tools) that wanted to connect to each type of external resource (databases, APIs, file systems) had to write custom adapter code. This created the "**N models × M resources = N×M custom integrations**" dilemma, with extremely high maintenance costs.
+
+By defining a universal protocol, MCP simplifies integration into an "**N + M**" model: model providers and resource providers only need to support MCP individually to achieve plug-and-play connectivity.
+
+## 🏗️ Architecture: A Three-Layer Model
+
+MCP adopts a **Host-Client-Server** three-layer architecture, ensuring clear responsibility boundaries and security isolation.
+
+| Component | Role | Core Responsibility |
+|---|---|---|
+| **Host** | Coordinator | Runs the AI application (e.g., Claude Desktop, VS Code), manages multiple Client instances, enforces security policies, and controls user authorization |
+| **Client** | Connector | Embedded in the Host, establishes a 1:1 connection with **one** Server, handling protocol negotiation, message routing, and session management |
+| **Server** | Capability Provider | Wraps external data or tools into standardized interfaces, exposing capabilities through three primitives |
+
+A single Host can run multiple Clients simultaneously, with each Client connected to an independent Server. This design ensures that **a Server can only see the necessary context**, with the full conversation history retained in the Host and Servers isolated from one another.
+
+## 🔧 Three Core Capabilities (Primitives Provided by the Server)
+
+Servers expose capabilities to AI through the following three standardized "primitives":
+
+**Resources**: Read-only contextual data. Similar to REST's GET interface, they provide the model with static information such as documents, database records, and calendar events, used to reduce hallucinations and enhance the truthfulness of responses.
+
+**Tools**: Executable operations. They enable AI to truly "take action," such as sending emails, querying flights, creating calendar events, and executing code. Each tool has a well-defined input/output schema, and execution typically requires user authorization.
+
+**Prompts**: Reusable interaction templates. They provide preset instruction structures for specific workflows, guiding the model to follow consistent behavioral norms.
+
+## 🔐 Security Principles
+
+While MCP grants AI powerful capabilities, it also introduces security challenges. The protocol explicitly requires implementers to focus on:
+
+1. **User Informed Consent**: Users must explicitly authorize any data access or tool invocation
+2. **Data Privacy**: The Host must obtain consent before exposing user data to a Server, and must not forward data without permission
+3. **Tool Safety**: Tools imply arbitrary code execution and must be treated with caution; tool descriptions themselves may be untrustworthy unless they come from a trusted Server
+
+## 📦 Ecosystem and Current State
+
+Since its launch in late 2024, MCP has been adopted by major vendors including **OpenAI, Google DeepMind, and Microsoft**. The official repository provides a large number of ready-made MCP Servers for Google Drive, Slack, Git, databases, and more, while third-party developers continue to contribute new services.
+
+Taking **APISIX-MCP** as an example, MCP enables direct management of API gateway routes, plugins, consumers, and other resources through natural language, significantly reducing the cognitive cost of operations.
+
+## 💡 Conclusion
+
+The core value of MCP lies in **standardization**. It moves the connection between AI applications and the external world from "siloed custom development" toward "ecosystem collaboration under a unified protocol," allowing developers to focus on business logic without repeatedly solving integration problems.

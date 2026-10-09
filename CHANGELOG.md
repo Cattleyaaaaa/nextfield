@@ -1,5 +1,9 @@
 # 更新记录
 
+## V2.1.1 — 2026-10-09
+
+- 修正限流 Durable Object 类的 Cloudflare 基类继承，保持 Field Agent 生产额度可持久化；额度为每 IP 每日 15 次、全站每日 300 次。
+
 ## V2.1.0 — 2026-10-09
 
 - Field Agent 额度提升为每 IP 每日 15 次、全站每日 300 次；本地与 Cloudflare Durable Object 限流同步更新。

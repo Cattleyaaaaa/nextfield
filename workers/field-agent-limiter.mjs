@@ -1,10 +1,7 @@
 const USER_LIMIT = 15;
 const SITE_LIMIT = 300;
 
-export class FieldAgentLimiter {
-  constructor(ctx) { this.ctx = ctx; }
-
-  async fetch(request) {
+export async function handleFieldAgentLimit(ctx, request) {
     if (request.method !== 'POST') return new Response(null, {status:405});
     const body = await request.json();
     if (typeof body.visitor !== 'string' || !/^[a-f0-9]{64}$/.test(body.visitor)) return new Response(null,{status:400});
@@ -12,7 +9,7 @@ export class FieldAgentLimiter {
     const shifted = new Date(now + 8*60*60*1000);
     const day = shifted.toISOString().slice(0,10);
     const resetAt = Date.parse(day+'T00:00:00Z') + 24*60*60*1000 - 8*60*60*1000;
-    const result = await this.ctx.storage.transaction(async txn => {
+    const result = await ctx.storage.transaction(async txn => {
       let state = await txn.get('budget');
       if (!state || state.day !== day) state = {day,total:0,visitors:{}};
       const visitor = state.visitors[body.visitor] || {count:0,last:0};
@@ -26,5 +23,4 @@ export class FieldAgentLimiter {
       return {allowed:true,remaining:USER_LIMIT-visitor.count,resetAt};
     });
     return Response.json(result,{headers:{'Cache-Control':'no-store'}});
-  }
 }

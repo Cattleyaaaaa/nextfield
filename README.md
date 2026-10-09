@@ -1,4 +1,4 @@
-# NEXTFIELD / 下一场域 · V2.1.0
+# NEXTFIELD / 下一场域 · V2.1.1
 
 [在线体验](https://nextfield.top/)
 
@@ -8,7 +8,7 @@
 
 FIELD SCHOOL 提供从入门到交付的课程路径。功能与验收清单见 [V1.1.0 说明](docs/v1.1.0-review.md)，版本更新见 [发布说明](docs/releases/V1.1.0.md)。正式考试每条路径 6 题，答对至少 5 题通过；开放自测每节课一道题，仅供复习，不上传成绩或生成正式记录。实践任务为学习者自查，不提供自动代码评分。
 
-## V2.1.0 更新
+## V2.1.1 更新
 
 - **Field Agent**：免登录、仅回答本站内容的 DeepSeek 流式助手，附真实来源；每 IP 每日 15 次，全站每日 300 次。
 - **内容发现**：7×7 全息光柱矩阵，局部悬停反馈、五类内容信号与问题种子；浏览卡片不消耗提问额度。
@@ -19,8 +19,9 @@ FIELD SCHOOL 提供从入门到交付的课程路径。功能与验收清单见 
 - **热门地区**：Analytics 加入访问国家 / 地区榜；年度筛选使用最近 30 天的地区汇总。
 - **额度与助手界面**：Field Agent 提升至每 IP 每日 15 次、全站每日 300 次；调整全息矩阵在欢迎页和对话中的布局，并修正本地开发环境的请求来源校验。
 - **双语技术文章**：发布 MCP 协议介绍的中英文版本。
+- **限流运行时修正**：Field Agent 的 Cloudflare Durable Object 正式继承平台基类，保持生产限额存储可用。
 
-[在线体验](https://nextfield.top/) · [V2.1.0 发布说明](docs/releases/V2.1.0.md) · [完整更新记录](CHANGELOG.md)
+[在线体验](https://nextfield.top/) · [V2.1.1 发布说明](docs/releases/V2.1.1.md) · [完整更新记录](CHANGELOG.md)
 
 ## Field Agent（当前版本）
 
@@ -33,7 +34,7 @@ FIELD SCHOOL 提供从入门到交付的课程路径。功能与验收清单见 
 - 生产使用 Cloudflare Durable Object 持久化额度；本地开发使用进程内计数。
 - 知识索引来自公开页面、Git 跟踪的非草稿与非示例文章，以及 `content/field-agent-posts.json` 明确收录的十三篇双语新文章；其他本地文件不自动进入索引，课程暂只提供入口说明。
 
-在 `.env.local` 中配置 `DEEPSEEK_API_KEY`、`DEEPSEEK_MODEL`，在本地进程启用 `FIELD_AGENT_ENABLED=true` 后运行开发服务即可体验。功能、数据去向与预览步骤见 [Field Agent 说明](docs/field-agent-plan.md)，当前部署记录见 [V2.1.0 发布说明](docs/releases/V2.1.0.md)。
+在 `.env.local` 中配置 `DEEPSEEK_API_KEY`、`DEEPSEEK_MODEL`，在本地进程启用 `FIELD_AGENT_ENABLED=true` 后运行开发服务即可体验。功能、数据去向与预览步骤见 [Field Agent 说明](docs/field-agent-plan.md)，当前部署记录见 [V2.1.1 发布说明](docs/releases/V2.1.1.md)。
 
 ## Analytics（V1.2.0）
 
@@ -134,7 +135,7 @@ npm run preview
 
 `preview` 会重新构建并在 Workers 环境预览。运行时密钥写入 Cloudflare Secrets；本地 Workers 预览使用被忽略的 `.dev.vars`，格式见 [.dev.vars.example](.dev.vars.example)。涉及浏览器的 Supabase 公开变量也需要在构建环境配置。完整问答索引与轻量内容信号由脚本自动生成，不提交生成的 JSON。
 
-Field Agent 已配置 DeepSeek Secret、`FIELD_AGENT_LIMITER` 绑定及 `field-agent-v1` SQLite Durable Object 迁移，生产 `FIELD_AGENT_ENABLED=true`。后续发布仍需保留这些配置；缺少额度绑定时问答拒绝服务。完整重新构建并发布的命令为 `npm run deploy`。详见 [V2.1.0 发布说明](docs/releases/V2.1.0.md)、[Field Agent 说明](docs/field-agent-plan.md)与 [FIELD SCHOOL 部署说明](docs/field-school-deployment.md)。
+Field Agent 已配置 DeepSeek Secret、`FIELD_AGENT_LIMITER` 绑定及 `field-agent-v1` SQLite Durable Object 迁移，生产 `FIELD_AGENT_ENABLED=true`。后续发布仍需保留这些配置；缺少额度绑定时问答拒绝服务。完整重新构建并发布的命令为 `npm run deploy`。详见 [V2.1.1 发布说明](docs/releases/V2.1.1.md)、[Field Agent 说明](docs/field-agent-plan.md)与 [FIELD SCHOOL 部署说明](docs/field-school-deployment.md)。
 
 ### Vercel（当前 Next.js 构建可用）
 

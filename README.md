@@ -1,5 +1,6 @@
 # NEXTFIELD / 下一场域 · V2.0.0
 
+[在线体验](https://nextfield.top/)
 一个持续生长的个人网站，收录项目、写作、视觉实验与学习内容。项目页以 [Neptune 多 Agent 工作空间](https://github.com/Cattleyaaaaa/Neptune-Multi-agent-Workspace)为重点作品，提供[项目网站](http://myneptune.tech/)和源码入口；其他项目方向仍在整理中。
 
 站内还有开放实验室、按文件夹生成相册的画廊、Field Radio，以及 FIELD SCHOOL：3 条学习路径、32 节双语课程、四阶段课程目录、案例库、代码练习、免登录综合自测和正式结课考试。Agent 路径从概念与 LLM 开始，逐步进入工具、状态、RAG、多 Agent 与生产实践；全栈路径从 Web 原理、HTML、CSS、JavaScript 开始，进入 React、接口、数据库、GitHub 登录、测试和交付。课程可直接阅读；GitHub 登录、跨设备进度、账户记录及正式考试依赖 Supabase。课程导师另需模型接口配置。
@@ -15,7 +16,7 @@ FIELD SCHOOL 提供从入门到交付的课程路径。功能与验收清单见 
 
 - **日期整理**：随笔自动按日期倒序；失败博物馆展示收录日期，保持最新记录在前。
 
-[在线体验](https://nextfield.top/) · [V2.0.0 发布说明](docs/releases/V2.0.0.md) · [完整更新记录](CHANGELOG.md)
+  [V2.0.0 发布说明](docs/releases/V2.0.0.md) · [完整更新记录](CHANGELOG.md)
 
 ## Field Agent（V2.0.0，已上线）
 

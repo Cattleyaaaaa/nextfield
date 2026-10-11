@@ -47,7 +47,7 @@ const ROUTE_HINTS: { href: string; pattern: RegExp }[] = [
     { href: "/build-log", pattern: /建站纪事|建站过程|更新记录|版本|build\s*log|changelog|versions?/i },
     { href: "/colophon", pattern: /制作说明|设计原则|构建方式|怎么搭建|如何搭建|怎么开发|技术架构|colophon|design\s*principles|how.*built/i },
     { href: "/gallery", pattern: /实验室|交互实验|experiments?|laboratory/i },
-    { href: "/essays", pattern: /随笔|essays?/i },
+    { href: "/blog?chapter=essays", pattern: /随笔|essays?/i },
     { href: "/failures", pattern: /失败博物馆|失败记录|failures?/i },
     { href: "/live-studio", pattern: /live\s*studio|正在做|近期计划|working\s+on/i },
     { href: "/systems", pattern: /证据层|systems|evidence\s*layer/i },

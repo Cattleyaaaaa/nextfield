@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { BlogPostChrome } from "@/components/blog/blog-post-chrome";
+import { FieldBookReader } from "@/components/field-book/field-book-reader";
+import { getFieldBookEntries } from "@/lib/field-book";
 import { getAllPosts, getPostBySlug, loadPostComponent } from "@/lib/posts";
 import { mdxComponents } from "@/mdx-components";
 
@@ -29,15 +30,22 @@ export default async function PostPage({ params }: { params: Promise<PostPagePar
 
   const Content = await loadPostComponent(post.slug);
   const EnglishContent = post.english ? await loadPostComponent(post.slug, "en") : null;
+  const entries = getFieldBookEntries();
+  const entry = entries.find((item) => item.href === `/blog/${post.slug}`) ?? {
+    kind: "writing" as const,
+    slug: post.slug,
+    href: `/blog/${post.slug}`,
+    date: post.date,
+    category: post.category,
+    title: { zh: post.title, en: post.english?.title ?? post.title },
+    summary: { zh: post.summary, en: post.english?.summary ?? post.summary },
+    minutes: { zh: post.minutes, en: post.english?.minutes ?? post.minutes },
+  };
 
-  return (
-    <div className="relative isolate mx-auto max-w-site px-5 pb-28 pt-20 sm:px-8 sm:pt-28 lg:px-12">
-      <BlogPostChrome post={post} position="top" />
-      <article className="post-content--zh mt-10 max-w-article" lang="zh-CN">
-        <Content components={mdxComponents} />
-      </article>
-      {EnglishContent ? <article className="post-content--en mt-10 max-w-article" lang="en"><EnglishContent components={mdxComponents} /></article> : null}
-      <BlogPostChrome post={post} position="bottom" />
-    </div>
-  );
+  return <FieldBookReader
+    entry={entry}
+    entries={entries}
+    contentZh={<Content components={mdxComponents} />}
+    contentEn={EnglishContent ? <EnglishContent components={mdxComponents} /> : undefined}
+  />;
 }

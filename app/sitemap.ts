@@ -32,7 +32,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteConfig.url}/gallery/radio`, lastModified: new Date() },
     { url: `${siteConfig.url}/build-log`, lastModified: new Date() },
     { url: `${siteConfig.url}/colophon`, lastModified: new Date() },
-    { url: `${siteConfig.url}/essays`, lastModified: new Date() },
     { url: `${siteConfig.url}/learn`, lastModified: new Date() },
     { url: `${siteConfig.url}/analytics`, lastModified: new Date() },
     { url: `${siteConfig.url}/learn/exam`, lastModified: new Date() },

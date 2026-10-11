@@ -345,6 +345,72 @@ export const COLOPHON_ARTICLES: EditorialArticle[] = [
 */
 
 export const ESSAY_ARTICLES: EditorialArticle[] = [
+  {
+    slug: "a-day-does-not-need-a-conclusion",
+    date: "2026 · 10 · 11",
+    eyebrow: "Essay / 01",
+    tags: ["日常", "记录", "留白"],
+    minutes: 2,
+    title: { zh: "今天不必整理成结论", en: "Today Does Not Need a Conclusion" },
+    summary: {
+      zh: "不是每一天都要提炼出收获。有些日子只是在忙乱中走过去，允许它保持原样，也是一种诚实的记录。",
+      en: "Not every day needs a lesson. Some days simply pass in a blur, and letting them stay that way can be an honest kind of record."
+    },
+    sections: [
+      { heading: { zh: "没有标题的一天", en: "A Day Without a Headline" }, paragraphs: [
+        { zh: "晚上回看今天，想不出什么适合写在开头的事。做过的事情不少，却没有一件特别值得拿出来讲。窗口开了又关，消息回了几条，计划表上的小格子被划掉，也留下了几项没能完成。", en: "At night, I cannot think of an opening line for today. Plenty happened, but nothing feels important enough to single out. Windows opened and closed, a few messages were answered, boxes on the plan were checked, and a few tasks remained." },
+        { zh: "以前总觉得，既然要记录，就该替一天找到一个意义。后来发现，太急着总结，会把真实的疲惫和犹豫修饰成一段漂亮的话。日子并不总要给出答案。", en: "I used to think that a record needed to find meaning in every day. But rushing to summarise can polish real tiredness and doubt into a neat story. A day does not always have to provide an answer." }
+      ]},
+      { heading: { zh: "把空白留下来", en: "Leave Some Space" }, paragraphs: [
+        { zh: "于是今晚只写下天气、晚饭和一件明天要做的小事。没有感悟，也没有计划要成为更好的自己。纸上留出一块空白，不代表忘记，而是承认今天已经足够普通。", en: "So tonight I write down the weather, dinner, and one small thing for tomorrow. No lesson, no plan to become a better person. The blank space on the page does not mean forgetting; it admits that today was ordinary enough." },
+        { zh: "合上本子之后，事情仍然没有变得明朗。但我不必再把它们整理成结论，才允许自己休息。明天如果有新的想法，再让它从明天开始。", en: "Closing the notebook does not make everything clearer. But I do not have to turn it into a conclusion before allowing myself to rest. If a new thought comes tomorrow, it can begin there." }
+      ]}
+    ]
+  },
+  {
+    slug: "seven-minutes-at-the-bus-stop",
+    date: "2026 · 10 · 10",
+    eyebrow: "Essay / 02",
+    tags: ["等待", "城市", "片刻"],
+    minutes: 2,
+    title: { zh: "公交晚了七分钟", en: "The Bus Was Seven Minutes Late" },
+    summary: {
+      zh: "多出来的七分钟没有被安排进计划，却让一个匆忙的傍晚出现了缝隙。站在路边，我终于看见天色怎样慢慢变暗。",
+      en: "Seven unplanned minutes opened a small gap in a hurried evening. Waiting by the road, I finally noticed the light changing."
+    },
+    sections: [
+      { heading: { zh: "时间表以外", en: "Outside the Schedule" }, paragraphs: [
+        { zh: "站牌上的时间比手机显示的晚了七分钟。起初我隔一会儿就看一次屏幕，像是盯着它，车就会快一点。后来手机锁了屏，路口的红灯又亮起来，我才发觉自己已经很久没有抬头看过树。", en: "The bus was seven minutes later than the time on my phone. At first I kept checking the screen, as if watching it could make the bus arrive sooner. Then the phone locked and the traffic light turned red again. I realised I had not looked up at the trees in a while." },
+        { zh: "风把路边店铺的招牌吹得轻轻晃动。有人提着刚买的菜，有人从耳机里漏出一小段旋律，还有一个小孩蹲下来数地砖。每个人都在等同一班车，却各自带着不同的心事。", en: "The wind gently moved the shop signs. Someone carried groceries; a melody leaked from someone else’s headphones; a child crouched to count the paving stones. We were waiting for the same bus, each carrying a different thought." }
+      ]},
+      { heading: { zh: "刚好够用的停顿", en: "A Pause Just Long Enough" }, paragraphs: [
+        { zh: "车终于到了，并没有带来什么特别的改变。我照常上车、找座位、继续去要去的地方。只是那七分钟里，我没有同时赶路、回复消息和安排接下来的事。", en: "The bus finally arrived and changed nothing in particular. I got on, found a seat, and continued where I was going. But during those seven minutes, I was not travelling, replying to messages and planning the next thing all at once." },
+        { zh: "等待通常被看作计划被打断。但有时，计划之外的一小段时间刚好够我们回到眼前。它不必变成效率，也不需要留下什么成果，只要让呼吸慢下来一点就够了。", en: "Waiting is usually treated as an interruption. Sometimes, though, a little time outside the plan is enough to bring us back to the present. It does not need to become productive or leave an achievement behind. A slower breath is enough." }
+      ]}
+    ]
+  },
+  {
+    slug: "the-light-at-the-crossing",
+    date: "2026 · 10 · 09",
+    eyebrow: "Essay / 03",
+    tags: ["夜晚", "城市", "日常"],
+    minutes: 2,
+    title: { zh: "路口亮起的灯", en: "The Light at the Crossing" },
+    summary: {
+      zh: "夜里回家的路上，一盏普通的路灯照见了行人短暂交错的方向。谁也没有停留太久，却共同经过了同一片亮处。",
+      en: "On the way home, an ordinary streetlight held a brief crossing of paths. No one stayed for long, but we passed through the same patch of light."
+    },
+    sections: [
+      { heading: { zh: "等一个绿灯", en: "Waiting for Green" }, paragraphs: [
+        { zh: "晚上走到路口时，行人灯刚好变红。几个人在白线后停下来，有人看着对面的便利店，有人低头把围巾重新绕好。我也停下，听见远处的车声从一阵变成另一阵。", en: "The pedestrian light turned red just as I reached the crossing. A few people stopped behind the line. Someone looked at the shop across the street; someone else adjusted a scarf. I paused too, listening as traffic swelled and faded in the distance." },
+        { zh: "头顶的灯不算明亮，只把地面照出一块温暖的颜色。风把树枝的影子推到斑马线上，影子又被经过的车灯切碎。那一小片地方一直在变化，等绿灯的人却暂时什么也不用做。", en: "The light overhead was not bright, but it left a warm patch on the ground. Wind pushed branch shadows across the crossing, and passing headlights broke them apart. The small scene kept changing while everyone waiting had nothing to do for a moment." }
+      ]},
+      { heading: { zh: "各自走向下一段", en: "On to the Next Part" }, paragraphs: [
+        { zh: "绿灯亮起以后，人群向前移动，几秒钟就散开了。刚才并排站着的人走向不同的街道，也没有谁需要知道另一个人的目的地。", en: "When the light turned green, people moved forward and separated within seconds. Those who had stood side by side went down different streets; no one needed to know where the others were headed." },
+        { zh: "我继续往前，回想起那盏灯下短暂的安静。城市里有许多这样的时刻，不会留下名字，却把陌生人的路线轻轻放在一起。然后灯光留在身后，夜晚继续向前。", en: "I kept walking and remembered the brief quiet beneath that light. A city holds many moments like this: unnamed, briefly bringing strangers’ paths together. Then the glow stays behind, and the night moves on." }
+      ]}
+    ]
+  },
 {
   "slug": "after-closing-the-laptop",
   "date": "2026 · 10 · 08",

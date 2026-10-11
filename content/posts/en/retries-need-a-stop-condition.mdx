@@ -1,0 +1,28 @@
+---
+title: "Retries Need a Stop Condition"
+date: "2026-10-11"
+tags: ["Retries", "Reliability", "Networking"]
+summary: "Retries can bridge a transient failure, but they can also amplify traffic and delay. Bound attempts and time, classify retryable errors and verify that an operation is idempotent."
+---
+
+Trying a request again after it fails sounds like a simple reliability improvement. But when both clients and servers retry automatically, one incident can become many rounds of requests. If the upstream is already busy, the extra traffic can make recovery harder. A retry is not “try again whenever there is an error”; it is a recovery strategy with a cost.
+
+First ask whether the failure might be temporary. A reset connection or a service explicitly reporting temporary unavailability may justify a retry. Invalid input, missing permission or a permanently absent resource will not change if the same request is repeated. When a service returns `Retry-After`, respect its waiting time instead of sending requests in quick succession.
+
+## Bound both attempts and total time
+
+Set a maximum attempt count and an overall deadline. Increasing the wait between attempts can reduce pressure; adding a small random jitter helps prevent many clients from retrying at the same moment. Once the limit is reached, return control to the interface or user instead of looping silently in the background.
+
+A timeout for one request is not the same as a deadline for the whole operation. If every attempt can wait a long time, even a bounded number of retries may exceed what the user expects. The system can set a total budget at the start and decide whether another attempt fits within the remaining time.
+
+## Check whether repeating is safe
+
+Reading data is usually easier to retry. Writes, payments and resource creation need more care. A timeout does not prove that the server failed to complete the operation: the client may have disconnected before the response arrived. Sending the same request again could create duplicate records or repeat a side effect.
+
+An idempotency key or server-side deduplication record can make a write safe to retry by ensuring that repeated deliveries of one logical operation produce only one result. If the system cannot guarantee this, the interface should check the operation’s status or clearly say that its outcome is unknown instead of assuming failure.
+
+## Return a final state to the caller
+
+After retries finish, the caller needs to know whether the request succeeded, failed clearly or remains uncertain. Recording attempt count, intervals, final state and a controlled error category can reveal whether retries are hiding an upstream incident. Logs do not need sensitive request bodies, and a policy should not be judged from one lucky success.
+
+A good retry policy gives transient failures a chance to recover while knowing when to stop. Attempt count, total duration, error category and idempotency define that boundary.

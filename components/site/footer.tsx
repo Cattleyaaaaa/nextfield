@@ -20,7 +20,6 @@ export function Footer() {
           ))}
           <TransitionLink className="hover:text-accent" href="/colophon">制作说明</TransitionLink>
           <TransitionLink className="hover:text-accent" href="/learn">FIELD SCHOOL</TransitionLink>
-          <TransitionLink className="hover:text-accent" href="/essays">随笔</TransitionLink>
           <TransitionLink className="hover:text-accent" href="/live-studio">Live Studio</TransitionLink>
           <TransitionLink className="hover:text-accent" href="/failures">失败博物馆</TransitionLink>
           <TransitionLink className="hover:text-accent" href="/systems">Systems</TransitionLink>

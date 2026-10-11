@@ -7,8 +7,23 @@ import { localizeText } from "@/lib/translations";
 
 export type Locale = "zh" | "en";
 const LanguageContext = createContext<{ locale: Locale; toggle: () => void }>({ locale: "zh", toggle: () => {} });
+const LANGUAGE_PREFERENCE_KEY = "nextfield-language-preference";
 const textStates = new WeakMap<Text, { source: string; rendered: string }>();
 const attributeStates = new WeakMap<Element, Map<string, { source: string; rendered: string }>>();
+
+function getBrowserLocale(): Locale {
+  const preferences = navigator.languages?.length ? navigator.languages : [navigator.language];
+  for (const preference of preferences) {
+    const language = preference.toLowerCase();
+    if (language.startsWith("zh")) return "zh";
+    if (language.startsWith("en")) return "en";
+  }
+  return "en";
+}
+
+function getSavedLocale(value: string | null): Locale | null {
+  return value === "zh" || value === "en" ? value : null;
+}
 
 function translateNode(node: Text, locale: Locale) {
   const raw = node.nodeValue ?? "";
@@ -50,11 +65,17 @@ export function useLanguage() { return useContext(LanguageContext); }
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [locale, setLocale] = useState<Locale>("zh");
-  useEffect(() => { const saved = window.localStorage.getItem("nextfield-language"); if (saved === "en") setLocale("en"); }, []);
   useEffect(() => {
-    document.documentElement.lang = locale === "en" ? "en" : "zh-CN";
+    try {
+      const savedPreference = window.localStorage.getItem(LANGUAGE_PREFERENCE_KEY);
+      setLocale(getSavedLocale(savedPreference) ?? getBrowserLocale());
+    } catch {
+      setLocale(getBrowserLocale());
+    }
+  }, []);
+  useEffect(() => {
+    document.documentElement.lang = locale === "zh" ? "zh-CN" : "en";
     document.documentElement.dataset.locale = locale;
-    window.localStorage.setItem("nextfield-language", locale);
     translateTree(document.body, locale);
     const observer = new MutationObserver((mutations) => mutations.forEach((mutation) => {
       if (mutation.type === "characterData") translateNode(mutation.target as Text, locale);
@@ -64,7 +85,14 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     observer.observe(document.body, { attributes: true, attributeFilter: ["placeholder", "title", "aria-label"], characterData: true, childList: true, subtree: true });
     return () => observer.disconnect();
   }, [locale]);
-  return <LanguageContext.Provider value={{ locale, toggle: () => setLocale((value) => value === "zh" ? "en" : "zh") }}>{children}</LanguageContext.Provider>;
+  const chooseLocale = (next: Locale) => {
+    setLocale(next);
+    try {
+      window.localStorage.setItem(LANGUAGE_PREFERENCE_KEY, next);
+    } catch { /* Keep the current-session selection even if Storage is unavailable. */ }
+  };
+  const toggle = () => chooseLocale(locale === "zh" ? "en" : "zh");
+  return <LanguageContext.Provider value={{ locale, toggle }}>{children}</LanguageContext.Provider>;
 }
 
 export function LanguageToggle({ footer = false }: { footer?: boolean }) {

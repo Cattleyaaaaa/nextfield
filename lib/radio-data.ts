@@ -39,6 +39,8 @@ const LISTED_TRACKS: readonly RadioTrack[] = [
   { src: "/audio/陈奕迅 - 葡萄成熟时.mp3", title: "葡萄成熟时", artist: "陈奕迅", note: "专辑 · U87", cover: "/covers/putao-chengshushi.jpg" },
   { src: "/audio/陈奕迅 - 十面埋伏.mp3", title: "十面埋伏", artist: "陈奕迅", note: "专辑 · The Best Moment", cover: "/covers/shimian-maifu.jpg" },
   { src: "/audio/陈奕迅 - 单车.mp3", title: "单车", artist: "陈奕迅", cover: "/covers/danche.jpg" },
+  { src: "/audio/陈奕迅 - 落花流水.mp3", title: "落花流水", artist: "陈奕迅", note: "专辑 · Life Continues", cover: "/covers/luo-hua-liu-shui.jpg" },
+  { src: "/audio/陈奕迅 - 陀飞轮.mp3", title: "陀飞轮", artist: "陈奕迅", note: "专辑 · Time Flies", cover: "/covers/tuo-fei-lun.jpg" },
   { src: "/audio/方大同 - Love Song.mp3", title: "Love Song", artist: "方大同", note: "专辑 · 未来", cover: "/covers/love-song.jpg" },
   { src: "/audio/方大同 - 爱爱爱.mp3", title: "爱爱爱", artist: "方大同", note: "专辑 · 爱爱爱", cover: "/covers/aiaiai.jpg" },
   { src: "/audio/方大同 - 才二十三.mp3", title: "才二十三", artist: "方大同", note: "梦想家 The Dreamer", cover: "/covers/cai-ershisan.jpg" },
@@ -63,10 +65,19 @@ const LISTED_TRACKS: readonly RadioTrack[] = [
   { src: "/audio/鹿晗 - 我们的明天.mp3", title: "我们的明天", artist: "鹿晗", note: "单曲 · 我们的明天", cover: "/covers/women-de-mingtian.jpg" },
   { src: "/audio/王力宏 - 爱的就是你.mp3", title: "爱的就是你", artist: "王力宏", note: "专辑 · 唯一", cover: "/covers/weiyi.jpg" },
   { src: "/audio/王力宏 - 唯一.mp3", title: "唯一", artist: "王力宏", note: "专辑 · 唯一", cover: "/covers/weiyi.jpg" },
+  { src: "/audio/孙燕姿 - 我怀念的.mp3", title: "我怀念的", artist: "孙燕姿", note: "专辑 · 逆光", cover: "/covers/wo-huai-nian-de.jpg" },
+  { src: "/audio/孙燕姿 - 遇见.mp3", title: "遇见", artist: "孙燕姿", note: "专辑 · The Moment", cover: "/covers/yu-jian.jpg" },
+  { src: "/audio/孙燕姿 - 雨天.mp3", title: "雨天", artist: "孙燕姿", note: "专辑 · My Story, Your Song", cover: "/covers/yu-tian.jpg" },
+  { src: "/audio/孙燕姿 - 我不难过.mp3", title: "我不难过", artist: "孙燕姿", note: "专辑 · 未完成", cover: "/covers/wo-bu-nan-guo.jpg" },
+  // 原始专辑《第一张》(2006) 在本机可达的几个音乐目录里都查不到收录记录，
+  // 这里用的是 2013 年确实收录该曲的《爱，不解释》，note 如实写的是这张。
+  { src: "/audio/张杰 - 他不懂.mp3", title: "他不懂", artist: "张杰", note: "专辑 · 爱，不解释", cover: "/covers/ta-bu-dong.jpg" },
+  { src: "/audio/张杰 - 明天过后.mp3", title: "明天过后", artist: "张杰", note: "专辑 · 明天过后", cover: "/covers/ming-tian-guo-hou.jpg" },
+  { src: "/audio/李健 - 传奇.mp3", title: "传奇", artist: "李健", note: "专辑 · 似水流年", cover: "/covers/chuan-qi.jpg" },
 ];
 
 // 未核实的专辑图使用本站原创 SVG 视觉封面，避免把占位图伪装成官方唱片封面。
-// 目前 35 首都已配图：33 首用发行图（31 张 jpg，《新的心跳》《唯一》各被两首共用），
+// 目前 44 首都已配图：42 首用发行图（40 张 jpg，《新的心跳》《唯一》各被两首共用），
 // 2 首 Akie 秋绘的翻唱没有官方封面，继续用本站原创图。这条兜底只防以后新增曲目漏配图。
 export const RADIO_TRACKS: readonly RadioTrack[] = LISTED_TRACKS.map((track) => ({
   ...track,

@@ -1,0 +1,28 @@
+---
+title: "A Cache Key Defines What Counts as the Same Content"
+date: "2026-10-11"
+tags: ["Caching", "HTTP", "Internationalisation"]
+summary: "Cache safety depends on which requests the system treats as equivalent. Language, query parameters and personalised data can change a response, and may therefore need to change its cache key."
+---
+
+Caching is often described as “saving a result for a while,” but its safety depends on how the cache decides that two requests can share one result. If it considers them equivalent, it gives the later request the content produced for the earlier one. The cache key usually makes that decision.
+
+A basic key considers the method and URL. But if a response also depends on language, device type, query options or a public feature flag, comparing only the URL is insufficient. A cached Chinese page delivered to an English reader, or one filter’s results reused for another, are examples of a cache hit that is still wrong.
+
+## List every input that changes the response
+
+For a page or endpoint, list the factors that affect its response: path, query parameters, necessary request headers, language preference and whether the content is user-specific. Decide for each one whether it belongs in the cache key or whether the response should not be shared at all. HTTP `Vary` can declare that some request headers change a response, but it must agree with the cache rules used by the CDN and application.
+
+Language is easy to miss. If the server chooses a version from `Accept-Language`, the cache configuration must represent that difference. Another option is an explicit language path such as `/en/...` and `/zh/...`, where the URL itself identifies the content version. Whichever approach is used, server rendering, client-side switching and edge caching should follow the same rule.
+
+## Treat personalised responses with care
+
+When a response depends on sign-in state, personal settings or private data, a shared cache could deliver one visitor’s content to another. Adding a cookie or identity to a public cache key can create many inefficient variants and does not replace access control. For private responses, explicitly disabling shared caching is often more reliable than trying to build a public key from every identity detail.
+
+Query parameters also carry product meaning. If `?page=2` or `?sort=recent` changes the content, the cache must distinguish it. If a tracking parameter does not affect content, it can be ignored once the rule is clear. Inconsistent parameter handling can create needless cache fragmentation or treat different results as one.
+
+## Verify cache rules with different identities
+
+Testing should go beyond requesting the same URL repeatedly. Change the language, query options and sign-in state, then check that the body, cache headers and CDN hit status match expectations. Cover the initial miss, later hit and invalidation after content changes too.
+
+A cache key is a declaration about content identity. Listing the inputs that change a result makes the choice between speed and correctness explainable, and caching stops feeling like an accidental optimisation.

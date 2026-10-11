@@ -1,0 +1,28 @@
+---
+title: "Empty Data Is Not Zero"
+date: "2026-10-10"
+tags: ["API", "Error states", "Data experience"]
+summary: "An empty list can be a valid result, or it can mean the request never returned. Separate success, empty results and failures so zero values do not conceal real problems."
+---
+
+When a page says “No data yet,” visitors usually understand that the request succeeded but there are no records. If the request actually failed, that message disguises a system problem as a business result.
+
+The two cases look similar because neither shows content, but they mean different things. A successful empty query can show an empty state and a next action. A failed request should say that the data cannot be read right now and offer a retry. If both become the same empty array, the interface loses the evidence it needs to tell them apart.
+
+## Make result status part of the data
+
+An interface can distinguish states across the request lifecycle: loading, success with data, success with no results and failure. Each state can then show a chart, an empty prompt, loading feedback or an error. “Zero records” appears only when the request really succeeded and returned nothing.
+
+Metrics are especially easy to misread. Filling a failed traffic request with zero suggests that the site had no visits. Showing “There are no messages yet” after the guestbook request failed can make its owner think their posts were deleted. Numbers and empty states may look concise, but they should not replace connection status.
+
+## Errors should point to a next step
+
+An error message does not need to expose internal server details. It should not send tokens, SQL or raw upstream responses to visitors. It can say that the action did not finish, offer a retry, and let maintainers distinguish network timeouts, permission failures and invalid data through carefully filtered logs.
+
+If the previous request produced data, a product may keep the last successful result and clearly mark it as stale. That can be more useful than suddenly clearing the page, but the timestamp and status need to appear together. Old data must not pose as live data.
+
+## Empty and failure states have different jobs
+
+An empty state can help someone begin: create the first record, change a filter or learn when data will appear. A failure state responds to an interruption: reload, check the connection or try again later. One describes “there is no result”; the other says “the result is not known yet.” They should not share the same presentation.
+
+When an interface makes that distinction, visitors do not have to guess whether data disappeared or the system is temporarily unable to read it. The error still exists, but it no longer disguises itself as a normal-looking number.

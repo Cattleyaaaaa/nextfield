@@ -1,0 +1,30 @@
+---
+title: "A Data-Source Label Is a Promise"
+date: "2026-10-09"
+tags: ["Data visualisation", "Analytics", "Trust"]
+summary: "A source name beside a chart suggests that data is connected, current and clearly defined. Show the source, update time and metric boundaries together to make the numbers trustworthy."
+---
+
+When a chart says “Cloudflare,” visitors naturally assume the numbers come from a real connection and follow a clear definition. A source label looks like a footnote, but it creates a promise about authenticity, freshness and scope.
+
+Showing a source name is not the same as showing its status. A token may be configured while a query still fails. A request may succeed while reporting delays or range limits remain. The source, connection state and metric each need their own explanation.
+
+## A source name does not mean data is available
+
+A dashboard can separate several facts: which source is in use, when it last returned data successfully, whether the current view is live or illustrative, and what happened if retrieval failed. Then the source name cannot imply a healthy connection beside an empty chart.
+
+It should not fill a failed request with zero just to keep a chart complete. Zero is a result from a successful query; a retrieval failure means the result is not yet known. Keeping them separate tells visitors what they can trust and helps maintainers locate problems.
+
+## Metrics have boundaries too
+
+The word “visits” might mean requests, page views, sessions or unique visitors. Those are not interchangeable. The source affects how a metric is calculated, and a client-side route change may not count as a server-side page view.
+
+Legends, units and notes should therefore match the metric actually used. If a country list is ranked by visits, explain that it is not a count of unique people. If the regional data in a yearly filter covers only the latest 30 days, put that range near the list rather than burying it at the bottom of the page.
+
+## Make freshness visible
+
+A successful response does not necessarily mean “right now.” Data may be grouped hourly or daily, a provider may report it late, and the application may cache the response. Showing the update time and date range lets visitors understand the view on the right timescale.
+
+Maintainers also need to distinguish production from local preview. A chart loading locally does not prove that production credentials, service permissions and external connections work. Conversely, a local proxy that cannot reach an external service does not necessarily mean production is broken.
+
+A data interface earns trust through the details its labels promise: a traceable source, defined metrics, visible dates and an honest failure state. Only then is a beautiful chart actually presenting evidence.

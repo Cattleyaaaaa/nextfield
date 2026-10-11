@@ -17,6 +17,7 @@ import { WaterRipple } from "@/components/visual/water-ripple";
 import { StudioBadgeDropProvider } from "@/components/visual/studio-badge-drop";
 import { siteConfig } from "@/site.config";
 import "./globals.css";
+import "@/components/field-book/field-book.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),

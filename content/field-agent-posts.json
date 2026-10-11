@@ -11,5 +11,9 @@
   "preview-and-production-need-shared-assumptions",
   "error-responses-are-part-of-the-api",
   "defaults-are-product-decisions",
-  "what-can-follow-an-honest-unknown"
+  "what-can-follow-an-honest-unknown",
+  "one-request-three-boundaries",
+  "a-cache-key-defines-identity",
+  "retries-need-a-stop-condition",
+  "logs-without-secrets"
 ]

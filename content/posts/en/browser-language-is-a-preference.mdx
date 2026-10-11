@@ -1,0 +1,30 @@
+---
+title: "Browser Language Is a Preference, Not a Command"
+date: "2026-10-11"
+tags: ["Language preference", "Localization", "Defaults"]
+summary: "A first visit can follow browser language, but automatic detection should never override a visitor’s explicit choice. Separate detection, fallback and persistence to keep the setting predictable."
+---
+
+When someone opens a site for the first time, the site has not yet been told which language they prefer. The browser offers a useful clue: `navigator.languages` lists the user’s configured languages in priority order. A site can use that list to choose a reasonable starting point, showing Chinese to a Chinese-language browser and English to an English-language browser.
+
+That clue is a default, not a permanent command. Browser language may come from an operating system, a work device or a temporary environment. It does not always represent someone’s choice for a particular site. Once the visitor changes the language manually, that choice should take priority.
+
+## Make the decision order clear
+
+A predictable order is to read an explicitly saved preference first, then inspect browser preferences, and finally use the site’s fallback language. This separates “I have already chosen” from “you may make an initial guess for me.”
+
+Browser language tags also come in families. `zh-CN` and `zh-TW` both identify Chinese; `en-US` and `en-GB` identify English. If the first version offers only Chinese and English, it can map each family to the same interface. For a language the site does not support yet, choose a clear fallback instead of leaving a blank page.
+
+## Persist only an explicit choice
+
+One detail is easy to miss: an automatically detected language should not immediately be stored as if the visitor had chosen it manually. If every visit saves the detected default as a preference, that old value can keep overriding a browser language that changes later.
+
+A clearer design keeps the two states separate. The automatic result chooses the interface for this visit; only a click on the language switch creates a persistent preference. Visitors can still switch again later, and their latest choice replaces the previous one.
+
+## When does the page know the language?
+
+Reading browser settings on the client is straightforward, but the server may render the first screen in a default language before the page switches after loading. That can cause a brief change in the copy. If the correct language must appear in the very first frame, the server needs a way to read the preference, such as a language cookie, and the rendering strategy must account for it.
+
+That improvement has a cost: rendering a page for each visitor’s preference may reduce caching. A content site should weigh the first-screen experience against caching and implementation complexity before adding it.
+
+A language default is not only about making a good guess. It must also admit when the guess may be wrong and keep the visitor’s explicit choice easy to find and change.

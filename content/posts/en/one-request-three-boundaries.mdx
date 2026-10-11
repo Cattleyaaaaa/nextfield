@@ -1,0 +1,28 @@
+---
+title: "One Request, Three Boundaries: Browser, Worker and Upstream"
+date: "2026-10-11"
+tags: ["HTTP", "Server", "Observability"]
+summary: "A request crosses the browser, an edge runtime and an upstream service, each with different failure modes. Make those boundaries visible so diagnosis is based on evidence rather than guesses."
+---
+
+A failed page load may show one red message, but the failure could have happened in very different places: the browser never sent the request, an edge function rejected it, an upstream service did not respond, or the browser failed to parse a response that arrived. A generic “something went wrong” does not tell us where to begin.
+
+It helps to picture the request as a directed path instead of calling every step an “API call.” The browser sends the request and interprets the response. A Worker or server handles validation, limits and forwarding. The upstream service provides the final capability. Each layer should hold only the data needed for its responsibility and make clear whether it handed the request to the next layer.
+
+## Check one boundary at a time
+
+Start by confirming that the browser sent a request to the expected URL with the expected method. Then inspect its status and timing. Next, check whether the Worker received it, passed validation and quota checks, and contacted the upstream. Finally, inspect the upstream status and how the server parsed its response. This order separates “never sent,” “rejected here” and “failed upstream” into distinct facts.
+
+Status codes also need boundary context. A 502 in the browser does not automatically prove that the upstream is the only source of the problem. It may come from a proxy, or it may be a result the Worker produced while handling an upstream response. The server can keep a controlled internal error category while returning a stable public message. Diagnostic records should identify the stage instead of recording only “request failed.”
+
+## Correlate the path safely
+
+Generate a request ID that contains no personal information and pass it through the layers. The browser can show a short ID when an error occurs, while server logs use it to connect validation, upstream calls and the final response. This makes it possible to find how far a request travelled without logging the entire user input.
+
+Logs need boundaries too. Time, route, stage, status, duration and a controlled error category are enough to locate many problems. Secrets, full cookies, authorization headers and unnecessary request bodies should not be kept merely because they might be convenient during debugging. If additional diagnostic data must be retained temporarily, define its lifetime and who can access it.
+
+## Give each layer an actionable outcome
+
+The browser needs to know whether retrying makes sense. The Worker needs to distinguish invalid input, quota limits and upstream unavailability. Upstream errors must be translated safely by the site. Once these boundaries are part of the API contract, the interface can offer the right recovery path and operators can locate the responsible layer from evidence.
+
+A request is not an indivisible black box. Split its path into boundaries and let each layer leave a small, useful record. Then an error becomes a process that can be checked instead of a guess.

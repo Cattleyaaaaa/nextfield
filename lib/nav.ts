@@ -68,7 +68,6 @@ export const fieldSections = [
   { label: "开放实验室", eyebrow: "Experiments", href: "/gallery", description: "触碰文字、空间、声音与界面反馈的开放实验。" },
   { label: "画廊", eyebrow: "Gallery", href: "/gallery/visual", description: "以图片为主的视觉档案：插画、配色与现场记录。" },
   { label: "电台", eyebrow: "Radio", href: "/gallery/radio", description: "少数几首确定的曲目，点开就播；播放器常驻右下角。" },
-  { label: "随笔", eyebrow: "Essays", href: "/essays", description: "关于界面、系统与构建过程的短观察。" },
   { label: "建站纪事", eyebrow: "Build log", href: "/build-log", description: "查看网站每一版的设计与实现变化。" },
   { label: "制作说明", eyebrow: "Colophon", href: "/colophon", description: "了解技术栈、设计原则与构建方式。" },
   { label: "Live Studio", eyebrow: "Now", href: "/live-studio", description: "此刻正在构建、测试和计划的内容。" },

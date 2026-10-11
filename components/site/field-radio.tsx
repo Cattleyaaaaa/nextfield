@@ -7,7 +7,7 @@ import { RadioLyrics } from "@/components/site/radio-lyrics";
 import { TransitionLink } from "@/components/site/transition-link";
 import { lyricsPathFor } from "@/lib/lrc";
 import { RADIO_TRACKS } from "@/lib/radio-data";
-import { isRadioAudioAnalysisRequested, RADIO_AUDIO_EVENT, RADIO_AUDIO_REQUEST_EVENT, RADIO_STATE_EVENT, RADIO_STATE_REQUEST_EVENT, RADIO_TIME_EVENT, type RadioAudioSignal, type RadioSignal, type RadioTimeSignal } from "@/lib/radio-signal";
+import { RADIO_AUDIO_EVENT, RADIO_STATE_EVENT, RADIO_STATE_REQUEST_EVENT, RADIO_TIME_EVENT, RADIO_VISUALIZER_BAR_COUNT, RADIO_VISUALIZER_BAR_HEIGHTS, type RadioAudioSignal, type RadioSignal, type RadioTimeSignal } from "@/lib/radio-signal";
 import { usePageTransition } from "@/components/site/page-transition-provider";
 
 const VOLUME_KEY = "nextfield-radio-volume-v2";
@@ -36,7 +36,6 @@ export function FieldRadio() {
   const frequencyDataRef = useRef<Uint8Array<ArrayBuffer> | null>(null);
   const [open, setOpen] = useState(false);
   const [playing, setPlaying] = useState(false);
-  const [audioAnalysisRequested, setAudioAnalysisRequested] = useState(isRadioAudioAnalysisRequested);
   const [index, setIndex] = useState(0);
   const indexRef = useRef(0);
   const historyRef = useRef<number[]>([]);
@@ -87,18 +86,11 @@ export function FieldRadio() {
     return () => window.removeEventListener(RADIO_STATE_REQUEST_EVENT, publish);
   }, [index, current]);
 
-  useEffect(() => {
-    const requestAnalysis = (event: Event) =>
-      setAudioAnalysisRequested(Boolean((event as CustomEvent<boolean>).detail));
-    window.addEventListener(RADIO_AUDIO_REQUEST_EVENT, requestAnalysis);
-    return () => window.removeEventListener(RADIO_AUDIO_REQUEST_EVENT, requestAnalysis);
-  }, []);
-
-  // 仅在电台页面需要动画时采样；高频更新通过事件传数组，不触发 React 重渲染。
+  // 播放期间持续采样，曲库可视化与播放器音符都读取这条真实音频信号。
   useEffect(() => {
     const analyser = analyserRef.current;
     const data = frequencyDataRef.current;
-    if (!audioAnalysisRequested || !playing || !motionEnabled || !analyser || !data) return;
+    if (!playing || !motionEnabled || !analyser || !data) return;
 
     let animationFrame = 0;
     let lastSample = 0;
@@ -108,9 +100,9 @@ export function FieldRadio() {
       lastSample = time;
       analyser.getByteFrequencyData(data);
 
-      const bars = Array.from({ length: 24 }, (_, index) => {
-        const start = Math.max(1, Math.floor((index / 24) ** 2 * data.length));
-        const end = Math.max(start + 1, Math.floor(((index + 1) / 24) ** 2 * data.length));
+      const bars = Array.from({ length: RADIO_VISUALIZER_BAR_COUNT }, (_, index) => {
+        const start = Math.max(1, Math.floor((index / RADIO_VISUALIZER_BAR_COUNT) ** 2 * data.length));
+        const end = Math.max(start + 1, Math.floor(((index + 1) / RADIO_VISUALIZER_BAR_COUNT) ** 2 * data.length));
         let total = 0;
         for (let bin = start; bin < Math.min(end, data.length); bin += 1) total += data[bin];
         const average = total / Math.max(1, Math.min(end, data.length) - start);
@@ -125,7 +117,29 @@ export function FieldRadio() {
 
     animationFrame = window.requestAnimationFrame(sample);
     return () => window.cancelAnimationFrame(animationFrame);
-  }, [audioAnalysisRequested, playing, motionEnabled]);
+  }, [playing, motionEnabled]);
+
+  // 控制器的音符随当前曲目的频谱起伏，而不是用与旋律无关的 CSS 定时循环。
+  useEffect(() => {
+    const bars = document.querySelectorAll<HTMLElement>("[data-radio-controller-bar]");
+    if (!playing || !motionEnabled) {
+      bars.forEach((bar) => {
+        bar.style.transform = "";
+        bar.style.opacity = "";
+      });
+      return;
+    }
+    const update = (event: Event) => {
+      const { bars: levels } = (event as CustomEvent<RadioAudioSignal>).detail;
+      bars.forEach((bar, barIndex) => {
+        const level = levels[barIndex] ?? 0;
+        bar.style.transform = `scaleY(${0.14 + level * 1.05})`;
+        bar.style.opacity = String(0.45 + level * 0.55);
+      });
+    };
+    window.addEventListener(RADIO_AUDIO_EVENT, update);
+    return () => window.removeEventListener(RADIO_AUDIO_EVENT, update);
+  }, [playing, motionEnabled, open]);
 
   // 页面上的「点歌」按钮走 window 事件（和 field-radio:open 同一套约定）。
   // 用 state 承接请求而不是 ref：事件回调只在挂载时创建一次，闭包读不到最新的 index / play。
@@ -428,7 +442,7 @@ export function FieldRadio() {
                   <p className="truncate font-display text-2xl tracking-[-0.04em]">{track.title}</p>
                   <p className="mt-1 truncate font-mono text-[10px] uppercase tracking-[0.16em] text-paper/50">{track.artist}{track.note ? ` · ${track.note}` : ""}</p>
                   <div className="mt-3 flex h-6 items-end gap-[2px]" aria-hidden="true">
-                    {Array.from({ length: 20 }).map((_, barIndex) => <span className="radio-bar flex-1 rounded-full bg-liquid-foam/70" key={barIndex} style={{ animationDelay: `${-barIndex * 90}ms`, height: `${20 + ((barIndex * 17) % 70)}%`, animationPlayState: playing && motionEnabled ? "running" : "paused" }} />)}
+                    {RADIO_VISUALIZER_BAR_HEIGHTS.map((height, barIndex) => <span className="radio-bar flex-1 rounded-full bg-liquid-foam/70" data-radio-controller-bar key={barIndex} style={{ height: `${height}%` }} />)}
                   </div>
                 </div>
               ) : (

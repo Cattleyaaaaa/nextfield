@@ -18,18 +18,13 @@ import { TransitionLink } from "@/components/site/transition-link";
 import { useLanguage } from "@/components/site/language-provider";
 import { usePageTransition } from "@/components/site/page-transition-provider";
 import { RADIO_TRACKS } from "@/lib/radio-data";
-import { RADIO_AUDIO_EVENT, setRadioAudioAnalysisRequested, type RadioAudioSignal } from "@/lib/radio-signal";
+import { RADIO_AUDIO_EVENT, RADIO_VISUALIZER_BAR_HEIGHTS, type RadioAudioSignal } from "@/lib/radio-signal";
 import {
   RADIO_STATE_EVENT,
   RADIO_STATE_REQUEST_EVENT,
   type RadioSignal,
 } from "@/lib/radio-signal";
 import { gsap, useGSAP } from "@/lib/gsap";
-
-const WAVE_HEIGHTS = [
-  28, 58, 39, 77, 48, 91, 62, 42, 84, 52, 95, 69, 35, 73, 51, 88, 44, 64, 31,
-  72, 48, 81, 37, 60,
-];
 
 /** 发行图（站内存放的 jpg/png）与本站原创视觉图（生成的 data: URI 或手绘 svg）要分开标注，不能混为一谈。 */
 function isReleaseArtwork(cover?: string | null) {
@@ -84,10 +79,8 @@ export function RadioLibrary() {
       setRadio((event as CustomEvent<RadioSignal>).detail);
     window.addEventListener(RADIO_STATE_EVENT, update);
     window.dispatchEvent(new Event(RADIO_STATE_REQUEST_EVENT));
-    setRadioAudioAnalysisRequested(true);
     return () => {
       window.removeEventListener(RADIO_STATE_EVENT, update);
-      setRadioAudioAnalysisRequested(false);
     };
   }, []);
 
@@ -206,7 +199,7 @@ export function RadioLibrary() {
                 aria-hidden="true"
                 className="mt-9 flex h-16 max-w-lg items-end gap-[3px] overflow-hidden border-b border-liquid-foam/25 pb-1"
               >
-                {WAVE_HEIGHTS.map((height, index) => (
+                {RADIO_VISUALIZER_BAR_HEIGHTS.map((height, index) => (
                   <span
                     className="min-w-0 flex-1 rounded-t-full bg-liquid-foam/75"
                     data-radio-wave

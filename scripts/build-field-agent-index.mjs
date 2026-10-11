@@ -18,6 +18,24 @@ const { BUILD_LOG_ARTICLES, COLOPHON_ARTICLES, ESSAY_ARTICLES } = await readData
 const { FAILURE_ITEMS } = await readData('lib/nextfield-data.ts');
 add('关于 NEXTFIELD', '/about', [siteConfig.name,siteConfig.role,siteConfig.description,siteConfig.statement,siteConfig.location,...siteConfig.socials.map(s=>`${s.label}: ${s.href}`)].join('\n'));
 for (const page of [...navSections,...fieldSections]) add(page.label,page.href,page.description);
+// Public routes outside the main navigation still need searchable page-level facts.
+for (const href of ['/messages', '/analytics', '/gallery/radio', '/learn', '/gallery', '/live-studio', '/failures', '/systems']) {
+  const file = `app${href}/page.tsx`;
+  const source = ts.createSourceFile(file, await fs.readFile(file, 'utf8'), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  let metadata;
+  function visitMetadata(node) {
+    if (ts.isVariableDeclaration(node) && node.name.getText(source) === 'metadata' && node.initializer && ts.isObjectLiteralExpression(node.initializer)) metadata = node.initializer;
+    ts.forEachChild(node, visitMetadata);
+  }
+  visitMetadata(source);
+  const field = name => metadata?.properties.find(item => ts.isPropertyAssignment(item) && item.name.getText(source) === name)?.initializer;
+  const title = field('title');
+  const description = field('description');
+  if (title && description && ts.isStringLiteralLike(title) && ts.isStringLiteralLike(description))
+    add(title.text, href, description.text);
+}
+add('留言板使用方式', '/messages', '留言板公开展示最近留言。登录后可以发布最多 500 字的留言，也可以选择匿名发布；所有访客都能阅读留言。');
+add('访问统计看板', '/analytics', '访问统计公开展示请求数、独立访问、页面浏览、缓存命中率、带宽、热门国家或地区，以及小时和每日趋势；可切换时间范围和导出 JSON。');
 const projectFile = ts.createSourceFile('projects.tsx',await fs.readFile('components/projects/project-grid.tsx','utf8'),ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
 const profileFile = ts.createSourceFile('profile.tsx', await fs.readFile('components/home/fullpage-portfolio.tsx', 'utf8'), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
 const profileText = [];

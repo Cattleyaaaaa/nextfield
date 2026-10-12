@@ -17,6 +17,7 @@ import {
 import { SplitText, gsap, useGSAP } from "@/lib/gsap";
 import { useMotionPreference } from "@/lib/use-motion-preference";
 import { useLanguage } from "@/components/site/language-provider";
+import { localizeText } from "@/lib/translations";
 
 // 与 Agent 屏刻意错开：标题自上而下、更慢；层带自底向上「堆起来」。
 const FULLSTACK_SLIDE_MOTION = {
@@ -92,6 +93,7 @@ const fullstackFoundation = {
 export function FullStackSlide() {
   const reducedMotion = useMotionPreference();
   const { locale } = useLanguage();
+  const t = (value: string) => localizeText(value, locale);
   const slideRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const splitRef = useRef<SplitText | null>(null);
@@ -176,10 +178,10 @@ export function FullStackSlide() {
       <div className="w-full">
         <header className="mb-4 flex items-end justify-between gap-6 border-b border-line pb-4 sm:mb-5 sm:pb-5">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">02 / Specialty</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">{t("02 / Specialty")}</p>
             <h2 className="mt-3 font-display text-[clamp(2.6rem,5vw,4.75rem)] leading-[0.92] tracking-[-0.055em]" ref={titleRef}>{locale === "en" ? "Full-stack Development" : "全栈开发"}</h2>
           </div>
-          <p className="hidden max-w-sm text-sm leading-6 text-muted sm:block">从界面到数据层，构建可持续演进的 Web 产品。</p>
+          <p className="hidden max-w-sm text-sm leading-6 text-muted sm:block">{t("从界面到数据层，构建可持续演进的 Web 产品。")}</p>
         </header>
 
         <div className="space-y-2">
@@ -191,8 +193,8 @@ export function FullStackSlide() {
             >
               <div className="flex shrink-0 items-baseline gap-2 sm:w-32 sm:flex-col sm:items-start sm:gap-0.5">
                 <span className="font-mono text-[10px] tracking-[0.18em] text-accent">{layer.id}</span>
-                <p className="font-display text-base leading-tight tracking-[-0.02em]">{layer.name}</p>
-                <p className="hidden text-[11px] leading-4 text-muted sm:block">{layer.note}</p>
+                <p className="font-display text-base leading-tight tracking-[-0.02em]">{t(layer.name)}</p>
+                <p className="hidden text-[11px] leading-4 text-muted sm:block">{t(layer.note)}</p>
               </div>
               <div className="flex flex-1 flex-wrap gap-2">
                 {layer.items.map((item) => {
@@ -202,7 +204,7 @@ export function FullStackSlide() {
                       <Icon className="mt-0.5 size-4 shrink-0 text-accent" strokeWidth={1.75} />
                       <div>
                         <p className="text-sm font-medium leading-tight">{item.name}</p>
-                        <p className="mt-1 text-[11px] leading-4 text-muted">{item.description}</p>
+                        <p className="mt-1 text-[11px] leading-4 text-muted">{t(item.description)}</p>
                       </div>
                     </div>
                   );
@@ -216,12 +218,12 @@ export function FullStackSlide() {
           <div className="relative flex items-center gap-3 overflow-hidden rounded-2xl border border-accent/40 bg-accent/[0.06] px-4 py-3 sm:gap-5" data-fullstack-layer>
             <div className="flex shrink-0 items-baseline gap-2 sm:w-32 sm:flex-col sm:items-start sm:gap-0.5">
               <span className="font-mono text-[10px] tracking-[0.18em] text-accent">BASE</span>
-              <p className="font-display text-base leading-tight tracking-[-0.02em]">语言基础</p>
+              <p className="font-display text-base leading-tight tracking-[-0.02em]">{t("语言基础")}</p>
             </div>
             <div className="flex flex-1 items-center gap-2.5">
               <Braces className="size-4 shrink-0 text-accent" strokeWidth={1.75} />
               <p className="text-sm font-medium">{fullstackFoundation.name}</p>
-              <p className="hidden text-[11px] text-muted sm:inline">{fullstackFoundation.description}· 贯穿全部层级</p>
+              <p className="hidden text-[11px] text-muted sm:inline">{t(fullstackFoundation.description)} · {t("贯穿全部层级")}</p>
             </div>
             <span aria-hidden="true" className="absolute inset-x-4 bottom-0 h-px origin-left bg-accent/45" data-fullstack-bar />
           </div>

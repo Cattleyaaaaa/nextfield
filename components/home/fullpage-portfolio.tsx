@@ -18,6 +18,7 @@ import { NowSlide } from "@/components/home/now-slide";
 import { WritingSlide } from "@/components/home/writing-slide";
 import { siteConfig } from "@/site.config";
 import { useLanguage } from "@/components/site/language-provider";
+import { localizeText } from "@/lib/translations";
 import { gsap, useGSAP } from "@/lib/gsap";
 import type { PostMeta } from "@/types/post";
 
@@ -104,6 +105,8 @@ const PROFILE_SWAP_LAYOUT = {
 };
 
 export function FullpagePortfolio({ posts }: { posts: PostMeta[] }) {
+  const { locale } = useLanguage();
+  const t = (value: string) => localizeText(value, locale);
   const reducedMotion = useMotionPreference();
   const [activeIndex, setActiveIndex] = useState(0);
   const [direction, setDirection] = useState(1);
@@ -215,17 +218,17 @@ export function FullpagePortfolio({ posts }: { posts: PostMeta[] }) {
         transition={{ duration: 0.72, ease: [0.65, 0, 0.25, 1] }}
       />}
 
-      <nav aria-label="首页分页" className="absolute right-5 top-1/2 z-30 flex -translate-y-1/2 flex-col gap-3 sm:right-8">
+      <nav aria-label={locale === "en" ? "About page sections" : "关于页面分屏"} className="absolute right-5 top-1/2 z-30 flex -translate-y-1/2 flex-col gap-3 sm:right-8">
         {slides.map((slide, index) => (
           <button
-            aria-label={`跳转至${labels[slide]}`}
+            aria-label={locale === "en" ? `Go to ${t(labels[slide])}` : `跳转至${labels[slide]}`}
             aria-current={activeIndex === index ? "step" : undefined}
             className="group flex items-center justify-end gap-3"
             key={slide}
             onClick={() => goTo(index)}
             type="button"
           >
-            <span className={`hidden text-[10px] uppercase tracking-[0.18em] transition-opacity sm:block ${activeIndex === index ? "opacity-100 text-ink" : "opacity-0 text-muted group-hover:opacity-100"}`}>{labels[slide]}</span>
+            <span className={`hidden text-[10px] uppercase tracking-[0.18em] transition-opacity sm:block ${activeIndex === index ? "opacity-100 text-ink" : "opacity-0 text-muted group-hover:opacity-100"}`}>{t(labels[slide])}</span>
             <span className={`block rounded-full transition-all duration-300 ${activeIndex === index ? "h-7 w-1.5 bg-accent" : "size-1.5 bg-line group-hover:bg-muted"}`} />
           </button>
         ))}
@@ -233,7 +236,7 @@ export function FullpagePortfolio({ posts }: { posts: PostMeta[] }) {
 
       {activeIndex < slides.length - 1 && (
         <button className="absolute bottom-5 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-muted hover:text-accent" onClick={() => goTo(activeIndex + 1)} type="button">
-          <MousePointer2 className="size-3" /> {activeSlide === "intro" ? "向下探索" : "向下切换"} <ChevronDown className="size-3" />
+          <MousePointer2 className="size-3" /> {t(activeSlide === "intro" ? "向下探索" : "向下切换")} <ChevronDown className="size-3" />
         </button>
       )}
     </div>
@@ -252,10 +255,11 @@ function SlideContent({ slide, goTo, posts }: { slide: SlideName; goTo: (index: 
 }
 
 function ProfileSlide({ onNext }: { onNext: () => void }) {
+  const { locale } = useLanguage();
   return (
     <div className="mx-auto flex h-full max-w-site items-center px-5 sm:px-8 lg:px-12">
       <div className="grid w-full gap-10 border-y border-line py-10 lg:grid-cols-12 lg:items-end lg:py-16">
-        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent lg:col-span-3">Profile / Overview</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent lg:col-span-3">{localizeText("Profile / Overview", locale)}</p>
         <div className="lg:col-span-7">
           <PixelSwap
             {...PROFILE_PIXEL_SWAP_CONFIG}
@@ -265,39 +269,43 @@ function ProfileSlide({ onNext }: { onNext: () => void }) {
             secondContent={<ProfileDetail />}
           />
         </div>
-        <div className="lg:col-span-2 lg:pb-1"><button className="group inline-flex items-center gap-2 text-sm font-medium hover:text-accent" onClick={onNext} type="button">查看技术栈 <ArrowDown className="size-4 transition-transform group-hover:translate-y-1" /></button></div>
+        <div className="lg:col-span-2 lg:pb-1"><button className="group inline-flex items-center gap-2 text-sm font-medium hover:text-accent" onClick={onNext} type="button">{localizeText("查看技术栈", locale)} <ArrowDown className="size-4 transition-transform group-hover:translate-y-1" /></button></div>
       </div>
     </div>
   );
 }
 
 function ProfileOverview() {
+  const { locale } = useLanguage();
+  const t = (value: string) => localizeText(value, locale);
   return (
     <div className={PROFILE_SWAP_LAYOUT.shellClass}>
       <div>
-        <p aria-hidden="true" className={`${PROFILE_SWAP_LAYOUT.eyebrowClass} invisible`}>Profile / Overview</p>
-        <h2 className={`mt-5 ${PROFILE_SWAP_LAYOUT.titleClass}`}>从 Agent 工作流，到生产级 Web 产品。</h2>
-        <p className={PROFILE_SWAP_LAYOUT.bodyClass}>Agent 开发 & 全栈开发者 / 专注把 AI 能力变成真正好用的产品。</p>
+        <p aria-hidden="true" className={`${PROFILE_SWAP_LAYOUT.eyebrowClass} invisible`}>{t("Profile / Overview")}</p>
+        <h2 className={`mt-5 ${PROFILE_SWAP_LAYOUT.titleClass}`}>{t("从 Agent 工作流，到生产级 Web 产品。")}</h2>
+        <p className={PROFILE_SWAP_LAYOUT.bodyClass}>{t("Agent 开发 & 全栈开发者 / 专注把 AI 能力变成真正好用的产品。")}</p>
       </div>
-      <p className={PROFILE_SWAP_LAYOUT.hintClass}>点击展开</p>
+      <p className={PROFILE_SWAP_LAYOUT.hintClass}>{t("点击展开")}</p>
     </div>
   );
 }
 
 function ProfileDetail() {
+  const { locale } = useLanguage();
+  const t = (value: string) => localizeText(value, locale);
   return (
     <div className={PROFILE_SWAP_LAYOUT.shellClass}>
       <div>
-        <p className={PROFILE_SWAP_LAYOUT.eyebrowClass}>About / Detail</p>
-        <h2 className={`mt-5 ${PROFILE_SWAP_LAYOUT.titleClass}`}>让 AI 能力，成为产品体验。</h2>
-        <p className={PROFILE_SWAP_LAYOUT.bodyClass}>我把大语言模型、检索系统和工具调用融入真实业务，并完成从产品界面、服务端逻辑到数据层与部署的全栈交付。</p>
+        <p className={PROFILE_SWAP_LAYOUT.eyebrowClass}>{t("About / Detail")}</p>
+        <h2 className={`mt-5 ${PROFILE_SWAP_LAYOUT.titleClass}`}>{t("让 AI 能力，成为产品体验。")}</h2>
+        <p className={PROFILE_SWAP_LAYOUT.bodyClass}>{t("我把大语言模型、检索系统和工具调用融入真实业务，并完成从产品界面、服务端逻辑到数据层与部署的全栈交付。")}</p>
       </div>
       <div>
         <div className="grid gap-4 text-sm sm:grid-cols-2">
-          <div><p className="font-medium text-ink">Agent 开发</p><p className="mt-2 text-muted">工作流 · RAG · 工具调用</p></div>
-          <div><p className="font-medium text-ink">全栈开发</p><p className="mt-2 text-muted">产品界面 · 服务端 · 部署</p></div>
+          <div><p className="font-medium text-ink">{t("Agent 开发")}</p><p className="mt-2 text-muted">{t("工作流 · RAG · 工具调用")}</p></div>
+          <div><p className="font-medium text-ink">{t("全栈开发")}</p><p className="mt-2 text-muted">{t("产品界面 · 服务端 · 部署")}</p></div>
         </div>
-        <p className={`mt-6 ${PROFILE_SWAP_LAYOUT.hintClass}`}>再次点击收起</p>
+        <p className={`mt-6 ${PROFILE_SWAP_LAYOUT.hintClass}`}>{t("再次点击收起")}</p>
       </div>
     </div>
   );
@@ -346,7 +354,7 @@ function ContactSlide() {
         <span aria-hidden="true" className="absolute inset-x-8 top-0 h-px origin-center bg-accent/50 sm:inset-x-12" data-contact-rule />
         <div className="lg:col-span-8">
           <p className="text-xs font-semibold uppercase tracking-[0.22em]" data-contact-reveal>
-            <ShinyText text="Contact" />
+            <ShinyText text={localizeText("Contact", locale)} />
           </p>
           {/* 标题归 React Bits BlurText 管，所以不再挂 data-contact-reveal ——
               避免 GSAP 与 Framer Motion 同时操作同一个 h2。 */}
@@ -365,7 +373,7 @@ function ContactSlide() {
             href={siteConfig.socials[0].href}
           >
             <Github className="size-4" />
-            访问 GitHub
+            {localizeText("访问 GitHub", locale)}
             <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
           </SpecularButton>
         </div>
@@ -375,6 +383,7 @@ function ContactSlide() {
 }
 
 function ReducedMotionPortfolio({ posts }: { posts: PostMeta[] }) {
+  const { locale } = useLanguage();
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "auto" });
   };
@@ -385,7 +394,7 @@ function ReducedMotionPortfolio({ posts }: { posts: PostMeta[] }) {
       <div className="relative z-10">
         <div className="relative" id="intro">
           <IntroSlide />
-          <button className="absolute bottom-5 left-1/2 flex -translate-x-1/2 items-center gap-2 text-[10px] tracking-[0.2em] text-muted hover:text-accent" onClick={() => scrollTo("home-hero")} type="button">向下探索 <ChevronDown className="size-3" /></button>
+          <button className="absolute bottom-5 left-1/2 flex -translate-x-1/2 items-center gap-2 text-[10px] tracking-[0.2em] text-muted hover:text-accent" onClick={() => scrollTo("home-hero")} type="button">{localizeText("向下探索", locale)} <ChevronDown className="size-3" /></button>
         </div>
         <div id="home-hero"><Hero onContact={() => scrollTo("contact")} onExplore={() => scrollTo("profile")} /></div>
         <div id="profile"><ProfileSlide onNext={() => scrollTo("agent-stack")} /></div>

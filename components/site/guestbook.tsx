@@ -1,14 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { ArrowUpRight, EyeOff, Github, MessageCircle, Send, UserRound } from "lucide-react";
+import { ArrowUpRight, EyeOff, Github, Heart, MessageCircle, MessageSquare, Send, Trash2, UserRound } from "lucide-react";
 import { TransitionLink } from "@/components/site/transition-link";
 import { TiltSurface } from "@/components/motion/tilt-surface";
 import { VisitorTrace } from "@/components/site/visitor-trace";
 import { useLanguage } from "@/components/site/language-provider";
 import { getSchoolSession, type SchoolSession } from "@/lib/school-client";
 
-type Message = { id: string; author_name: string; is_anonymous: boolean; content: string; created_at: string };
+type Reply = { id: string; message_id: string; author_name: string; is_anonymous: boolean; content: string; created_at: string; canDelete: boolean };
+type Message = { id: string; author_name: string; is_anonymous: boolean; content: string; created_at: string; likeCount: number; likedByMe: boolean; canDelete: boolean; replies: Reply[] };
 
 export function Guestbook() {
   const { locale } = useLanguage();
@@ -21,6 +22,13 @@ export function Guestbook() {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [updatingMessageId, setUpdatingMessageId] = useState<string | null>(null);
+  const [repliesEnabled, setRepliesEnabled] = useState(false);
+  const [replyDraftFor, setReplyDraftFor] = useState<string | null>(null);
+  const [replyContent, setReplyContent] = useState("");
+  const [replyAnonymous, setReplyAnonymous] = useState(false);
+  const [sendingReply, setSendingReply] = useState(false);
+  const [deletingReplyId, setDeletingReplyId] = useState<string | null>(null);
 
   const loadMessages = useCallback(async () => {
     setLoading(true);
@@ -30,6 +38,7 @@ export function Guestbook() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || (zh ? "暂时无法读取留言" : "Could not load messages"));
       setMessages(data.messages || []);
+      setRepliesEnabled(data.repliesEnabled === true);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : (zh ? "暂时无法读取留言" : "Could not load messages"));
     } finally {
@@ -63,6 +72,105 @@ export function Guestbook() {
       setError(cause instanceof Error ? cause.message : (zh ? "留言未能发送" : "Message could not be sent"));
     } finally {
       setSending(false);
+    }
+  }
+
+  async function toggleLike(message: Message) {
+    if (!session?.user || updatingMessageId) return;
+    setUpdatingMessageId(message.id);
+    setError("");
+    try {
+      const response = await fetch("/api/guestbook", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: message.id, action: message.likedByMe ? "unlike" : "like" }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || (zh ? "点赞操作失败" : "Could not update like"));
+      await loadMessages();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : (zh ? "点赞操作失败" : "Could not update like"));
+    } finally {
+      setUpdatingMessageId(null);
+    }
+  }
+
+  async function deleteMessage(message: Message) {
+    if (!message.canDelete || updatingMessageId) return;
+    const confirmed = window.confirm(zh ? "确定删除这条留言吗？此操作无法撤销。" : "Delete this message? This cannot be undone.");
+    if (!confirmed) return;
+    setUpdatingMessageId(message.id);
+    setError("");
+    setNotice("");
+    try {
+      const response = await fetch("/api/guestbook", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: message.id }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || (zh ? "删除留言失败" : "Could not delete message"));
+      setNotice(zh ? "留言已删除。" : "Message deleted.");
+      await loadMessages();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : (zh ? "删除留言失败" : "Could not delete message"));
+    } finally {
+      setUpdatingMessageId(null);
+    }
+  }
+
+  function openReplyComposer(messageId: string) {
+    setReplyDraftFor((current) => current === messageId ? null : messageId);
+    setReplyContent("");
+    setReplyAnonymous(false);
+  }
+
+  async function submitReply(event: FormEvent<HTMLFormElement>, messageId: string) {
+    event.preventDefault();
+    if (!session?.user || !repliesEnabled || !replyContent.trim() || sendingReply) return;
+    setSendingReply(true);
+    setError("");
+    setNotice("");
+    try {
+      const response = await fetch("/api/guestbook/replies", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messageId, content: replyContent, isAnonymous: replyAnonymous }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || (zh ? "评论未能发送" : "Could not post comment"));
+      setReplyContent("");
+      setReplyDraftFor(null);
+      setNotice(zh ? "评论已发布。" : "Comment posted.");
+      await loadMessages();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : (zh ? "评论未能发送" : "Could not post comment"));
+    } finally {
+      setSendingReply(false);
+    }
+  }
+
+  async function deleteReply(reply: Reply) {
+    if (!reply.canDelete || deletingReplyId) return;
+    const confirmed = window.confirm(zh ? "确定删除这条评论吗？此操作无法撤销。" : "Delete this comment? This cannot be undone.");
+    if (!confirmed) return;
+    setDeletingReplyId(reply.id);
+    setError("");
+    setNotice("");
+    try {
+      const response = await fetch("/api/guestbook/replies", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: reply.id }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || (zh ? "删除评论失败" : "Could not delete comment"));
+      setNotice(zh ? "评论已删除。" : "Comment deleted.");
+      await loadMessages();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : (zh ? "删除评论失败" : "Could not delete comment"));
+    } finally {
+      setDeletingReplyId(null);
     }
   }
 
@@ -132,7 +240,71 @@ export function Guestbook() {
               <div className="mt-4 rounded-2xl border border-dashed border-line px-6 py-16 text-center"><MessageCircle className="mx-auto size-6 text-accent/60" /><p className="mt-4 text-sm text-muted">{zh ? "这里还很安静，来写下第一条留言吧。" : "It’s quiet here. Leave the first note."}</p></div>
             ) : (
               <ol className="mt-4 space-y-3">
-                {messages.map((message, index) => <li key={message.id} className="guestbook-entry" style={{ animationDelay: `${Math.min(index, 8) * 55}ms` }}><TiltSurface maxTilt={4} lift={4} perspective={1000} className="rounded-2xl border border-line bg-paper/70 p-4 transition-colors hover:border-accent/40 sm:p-5"><article><div className="flex items-start gap-3.5"><span data-tilt-depth="26" className="grid size-9 shrink-0 place-items-center rounded-full border border-line bg-accent/5 text-accent shadow-sm">{message.is_anonymous ? <EyeOff className="size-4" /> : <UserRound className="size-4" />}</span><div className="min-w-0 flex-1"><div data-tilt-depth="10" className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1"><p className="text-sm font-medium">{message.is_anonymous ? (zh ? "匿名访客" : "Anonymous") : message.author_name}</p><time className="font-mono text-[10px] text-muted" dateTime={message.created_at}>{new Intl.DateTimeFormat(zh ? "zh-CN" : "en", { dateStyle: "medium", timeStyle: "short" }).format(new Date(message.created_at))}</time></div><p data-tilt-depth="18" className="mt-2 whitespace-pre-wrap break-words text-sm leading-7 text-ink/80">{message.content}</p><span data-tilt-depth="8" className="mt-3 block font-mono text-[9px] tracking-wider text-muted/70">{zh ? "留言" : "NOTE"} / {String(messages.length - index).padStart(3, "0")}</span></div></div></article></TiltSurface></li>)}
+                {messages.map((message, index) => <li key={message.id} className="guestbook-entry" style={{ animationDelay: `${Math.min(index, 8) * 55}ms` }}>
+                  <TiltSurface maxTilt={4} lift={4} perspective={1000} className="rounded-2xl border border-line bg-paper/70 p-4 transition-colors hover:border-accent/40 sm:p-5">
+                    <article>
+                      <div className="flex items-start gap-3.5">
+                        <span data-tilt-depth="26" className="grid size-9 shrink-0 place-items-center rounded-full border border-line bg-accent/5 text-accent shadow-sm">{message.is_anonymous ? <EyeOff className="size-4" /> : <UserRound className="size-4" />}</span>
+                        <div className="min-w-0 flex-1">
+                          <div data-tilt-depth="10" className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+                            <p className="text-sm font-medium">{message.is_anonymous ? (zh ? "匿名访客" : "Anonymous") : message.author_name}</p>
+                            <time className="font-mono text-[10px] text-muted" dateTime={message.created_at}>{new Intl.DateTimeFormat(zh ? "zh-CN" : "en", { dateStyle: "medium", timeStyle: "short" }).format(new Date(message.created_at))}</time>
+                          </div>
+                          <p data-tilt-depth="18" className="mt-2 whitespace-pre-wrap break-words text-sm leading-7 text-ink/80">{message.content}</p>
+                          <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+                            <span data-tilt-depth="8" className="font-mono text-[9px] tracking-wider text-muted/70">{zh ? "留言" : "NOTE"} / {String(messages.length - index).padStart(3, "0")}</span>
+                            <div className="flex items-center gap-2">
+                              {session?.user ? (
+                                <button type="button" onClick={() => void toggleLike(message)} disabled={updatingMessageId === message.id} aria-pressed={message.likedByMe} className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition disabled:opacity-50 ${message.likedByMe ? "border-rose-400/50 bg-rose-500/10 text-rose-600" : "border-line text-muted hover:border-rose-400/50 hover:text-rose-600"}`} aria-label={message.likedByMe ? (zh ? "取消点赞" : "Unlike") : (zh ? "点赞留言" : "Like message")}>
+                                  <Heart className={`size-3.5 ${message.likedByMe ? "fill-current" : ""}`} />{message.likeCount}
+                                </button>
+                              ) : (
+                                <TransitionLink href="/learn/login" className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-xs text-muted transition hover:border-rose-400/50 hover:text-rose-600" aria-label={zh ? "登录后点赞" : "Sign in to like"}>
+                                  <Heart className="size-3.5" />{message.likeCount}
+                                </TransitionLink>
+                              )}
+                              {message.canDelete && <button type="button" onClick={() => void deleteMessage(message)} disabled={updatingMessageId === message.id} className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-xs text-muted transition hover:border-red-500/40 hover:text-red-600 disabled:opacity-50" aria-label={zh ? "删除留言" : "Delete message"}><Trash2 className="size-3.5" />{zh ? "删除" : "Delete"}</button>}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-4 border-t border-line/70 pt-4">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <p className="inline-flex items-center gap-1.5 text-xs font-medium text-muted"><MessageSquare className="size-3.5" />{zh ? "评论" : "Comments"} · {message.replies.length}</p>
+                          {repliesEnabled && (session?.user ? (
+                            <button type="button" onClick={() => openReplyComposer(message.id)} aria-expanded={replyDraftFor === message.id} className="rounded-full border border-line px-3 py-1.5 text-xs text-accent transition hover:border-accent">
+                              {replyDraftFor === message.id ? (zh ? "收起" : "Close") : (zh ? "写评论" : "Add a comment")}
+                            </button>
+                          ) : (
+                            <TransitionLink href="/learn/login" className="rounded-full border border-line px-3 py-1.5 text-xs text-accent transition hover:border-accent">{zh ? "登录后评论" : "Sign in to comment"}</TransitionLink>
+                          ))}
+                        </div>
+                        {repliesEnabled ? (
+                          <>
+                            {message.replies.length > 0 && <ol className="mt-3 space-y-2">
+                              {message.replies.map((reply) => <li key={reply.id} className="rounded-xl border border-line/70 bg-panel/60 px-3.5 py-3 sm:px-4">
+                                <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                                  <span className="text-xs font-medium">{reply.is_anonymous ? (zh ? "匿名访客" : "Anonymous") : reply.author_name}</span>
+                                  <time className="font-mono text-[10px] text-muted" dateTime={reply.created_at}>{new Intl.DateTimeFormat(zh ? "zh-CN" : "en", { dateStyle: "medium", timeStyle: "short" }).format(new Date(reply.created_at))}</time>
+                                </div>
+                                <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-ink/80">{reply.content}</p>
+                                {reply.canDelete && <button type="button" onClick={() => void deleteReply(reply)} disabled={deletingReplyId === reply.id} className="mt-2 inline-flex items-center gap-1 text-xs text-muted transition hover:text-red-600 disabled:opacity-50" aria-label={zh ? "删除评论" : "Delete comment"}><Trash2 className="size-3" />{zh ? "删除评论" : "Delete comment"}</button>}
+                              </li>)}
+                            </ol>}
+                            {replyDraftFor === message.id && <form onSubmit={(event) => void submitReply(event, message.id)} className="mt-3 rounded-xl border border-accent/30 bg-accent/5 p-3">
+                              <label htmlFor={`reply-${message.id}`} className="sr-only">{zh ? "评论内容" : "Comment"}</label>
+                              <textarea id={`reply-${message.id}`} value={replyContent} onChange={(event) => setReplyContent(event.target.value)} maxLength={500} rows={3} placeholder={zh ? "回复这条留言…" : "Reply to this message…"} className="w-full resize-y rounded-lg border border-line bg-paper px-3 py-2 text-sm leading-6 outline-none placeholder:text-muted/70 focus:border-accent" />
+                              <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+                                <label className="inline-flex cursor-pointer items-center gap-2 text-xs text-muted"><input type="checkbox" checked={replyAnonymous} onChange={(event) => setReplyAnonymous(event.target.checked)} className="size-4 accent-[var(--accent)]" />{zh ? "匿名评论" : "Comment anonymously"}</label>
+                                <div className="flex items-center gap-3"><span className="font-mono text-[10px] text-muted">{replyContent.length}/500</span><button type="submit" disabled={sendingReply || !replyContent.trim()} className="inline-flex items-center gap-1.5 rounded-full bg-ink px-3.5 py-2 text-xs text-paper transition hover:bg-accent disabled:opacity-50"><Send className="size-3" />{sendingReply ? (zh ? "发送中…" : "Posting…") : (zh ? "发布评论" : "Post comment")}</button></div>
+                              </div>
+                            </form>}
+                          </>
+                        ) : <p className="mt-2 text-xs text-muted">{zh ? "评论暂不可用。" : "Comments are temporarily unavailable."}</p>}
+                      </div>
+                    </article>
+                  </TiltSurface>
+                </li>)}
               </ol>
             )}
           </section>

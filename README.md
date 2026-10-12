@@ -1,6 +1,12 @@
-# NEXTFIELD / 下一场域 · V3.0.0
+# NEXTFIELD / 下一场域 · V3.1.0
 
-[在线体验](https://nextfield.top/) · [V3.0.0 发布说明](docs/releases/V3.0.0.md) · [完整更新记录](CHANGELOG.md)
+[在线体验](https://nextfield.top/) · [V3.1.0 发布说明](docs/releases/V3.1.0.md) · [完整更新记录](CHANGELOG.md)
+
+## V3.1.0 更新
+
+- **留言互动**：登录访客可以为留言点赞、在自己或他人的留言下发表评论，并删除自己发布的留言和评论；管理员可删除全部留言和评论。
+- **关于页双语**：修正分屏导航、个人简介、技术栈、近况和写作列表的语言切换；英文模式使用文章的英文标题、标签与阅读时长。
+- **数据库迁移**：补齐点赞与评论的 Supabase 建表脚本，生产部署前需依次应用两份迁移。
 
 ## V3.0.0 更新
 
@@ -29,7 +35,7 @@ FIELD SCHOOL 提供从入门到交付的课程路径。功能与验收清单见 
 - 生产使用 Cloudflare Durable Object 持久化额度；本地开发使用进程内计数。
 - 知识索引来自公开页面、Git 跟踪的非草稿与非示例文章，以及 `content/field-agent-posts.json` 明确收录的十七篇双语新文章；其他本地文件不自动进入索引，课程暂只提供入口说明。
 
-在 `.env.local` 中配置 `DEEPSEEK_API_KEY`、`DEEPSEEK_MODEL`，在本地进程启用 `FIELD_AGENT_ENABLED=true` 后运行开发服务即可体验。功能、数据去向与预览步骤见 [Field Agent 说明](docs/field-agent-plan.md)，当前部署记录见 [V3.0.0 发布说明](docs/releases/V3.0.0.md)。
+在 `.env.local` 中配置 `DEEPSEEK_API_KEY`、`DEEPSEEK_MODEL`，在本地进程启用 `FIELD_AGENT_ENABLED=true` 后运行开发服务即可体验。功能、数据去向与预览步骤见 [Field Agent 说明](docs/field-agent-plan.md)，当前部署记录见 [V3.1.0 发布说明](docs/releases/V3.1.0.md)。
 
 ## Analytics（V1.2.0）
 
@@ -111,11 +117,14 @@ node scripts/test-school-exam.cjs
 | --- | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL`、`NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase 项目和客户端登录 | 可公开；构建时也需可用 |
 | `SUPABASE_SERVICE_ROLE_KEY` | 服务端考试、记录与额度操作 | 仅服务端 Secret |
+| `GUESTBOOK_ADMIN_GITHUB_IDS` | 可删除所有留言和评论的 GitHub OAuth 账号 ID，多个账号用逗号分隔 | 服务端配置；默认站长账号 `182344046` |
 | `SITE_URL` | 正式站点 origin，如 `https://你的域名` | 服务端配置；不要带路径或末尾斜杠 |
 | `OPENAI_API_KEY`、`OPENAI_MODEL` | 可选课程导师 | API Key 仅服务端 Secret |
 | `DEEPSEEK_API_KEY`、`DEEPSEEK_MODEL` | Field Agent 聊天与站内问答 | 密钥仅服务端使用；模型名可配置 |
 | `FIELD_AGENT_ENABLED` | Field Agent 开关，默认 `false` | 免登录，每 IP 每日 15 次，全站每日 300 次 |
 | `FIELD_AI_ENABLED` | 模型功能开关，默认 `false` | 启用前先设置费用与滥用防护 |
+
+留言板支持按账号点赞、在自己或他人的留言下发表评论，以及作者删除自己的留言和评论。配置在 `GUESTBOOK_ADMIN_GITHUB_IDS` 中的 GitHub 账号可删除所有留言和评论；服务端从已验证的 OAuth 身份读取固定账号 ID。部署前依次应用 `202610120001_guestbook_likes.sql` 与 `202610120002_guestbook_replies.sql`；尚未应用评论迁移时，现有留言仍可读取，评论入口会暂时关闭。
 
 在 Supabase 依次应用 `supabase/migrations/` 中尚未执行的迁移，并完成 [FIELD SCHOOL 部署说明](docs/field-school-deployment.md)中的 GitHub OAuth 和权限配置。GitHub OAuth App 的 Authorization callback URL 填 Supabase 提供的 `https://<project-ref>.supabase.co/auth/v1/callback`；Supabase 的 Redirect URLs 则加入 `https://你的域名/auth/callback`。绑定域名后同时更新 `site.config.ts` 的 `url`、`SITE_URL` 和 Supabase Site URL，然后重新部署。不要把 `SUPABASE_SERVICE_ROLE_KEY` 或 `OPENAI_API_KEY` 加上 `NEXT_PUBLIC_` 前缀。
 
@@ -130,7 +139,7 @@ npm run preview
 
 `preview` 会重新构建并在 Workers 环境预览。运行时密钥写入 Cloudflare Secrets；本地 Workers 预览使用被忽略的 `.dev.vars`，格式见 [.dev.vars.example](.dev.vars.example)。涉及浏览器的 Supabase 公开变量也需要在构建环境配置。完整问答索引与轻量内容信号由脚本自动生成，不提交生成的 JSON。
 
-Field Agent 已配置 DeepSeek Secret、`FIELD_AGENT_LIMITER` 绑定及 `field-agent-v1` SQLite Durable Object 迁移，生产 `FIELD_AGENT_ENABLED=true`。后续发布仍需保留这些配置；缺少额度绑定时问答拒绝服务。完整重新构建并发布的命令为 `npm run deploy`。详见 [V3.0.0 发布说明](docs/releases/V3.0.0.md)、[Field Agent 说明](docs/field-agent-plan.md)与 [FIELD SCHOOL 部署说明](docs/field-school-deployment.md)。
+Field Agent 已配置 DeepSeek Secret、`FIELD_AGENT_LIMITER` 绑定及 `field-agent-v1` SQLite Durable Object 迁移，生产 `FIELD_AGENT_ENABLED=true`。后续发布仍需保留这些配置；缺少额度绑定时问答拒绝服务。完整重新构建并发布的命令为 `npm run deploy`。详见 [V3.1.0 发布说明](docs/releases/V3.1.0.md)、[Field Agent 说明](docs/field-agent-plan.md)与 [FIELD SCHOOL 部署说明](docs/field-school-deployment.md)。
 
 ### Vercel（当前 Next.js 构建可用）
 

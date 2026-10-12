@@ -3,6 +3,8 @@
 import { useRef } from "react";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { useMotionPreference } from "@/lib/use-motion-preference";
+import { useLanguage } from "@/components/site/language-provider";
+import { localizeText } from "@/lib/translations";
 
 const NOW_SLIDE_MOTION = {
   delay: 0.32,
@@ -25,6 +27,8 @@ const nowGroups = [
 ];
 
 export function NowSlide() {
+  const { locale } = useLanguage();
+  const t = (value: string) => localizeText(value, locale);
   const reducedMotion = useMotionPreference();
   const slideRef = useRef<HTMLElement>(null);
 
@@ -67,21 +71,21 @@ export function NowSlide() {
       <div className="w-full">
         <div className="grid gap-8 border-y border-line py-8 lg:grid-cols-12 lg:gap-10 lg:py-12">
           <div className="lg:col-span-7" data-now-intro>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">04 / Now</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">{t("04 / Now")}</p>
             <h2 className="mt-4 max-w-2xl font-display text-[clamp(2.4rem,4.6vw,4.25rem)] leading-[0.94] tracking-[-0.055em]">
-              {nowIntro.headline}
+              {t(nowIntro.headline)}
             </h2>
-            <p className="mt-6 max-w-xl text-base leading-8 text-muted sm:text-lg sm:leading-9">{nowIntro.body}</p>
-            <p className="mt-7 font-mono text-xs tracking-[0.06em] text-accent">{nowIntro.updated}</p>
+            <p className="mt-6 max-w-xl text-base leading-8 text-muted sm:text-lg sm:leading-9">{t(nowIntro.body)}</p>
+            <p className="mt-7 font-mono text-xs tracking-[0.06em] text-accent">{t(nowIntro.updated)}</p>
           </div>
 
           <div className="flex flex-col gap-6 lg:col-span-5 lg:pt-2">
             {nowGroups.map((group) => (
               <div data-now-group key={group.label}>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted">{group.label}</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted">{t(group.label)}</p>
                 <ul className="mt-2.5 flex flex-wrap gap-2">
                   {group.items.map((item) => (
-                    <li className="rounded-full border border-line bg-panel px-3 py-1.5 text-xs text-ink" key={item}>{item}</li>
+                    <li className="rounded-full border border-line bg-panel px-3 py-1.5 text-xs text-ink" key={item}>{t(item)}</li>
                   ))}
                 </ul>
               </div>

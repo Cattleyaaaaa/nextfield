@@ -1,12 +1,17 @@
 import { DurableObject } from "cloudflare:workers";
 import app from "./.open-next/worker.js";
 import { handleFieldAgentLimit } from "./workers/field-agent-limiter.mjs";
+import { handleGuestbookLimit } from "./workers/guestbook-limiter.mjs";
 
 export { DOQueueHandler, DOShardedTagCache, BucketCachePurge } from "./.open-next/worker.js";
 
 export class FieldAgentLimiter extends DurableObject {
   constructor(ctx, env) { super(ctx, env); }
-  fetch(request) { return handleFieldAgentLimit(this.ctx, request); }
+  fetch(request) {
+    return new URL(request.url).pathname === "/guestbook/reserve"
+      ? handleGuestbookLimit(this.ctx, request)
+      : handleFieldAgentLimit(this.ctx, request);
+  }
 }
 
 /** Cloudflare static assets currently answer MP3 Range requests with a full 200 response. */

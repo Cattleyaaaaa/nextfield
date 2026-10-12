@@ -9,6 +9,15 @@
   min-width: 36px;
   padding-inline: 0;
 }
+.site-header-composite-icon {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  transition: transform 180ms ease;
+}
+.site-header .header-specular-button:hover .site-header-composite-icon {
+  transform: translateY(-1px);
+}
 @media (max-width: 767px) {
   .site-header .field-agent-launcher {
     width: 36px;
@@ -30,4 +39,9 @@
 .site-header[data-motion="off"] .header-specular-button:active,
 .site-header[data-motion="off"] .group:hover > span {
   transform: none;
+}
+.site-header[data-motion="off"] .site-header-composite-icon,
+.site-header[data-motion="off"] .header-specular-button:hover .site-header-composite-icon {
+  transform: none;
+  transition: none;
 }

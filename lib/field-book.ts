@@ -10,6 +10,7 @@ export function getFieldBookEntries(): FieldBookEntry[] {
     href: `/blog/${post.slug}`,
     date: post.date,
     category: post.category,
+    tags: { zh: post.tags, en: post.english?.tags ?? post.tags },
     title: { zh: post.title, en: post.english?.title ?? post.title },
     summary: { zh: post.summary, en: post.english?.summary ?? post.summary },
     minutes: { zh: post.minutes, en: post.english?.minutes ?? post.minutes },

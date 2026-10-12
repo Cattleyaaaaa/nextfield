@@ -13,6 +13,25 @@ export type EditorialArticle = {
 
 export const BUILD_LOG_ARTICLES: EditorialArticle[] = [
   {
+    slug: "radio-from-screen-to-listening-space", date: "2026 · 10 · 12", eyebrow: "Build log / Field Radio", tags: ["Field Radio", "Catalogue", "Lyrics", "Motion"], minutes: 5,
+    title: { zh: "把电台从页面改成聆听空间", en: "Turning the radio page into a listening space" },
+    summary: { zh: "记录场域电台的这一轮本地迭代：从封面与歌词同屏，到纯净模式、曲目目录和更安静的音乐响应场景。", en: "A record of Field Radio's latest local iteration: artwork and lyrics together, a pure listening mode, a usable catalogue and a quieter music-responsive scene." },
+    sections: [
+      { heading: { zh: "先把正在播放的歌放回中心", en: "Put the current song back at the centre" }, paragraphs: [
+        { zh: "早期电台页把歌曲发现、播放信息和歌词分散在不同区域。访客需要在页面与悬浮控制器之间来回寻找同一首歌的状态。这一轮把曲目、封面、歌词和基本控制放进一个连续的画面：左侧找歌，中央看见当前作品，右侧跟随歌词。手机则优先呈现封面，再用标签切换目录和歌词。", en: "The earlier radio separated discovery, playback details and lyrics. Visitors had to move between the page and floating controls to understand one track. This iteration puts the song, artwork, lyrics and primary controls into one continuous view: discovery on the left, the current work in the centre and lyrics on the right. On phones, artwork comes first, with tabs for the catalogue and lyrics." },
+        { zh: "目录经过几次调整，最终让曲目列表直接展示封面、歌名和歌手；搜索不再以先选歌手为前提。目录里明确标出当前曲目，并让列表本身可以滚动，避免看得见下一首却滑不到。", en: "After several revisions, each catalogue row now shows artwork, title and artist. Searching does not require choosing an artist first. The active track has a clear marker, and the list itself scrolls so a visible song is also reachable." },
+      ]},
+      { heading: { zh: "给专注聆听留一个入口", en: "Make room for focused listening" }, paragraphs: [
+        { zh: "点击控制区的唱片可以进入纯净模式，画面收起普通页面的信息密度，留下球体、歌词、方格地面和必要的播放控制。目录没有被排除在外，而是变成覆盖在场景上的轻量面板；找歌之后可以直接回到正在播放的画面。此模式下隐藏网站顶栏，让听歌界面拥有完整的视觉空间。", en: "Clicking the disc in the controls opens pure mode. It reduces the density of the regular page to a sphere, lyrics, a tiled floor and essential playback controls. The catalogue remains available as a light overlay, so choosing a song leads straight back into the scene. The site header is hidden in this mode to give listening a full visual field." },
+        { zh: "歌词当前句放大，前后句退后，随播放进度平滑移动；没有可用歌词时，保留歌曲名和封面并说明原因。切换模式和曲目时，场景维持底色与轮廓，避免突然露出黑屏。", en: "The active lyric line grows, its neighbours recede, and the view follows playback smoothly. When no usable lyrics exist, the title and artwork remain with an explanation. Mode and track changes keep the scene's background and outline in place rather than flashing to black." },
+      ]},
+      { heading: { zh: "让方格听见节奏，也学会停下", en: "Let the grid hear rhythm and learn to rest" }, paragraphs: [
+        { zh: "最初让大量方格同时起伏，画面显得拥挤。后来把响应限制在局部，并把雨滴作为另一个稀疏的触发源：落点附近的方格抬起，涟漪沿网格向外减弱。颜色改为同色系的柔和深浅，雨滴频率与涟漪传播分别控制。它们不需要每一拍都出现，少一些变化反而让单次落点更清楚。", en: "Moving too many tiles at once made the scene busy. The response became local, with sparse raindrops as a second trigger: tiles near an impact rise and the ripple fades outward. The palette uses gentle values from one colour family, while drop frequency and ripple travel are controlled separately. A drop need not arrive on every beat; fewer events make each impact clearer." },
+        { zh: "这一轮工作的判断标准不是动效数量，而是暂停时画面能否安静地停住、切歌后能否保持连续，以及访客是否始终找得到目录、歌词和退出入口。它仍是本地持续打磨的界面，后续将继续围绕实际聆听感受调整。", en: "The measure of this iteration is not the number of effects. It is whether the scene can rest when paused, remain continuous between tracks, and keep the catalogue, lyrics and exit easy to find. The local interface remains open to changes guided by actual listening." },
+      ]},
+    ],
+  },
+  {
     slug: "field-agent-from-chat-to-site-guide", date: "2026 · 10 · 08", eyebrow: "Build log / Field Agent", tags: ["Field Agent", "DeepSeek", "Streaming", "Retrieval"], minutes: 6,
     title: { zh: "让 Field Agent 成为站内向导", en: "Turning Field Agent into a site guide" },
     summary: { zh: "V2.0.0 从真实流式问答走向可点击的全息信号矩阵：让项目、文章与随笔成为内容信号，再用问题种子连接站内问答。记录这一版的交互、资料与设计取舍。", en: "V2.0.0 connects real streamed answers with a clickable holographic signal matrix: projects, writing and essays become content signals, with question seeds leading into site-grounded chat. This records the release's interaction, sources and design choices." },
@@ -208,6 +227,24 @@ export const BUILD_LOG_ARTICLES: EditorialArticle[] = [
 
 export const COLOPHON_ARTICLES: EditorialArticle[] = [
   {
+    slug: "how-the-radio-scene-listens", date: "2026 · 10 · 12", eyebrow: "Colophon / Field Radio", tags: ["Audio", "Lyrics", "Motion", "Accessibility"], minutes: 5,
+    title: { zh: "场域电台如何听见一首歌", en: "How Field Radio listens to a song" },
+    summary: { zh: "说明播放器状态、歌词时间、曲目封面和音乐响应场景怎样保持同步，以及暂停和切歌时画面如何落回稳定状态。", en: "How playback state, lyric time, artwork and the responsive scene stay in step, and how the image settles during pauses and track changes." },
+    sections: [
+      { heading: { zh: "一份播放状态，多个界面", en: "One playback state, several views" }, paragraphs: [
+        { zh: "悬浮播放器、电台页和纯净模式都围绕同一首曲目工作。播放器负责实际音频与当前时间，再向页面发布曲目、播放状态、进度、音量和播放方式；页面上的控制通过同一套命令回到播放器。这样切换视图不会各自启动一首歌，也不会让暂停按钮与声音状态分离。", en: "The floating player, radio page and pure mode share the same current track. The player owns audio and time, then publishes track, playback state, progress, volume and repeat mode to the views. Controls in each view send commands back through the same channel. Changing views therefore does not start separate songs or separate a pause button from actual playback." },
+        { zh: "封面与标题来自曲目数据，列表、当前曲目卡片和纯净模式沿用同一来源。缺少封面时使用明确的占位图，缺少歌词时显示说明；这些空状态也属于完整播放体验。", en: "Artwork and title come from the track data and feed the catalogue, current-track card and pure mode. Missing artwork gets an explicit placeholder; missing lyrics get an explanation. These empty states are part of a complete playback experience." },
+      ]},
+      { heading: { zh: "歌词跟随时间，不跟随动画猜测", en: "Lyrics follow time, not animation guesses" }, paragraphs: [
+        { zh: "歌词文件解析为带时间戳的行，当前播放秒数决定激活哪一句。悬浮歌词和纯净模式都使用这个时间关系，自动滚动只负责让当前句进入合适位置。点击可跳转的歌词行时，操作交给播放器更新实际进度，再由时间状态驱动新的高亮。", en: "Lyric files become timestamped lines, and playback seconds select the active one. Floating lyrics and pure mode share this timing relationship; automatic scrolling only places the current line well. When a listener seeks through a lyric line, the player updates real progress, and time state drives the new highlight." },
+      ]},
+      { heading: { zh: "画面的音量可以调低", en: "The image can lower its volume" }, paragraphs: [
+        { zh: "音频信号可以影响球体与方格，但视觉层并不直接决定播放。雨滴生成频率与方格涟漪的传播速度分开设置，暂停时停止新增触发并让已有位移回落。切歌时保留场景底色和网格，代表色再平滑过渡到下一首，避免内容交接处出现一帧黑屏。", en: "Audio can shape the sphere and grid, but the visual layer never controls playback. Raindrop frequency and tile-ripple speed are separate settings. Pausing stops new impacts and allows existing movement to settle. Track changes keep the scene background and grid while the accent colour blends toward the next song, avoiding a black frame during the handover." },
+        { zh: "日间和夜间沿用网站主题，减少动态效果偏好则让必要的信息在静止状态下仍可读取。视觉场景可以变得安静，歌曲、歌词与控制仍然在场。", en: "Day and night appearances follow the site theme. Reduced-motion preferences leave essential information readable in stillness. The scene can grow quiet while the song, lyrics and controls remain present." },
+      ]},
+    ],
+  },
+  {
     slug: "field-agent-sources-streaming-and-limits", date: "2026 · 10 · 08", eyebrow: "Colophon / Field Agent", tags: ["Retrieval", "Streaming", "Privacy", "Motion"], minutes: 6,
     title: { zh: "Field Agent 的资料、流式回答与使用边界", en: "Field Agent: sources, streaming and limits" },
     summary: { zh: "说明内容信号与问题种子如何连接公开资料、站内检索和流式回答，以及匿名额度、键盘入口与动效生命周期怎样协作。对应 V2.0.0。", en: "How content signals and question seeds connect public sources, retrieval and streamed answers, alongside anonymous quotas, keyboard access and animation lifecycles. This describes V2.0.0." },
@@ -345,6 +382,36 @@ export const COLOPHON_ARTICLES: EditorialArticle[] = [
 */
 
 export const ESSAY_ARTICLES: EditorialArticle[] = [
+  {
+    slug: "a-song-left-playing", date: "2026 · 10 · 12", eyebrow: "Essay / October", tags: ["音乐", "夜晚", "日常"], minutes: 2,
+    title: { zh: "歌还在放，房间已经安静了", en: "The Song Was Still Playing" },
+    summary: { zh: "一首歌放到尾声，周围的事渐渐停了下来。没有特别的感想，只是终于听清了那些原本要被匆忙盖过去的声音。", en: "As a song reached its end, the room became quiet. There was no great realisation, only time to hear what hurry usually covers." },
+    sections: [
+      { heading: { zh: "没有立刻切下一首", en: "Not Skipping Ahead" }, paragraphs: [
+        { zh: "歌放到最后一段时，我正准备做别的事。手停在桌面上，没有去按下一首。旋律渐渐变轻，剩下一点很短的尾音，像有人把一句话慢慢说完。", en: "As the song reached its final passage, I was about to do something else. My hand rested on the desk instead of skipping forward. The melody softened into a brief final note, like someone finishing a sentence slowly." },
+        { zh: "平时听歌，总想让下一首尽快接上。沉默好像是播放器的失误，必须立刻被填满。可是那天的间隙里，房间并没有空掉。我听见风从窗缝过去，听见远处有人关门，也听见自己的呼吸。", en: "Usually I want the next track to begin at once. Silence feels like a player error that should be filled. In that gap, though, the room did not become empty. I heard wind at the window, a door closing in the distance, and my own breathing." },
+      ]},
+      { heading: { zh: "留给尾音的位置", en: "Room for the Last Note" }, paragraphs: [
+        { zh: "一首歌结束，不需要我替它写一个结论。它可以只陪我走过几分钟，再把这几分钟交还给房间。后来我还是点了下一首，只是比平时晚了一点。", en: "A finished song does not need me to turn it into a conclusion. It can keep me company for a few minutes and then give those minutes back to the room. I did play another track eventually, only a little later than usual." },
+        { zh: "有些安静不是没有声音，而是终于不急着让声音做点什么。", en: "Some quiet is not the absence of sound. It is the moment I stop asking sound to do something for me." },
+      ]},
+    ],
+  },
+  {
+    slug: "the-bookmark-in-the-middle", date: "2026 · 10 · 12", eyebrow: "Essay / October", tags: ["阅读", "片刻", "未完成"], minutes: 2,
+    title: { zh: "书签停在中间", en: "The Bookmark Stayed in the Middle" },
+    summary: { zh: "一本读到一半的书留在桌上。重新翻开时，我发现阅读不一定要接着昨天的速度继续。", en: "A half-read book waited on the desk. Opening it again, I realised reading did not have to resume at yesterday's pace." },
+    sections: [
+      { heading: { zh: "从那一页开始", en: "Starting on That Page" }, paragraphs: [
+        { zh: "桌上那本书合着放了几天，书签露出窄窄的一角。我起初记不起前面讲到哪里，翻开后又往回读了两页。几个句子像是第一次看见，也有几个词让我想起那天读书时窗外的光。", en: "The book had stayed closed on the desk for days, a narrow corner of the bookmark showing. I could not remember exactly where I had stopped, so I turned back two pages. Some sentences felt new; a few words brought back the light outside the window from the earlier afternoon." },
+        { zh: "以前会觉得倒回去读是在浪费时间，好像一停下来就失去了进度。可书并不会因为我忘记了某个情节而责怪我。它只是安静地等在那一页，允许我重新找一条进去的路。", en: "I used to think rereading was wasted time, as if stopping meant losing progress. The book did not blame me for forgetting part of the story. It waited on that page and let me find another way in." },
+      ]},
+      { heading: { zh: "不必急着读完", en: "No Rush to Finish" }, paragraphs: [
+        { zh: "那天只读了几页，书签又夹在新的地方。它还在中间，而我并不觉得有什么没完成。读到喜欢的一句时停一停，和读到最后一页一样，都是阅读的一部分。", en: "I read only a few pages and placed the bookmark somewhere new. It was still in the middle, but nothing felt unfinished. Pausing at a line I liked belonged to reading as much as reaching the last page." },
+        { zh: "合上书之后，它继续留在桌上。下次打开，也许又要先往回翻两页。", en: "After closing it, I left it on the desk. Next time, I may turn back two pages again." },
+      ]},
+    ],
+  },
   {
     slug: "a-day-does-not-need-a-conclusion",
     date: "2026 · 10 · 11",

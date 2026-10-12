@@ -612,6 +612,8 @@
 .fieldbook-entry-card .fieldbook-entry-copy strong { display: block; overflow: visible; white-space: normal; font-size: clamp(18px, 2vw, 24px); line-height: 1.45; }
 .fieldbook-entry-card .fieldbook-entry-copy small { margin-top: 11px; font-size: 10px; }
 .fieldbook-entry-summary { display: -webkit-box; margin-top: 11px; overflow: hidden; color: rgb(var(--muted)); font-size: 13px; line-height: 1.65; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.fieldbook-entry-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.fieldbook-entry-tags > span { padding: 3px 8px; border: 1px solid rgb(var(--book-edge) / .32); border-radius: 999px; background: rgb(var(--book-canvas) / .58); color: rgb(var(--muted)); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 9px; line-height: 1.4; letter-spacing: .025em; }
 .fieldbook-entry-card > svg { margin-top: 2px; color: rgb(var(--accent)); opacity: .8; transform: none; }
 .fieldbook-directory-pagination { display: flex; align-items: center; justify-content: space-between; max-width: 1100px; margin: 24px auto 0; padding-top: 15px; border-top: 1px solid rgb(var(--book-edge) / .32); color: rgb(var(--muted)); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 10px; letter-spacing: .13em; }
 .fieldbook-directory-pagination > span > span { padding: 0 7px; color: rgb(var(--accent)); }

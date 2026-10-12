@@ -1,5 +1,6 @@
 import { authenticate, configured, failure, guardOrigin, json, readBody, SchoolError, supabase } from "@/lib/school-server";
 import { guestbookIdPattern, isGuestbookAdmin } from "@/lib/guestbook-server";
+import { assertGuestbookRateLimit } from "@/lib/guestbook-budget";
 
 export const dynamic = "force-dynamic";
 
@@ -86,6 +87,10 @@ export async function PATCH(request: Request) {
     const body = await readBody(request);
     if (typeof body.id !== "string" || !guestbookIdPattern.test(body.id)) throw new SchoolError(400, "留言 ID 无效");
     if (body.action !== "like" && body.action !== "unlike") throw new SchoolError(400, "操作无效");
+    await assertGuestbookRateLimit(request, user.id, "reaction");
+
+    const messages = await supabase(`/rest/v1/guestbook_messages?id=eq.${body.id}&select=id`, undefined, {}, true) as { id: string }[];
+    if (!messages.length) throw new SchoolError(404, "留言不存在或已删除");
 
     if (body.action === "like") {
       await supabase(`/rest/v1/guestbook_message_likes?on_conflict=message_id,user_id`, token, {
@@ -96,7 +101,9 @@ export async function PATCH(request: Request) {
     } else {
       await supabase(`/rest/v1/guestbook_message_likes?message_id=eq.${body.id}&user_id=eq.${user.id}`, token, { method: "DELETE" });
     }
-    return json({ ok: true });
+
+    const likes = await supabase(`/rest/v1/guestbook_message_likes?message_id=eq.${body.id}&select=user_id`, undefined, {}, true) as { user_id: string }[];
+    return json({ ok: true, likeCount: likes.length, likedByMe: likes.some((like) => like.user_id === user.id) });
   } catch (error) {
     return failure(error);
   }
@@ -105,16 +112,18 @@ export async function PATCH(request: Request) {
 export async function DELETE(request: Request) {
   try {
     guardOrigin(request);
-    const { user } = await authenticate();
+    const { user, token } = await authenticate();
     const body = await readBody(request);
     if (typeof body.id !== "string" || !guestbookIdPattern.test(body.id)) throw new SchoolError(400, "留言 ID 无效");
+    await assertGuestbookRateLimit(request, user.id, "delete");
 
     const rows = await supabase(`/rest/v1/guestbook_messages?id=eq.${body.id}&select=user_id`, undefined, {}, true) as { user_id: string }[];
     const message = rows[0];
     if (!message) throw new SchoolError(404, "留言不存在或已删除");
-    if (message.user_id !== user.id && !isGuestbookAdmin(user)) throw new SchoolError(403, "只能删除自己的留言");
+    const ownMessage = message.user_id === user.id;
+    if (!ownMessage && !isGuestbookAdmin(user)) throw new SchoolError(403, "只能删除自己的留言");
 
-    await supabase(`/rest/v1/guestbook_messages?id=eq.${body.id}`, undefined, { method: "DELETE" }, true);
+    await supabase(`/rest/v1/guestbook_messages?id=eq.${body.id}`, ownMessage ? token : undefined, { method: "DELETE" }, !ownMessage);
     return json({ ok: true });
   } catch (error) {
     return failure(error);
@@ -131,6 +140,7 @@ export async function POST(request: Request) {
     const content = body.content.replace(/\r\n?/g, "\n").trim();
     if (!content) throw new SchoolError(400, "请先填写留言");
     if (content.length > 500) throw new SchoolError(400, "留言最多 500 个字符");
+    await assertGuestbookRateLimit(request, user.id, "message");
     const authorName = String(user.user_metadata?.user_name || user.user_metadata?.preferred_username || user.email?.split("@")[0] || "GitHub 用户").slice(0, 60);
     const messages = await supabase("/rest/v1/guestbook_messages?select=id,author_name,is_anonymous,content,created_at", token, {
       method: "POST",

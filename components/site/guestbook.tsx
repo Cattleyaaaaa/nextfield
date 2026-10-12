@@ -77,8 +77,16 @@ export function Guestbook() {
 
   async function toggleLike(message: Message) {
     if (!session?.user || updatingMessageId) return;
+    const previousLikeCount = message.likeCount;
+    const previousLikedByMe = message.likedByMe;
+    const nextLikedByMe = !previousLikedByMe;
     setUpdatingMessageId(message.id);
     setError("");
+    setMessages((current) => current.map((item) => item.id === message.id ? {
+      ...item,
+      likedByMe: nextLikedByMe,
+      likeCount: Math.max(0, item.likeCount + (nextLikedByMe ? 1 : -1)),
+    } : item));
     try {
       const response = await fetch("/api/guestbook", {
         method: "PATCH",
@@ -87,8 +95,17 @@ export function Guestbook() {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || (zh ? "点赞操作失败" : "Could not update like"));
-      await loadMessages();
+      setMessages((current) => current.map((item) => item.id === message.id ? {
+        ...item,
+        likeCount: typeof data.likeCount === "number" ? data.likeCount : item.likeCount,
+        likedByMe: typeof data.likedByMe === "boolean" ? data.likedByMe : nextLikedByMe,
+      } : item));
     } catch (cause) {
+      setMessages((current) => current.map((item) => item.id === message.id ? {
+        ...item,
+        likeCount: previousLikeCount,
+        likedByMe: previousLikedByMe,
+      } : item));
       setError(cause instanceof Error ? cause.message : (zh ? "点赞操作失败" : "Could not update like"));
     } finally {
       setUpdatingMessageId(null);

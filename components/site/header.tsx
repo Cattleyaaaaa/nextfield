@@ -10,6 +10,7 @@ import { usePageTransition } from "@/components/site/page-transition-provider";
 import { HeaderSpecularButton } from "@/components/site/header-specular-button";
 import { ExploreMenu } from "@/components/site/explore-menu";
 import { HeaderSettings } from "@/components/site/header-settings";
+import { HeaderSectionIcon } from "@/components/site/header-section-icon";
 import { headerSections } from "@/lib/nav";
 import { siteConfig } from "@/site.config";
 import { FieldAgentLauncher } from "@/components/site/field-agent-launcher";
@@ -40,6 +41,7 @@ export function Header() {
             return <div key={section.href} className={home ? "block" : "hidden lg:block"}>
               <HeaderSpecularButton href={section.href} title={label} ariaLabel={label} ariaCurrent={active(section.href) ? "page" : undefined} onLinkClick={follow(section.href)} className={`site-header-nav header-specular-button--nav ${home ? "site-header-home" : ""} ${active(section.href) ? "header-specular-button--active" : ""}`}>
                 {home && <House aria-hidden="true" className="size-3.5" />}
+                {!home && <HeaderSectionIcon href={section.href} />}
                 <span className={home ? "hidden lg:inline" : "inline"}>{label}</span>
               </HeaderSpecularButton>
             </div>;

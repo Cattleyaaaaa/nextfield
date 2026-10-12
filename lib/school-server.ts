@@ -1,7 +1,7 @@
 import "server-only";
 import { cookies } from "next/headers";
 export const configured = () => Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
-export class SchoolError extends Error { constructor(public status: number, message: string) { super(message); } }
+export class SchoolError extends Error { constructor(public status: number, message: string, public retryAfter?: number) { super(message); } }
 export async function supabase(path: string, token?: string, init: RequestInit = {}, admin = false) {
  const key = admin ? process.env.SUPABASE_SERVICE_ROLE_KEY : process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
  if (!configured() || !key) throw new SchoolError(503, "Cloud learning is not configured / 云端学习尚未配置");
@@ -44,4 +44,7 @@ export async function readBody(r:Request) {
  try{const body=JSON.parse(Buffer.concat(chunks).toString("utf8"));if(!body||typeof body!=="object"||Array.isArray(body))throw Error();return body;}catch{throw new SchoolError(400,"Invalid JSON / 请求格式无效");}
 }
 export const json=(v:unknown,status=200)=>Response.json(v,{status,headers:{"Cache-Control":"private, no-store"}});
-export const failure=(e:unknown)=>json({error:e instanceof SchoolError ? e.message : "Service unavailable / 服务暂不可用"},e instanceof SchoolError ? e.status : 503);
+export const failure=(e:unknown)=>Response.json(
+ {error:e instanceof SchoolError ? e.message : "Service unavailable / 服务暂不可用"},
+ {status:e instanceof SchoolError ? e.status : 503,headers:{"Cache-Control":"private, no-store",...(e instanceof SchoolError && e.retryAfter ? {"Retry-After":String(e.retryAfter)} : {})}}
+);

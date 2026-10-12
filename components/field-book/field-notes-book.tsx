@@ -57,7 +57,7 @@ export function FieldNotesBook({ entries }: { entries: FieldBookEntry[] }) {
   const pageEntries = visible.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
   const renderEntry = (entry: FieldBookEntry, index: number) => <TransitionLink className="fieldbook-entry fieldbook-entry-card" href={entry.href} key={entry.href}>
     <span className="fieldbook-entry-number">{String(currentPage * pageSize + index + 1).padStart(2, "0")}</span>
-    <span className="fieldbook-entry-copy"><strong>{entry.title[locale]}</strong><small>{entry.date} <span aria-hidden="true">/</span> {entry.minutes[locale]} {locale === "zh" ? "分钟" : "min"}</small><span className="fieldbook-entry-summary">{entry.summary[locale]}</span></span>
+    <span className="fieldbook-entry-copy"><strong>{entry.title[locale]}</strong><small>{entry.date} <span aria-hidden="true">/</span> {entry.minutes[locale]} {locale === "zh" ? "分钟" : "min"}</small>{entry.kind === "writing" && Boolean(entry.tags?.[locale].length) && <span className="fieldbook-entry-tags" aria-label={locale === "zh" ? "文章标签" : "Article tags"}>{entry.tags?.[locale].map((tag) => <span key={tag}>{tag}</span>)}</span>}<span className="fieldbook-entry-summary">{entry.summary[locale]}</span></span>
     <ArrowRight size={16} aria-hidden="true" />
   </TransitionLink>;
 

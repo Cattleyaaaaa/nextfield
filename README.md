@@ -1,6 +1,11 @@
-# NEXTFIELD / 下一场域 · V4.0.0
+# NEXTFIELD / 下一场域 · V4.1.0
 
-[在线体验](https://nextfield.top/) · [V4.0.0 发布说明](docs/releases/V4.0.0.md) · [完整更新记录](CHANGELOG.md)
+[在线体验](https://nextfield.top/) · [V4.1.0 发布说明](docs/releases/V4.1.0.md) · [完整更新记录](CHANGELOG.md)
+
+## V4.1.0 更新
+
+- **场域电台**：调整纯净模式的整体布局、歌词呈现和目录入口；歌曲列表支持查看封面并滚动选择，播放控制与歌词区域的宽度和位置同步优化。
+- **导航与写作目录**：为顶栏栏目补充统一的组合图标；写作目录卡片展示文章标签，并按中英文界面切换对应标签。
 
 一个持续生长的个人网站，收录项目、写作、视觉实验与学习内容。项目页以 [Neptune 多 Agent 工作空间](https://github.com/Cattleyaaaaa/Neptune-Multi-agent-Workspace)为重点作品，提供[项目网站](http://myneptune.tech/)和源码入口；其他项目方向仍在整理中。
 
@@ -22,7 +27,7 @@ FIELD SCHOOL 提供从入门到交付的课程路径。功能与验收清单见 
 - 生产使用 Cloudflare Durable Object 持久化额度；本地开发使用进程内计数。
 - 知识索引来自公开页面、Git 跟踪的非草稿与非示例文章，以及 `content/field-agent-posts.json` 明确收录的十七篇双语新文章；其他本地文件不自动进入索引，课程暂只提供入口说明。
 
-在 `.env.local` 中配置 `DEEPSEEK_API_KEY`、`DEEPSEEK_MODEL`，在本地进程启用 `FIELD_AGENT_ENABLED=true` 后运行开发服务即可体验。功能、数据去向与预览步骤见 [Field Agent 说明](docs/field-agent-plan.md)，当前部署记录见 [V4.0.0 发布说明](docs/releases/V4.0.0.md)。
+在 `.env.local` 中配置 `DEEPSEEK_API_KEY`、`DEEPSEEK_MODEL`，在本地进程启用 `FIELD_AGENT_ENABLED=true` 后运行开发服务即可体验。功能、数据去向与预览步骤见 [Field Agent 说明](docs/field-agent-plan.md)，当前部署记录见 [V4.1.0 发布说明](docs/releases/V4.1.0.md)。
 
 ## Analytics（V1.2.0）
 
@@ -34,7 +39,7 @@ FIELD SCHOOL 提供从入门到交付的课程路径。功能与验收清单见 
 
 ## 导航与十月内容
 
-顶栏保持单行：桌面直接展示首页、关于、项目、写作、留言、统计与 Field Agent，导航使用鼠标跟随高光按钮。手机保留首页、留言、统计、助手和探索图标入口；关于、项目、写作也可从探索菜单进入。语言、特效、工牌和账户操作放入设置，较窄屏幕的主题切换也放入设置。按钮效果遵循站内动效开关与系统减少动态效果偏好。
+顶栏保持单行：桌面直接展示首页、关于、项目、写作、电台、留言、统计与 Field Agent，导航使用鼠标跟随高光按钮。手机保留首页、留言、统计、助手和探索图标入口；关于、项目、写作可从探索菜单进入，电台可从画廊进入。语言、特效、工牌和账户操作放入设置，较窄屏幕的主题切换也放入设置。按钮效果遵循站内动效开关与系统减少动态效果偏好。
 
 十月写作覆盖 Agent、前端、交互、设计、工程、技术、产品和哲学。新增十三篇文章均有英文正文，并通过明确清单收录到 Field Agent；随笔补充写作、未完成的时间与一天收尾等日常观察。日期覆盖 2026-10-01 至 2026-10-08。
 

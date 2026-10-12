@@ -22,11 +22,11 @@ import {
   VolumeX,
   X,
 } from "lucide-react";
+import { createPortal } from "react-dom";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useLanguage } from "@/components/site/language-provider";
 import { usePageTransition } from "@/components/site/page-transition-provider";
-import { RadioDisc } from "@/components/site/radio-disc";
 import { RadioPureScene } from "@/components/site/radio-pure-scene";
 import { activeLineIndex, parseLrc, lyricsPathFor } from "@/lib/lrc";
 import {
@@ -84,6 +84,7 @@ export function RadioPureMode({
   const [previewTime, setPreviewTime] = useState<number | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuQuery, setMenuQuery] = useState("");
+  const [portalReady, setPortalReady] = useState(false);
   const rootRef = useRef<HTMLElement>(null);
   const exitingRef = useRef(false);
   const listRef = useRef<HTMLDivElement>(null);
@@ -100,10 +101,18 @@ export function RadioPureMode({
     const query = menuQuery.trim().toLocaleLowerCase();
     return tracks
       .map((item, index) => ({ item, index }))
-      .filter(({ item }) =>
-        !query || `${item.title} ${item.artist} ${item.note ?? ""}`.toLocaleLowerCase().includes(query),
+      .filter(
+        ({ item }) =>
+          !query ||
+          `${item.title} ${item.artist} ${item.note ?? ""}`
+            .toLocaleLowerCase()
+            .includes(query),
       );
   }, [tracks, menuQuery]);
+
+  useEffect(() => {
+    setPortalReady(true);
+  }, []);
 
   const { contextSafe } = useGSAP(
     () => {
@@ -149,6 +158,14 @@ export function RadioPureMode({
     const observer = new MutationObserver(update);
     observer.observe(root, { attributes: true, attributeFilter: ["class"] });
     return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
   }, []);
 
   useEffect(() => {
@@ -272,12 +289,16 @@ export function RadioPureMode({
     { mode: "random", Icon: Shuffle, zh: "随机播放", en: "Shuffle" },
   ] as const;
 
-  return (
+  if (!portalReady) return null;
+
+  return createPortal(
     <section
       ref={rootRef}
-      className="fixed inset-x-0 bottom-0 top-16 z-[60] isolate flex min-h-0 flex-col overflow-hidden bg-paper text-ink"
+      className="fixed inset-0 z-[100] isolate flex min-h-0 flex-col overflow-hidden bg-paper text-ink"
       aria-label={locale === "zh" ? "纯净歌词模式" : "Pure lyrics mode"}
+      aria-modal="true"
       data-radio-pure-mode
+      role="dialog"
       style={
         {
           "--accent": accent.join(" "),
@@ -297,51 +318,6 @@ export function RadioPureMode({
         className={`pointer-events-none absolute inset-0 z-[1] ${dark ? "bg-[linear-gradient(to_bottom,rgba(2,7,16,0.18),transparent_35%,rgba(2,7,16,0.12)_72%,rgba(2,7,16,0.58))]" : "bg-[linear-gradient(to_bottom,rgba(255,255,255,0.08),transparent_35%,rgba(255,255,255,0.04)_72%,rgba(225,238,235,0.48))]"}`}
       />
 
-      <div className="relative z-10 flex items-center justify-between gap-4 px-6 pt-6 sm:px-10 sm:pt-8">
-        <div className="flex min-w-0 items-center gap-3">
-          <button
-            aria-label={
-              locale === "zh" ? "退出纯净歌词模式" : "Exit pure lyrics mode"
-            }
-            className="shrink-0 rounded-full transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-            onClick={exit}
-            type="button"
-          >
-            <RadioDisc
-              artist={track?.artist}
-              className="size-10"
-              cover={track?.cover}
-              playing={playing}
-              title={track?.title ?? "Field Radio"}
-            />
-          </button>
-          <div className="min-w-0">
-            <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-accent">
-              FIELD RADIO / PURE LYRICS
-            </p>
-            <p className="mt-1 truncate text-xs text-muted">
-              {track ? `${track.title} · ${track.artist}` : "Field Radio"}
-            </p>
-          </div>
-        </div>
-        <div className="flex shrink-0 items-center gap-3">
-          <span className="hidden font-mono text-[10px] tracking-[0.16em] text-muted sm:block">
-            {locale === "zh" ? "歌词随旋律流动" : "LYRICS IN MOTION"}
-          </span>
-          <button
-            aria-expanded={menuOpen}
-            aria-label={locale === "zh" ? "打开播放列表" : "Open playlist"}
-            className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-xs shadow-sm backdrop-blur-md transition-colors ${menuOpen ? "border-accent/60 bg-accent/15 text-accent" : "border-line bg-panel/75 text-ink hover:border-accent/50 hover:text-accent"}`}
-            onClick={() => setMenuOpen((open) => !open)}
-            type="button"
-          >
-            <ListMusic className="size-4" />
-            {locale === "zh" ? "曲目" : "Tracks"}
-            <span className="font-mono text-[10px] text-muted">{tracks.length}</span>
-          </button>
-        </div>
-      </div>
-
       {menuOpen ? (
         <>
           <button
@@ -353,80 +329,198 @@ export function RadioPureMode({
           <aside
             aria-label={locale === "zh" ? "播放列表" : "Playlist"}
             aria-modal="true"
-            className="absolute inset-y-0 right-0 z-30 flex w-[min(27rem,94vw)] flex-col border-l border-line/80 bg-panel/95 shadow-[-24px_0_80px_rgba(0,0,0,0.2)] backdrop-blur-2xl animate-[radio-pure-drawer-in_300ms_cubic-bezier(.2,.8,.2,1)_both]"
+            className="absolute left-1/2 top-1/2 z-30 grid h-[min(48rem,calc(100dvh-2rem))] w-[min(68rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 grid-cols-1 grid-rows-[minmax(0,1fr)] overflow-hidden rounded-[2rem] border border-line/80 bg-panel text-ink shadow-[0_36px_140px_rgba(0,0,0,0.42)] md:grid-cols-[minmax(15rem,0.78fr)_minmax(24rem,1.22fr)]"
             role="dialog"
           >
-            <div className="border-b border-line/70 px-5 pb-4 pt-5 sm:px-6">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-accent">
-                    FIELD RADIO / QUEUE
-                  </p>
-                  <h2 className="mt-2 font-display text-2xl tracking-[-0.04em]">
-                    {locale === "zh" ? "播放列表" : "Playlist"}
-                  </h2>
-                  <p className="mt-1 text-xs text-muted">
-                    {locale === "zh" ? `${tracks.length} 首曲目 · 点击即刻播放` : `${tracks.length} tracks · Select to play`}
-                  </p>
-                </div>
-                <button
-                  aria-label={locale === "zh" ? "关闭播放列表" : "Close playlist"}
-                  className="grid size-9 place-items-center rounded-full border border-line text-muted transition-colors hover:border-accent/50 hover:text-accent"
-                  onClick={() => setMenuOpen(false)}
-                  type="button"
-                >
-                  <X className="size-4" />
-                </button>
+            <div className="relative hidden min-h-0 flex-col justify-between overflow-hidden border-r border-line/70 bg-accent/[0.035] p-7 md:flex lg:p-9">
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute -left-24 -top-24 size-80 rounded-full bg-[rgb(var(--accent)/0.12)] blur-3xl"
+              />
+              <div className="relative">
+                <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-accent">
+                  FIELD RADIO / CATALOG
+                </p>
+                <h2 className="mt-5 font-display text-4xl tracking-[-0.055em]">
+                  {locale === "zh" ? "曲目目录" : "The catalogue"}
+                </h2>
+                <p className="mt-2 text-sm text-muted">
+                  {locale === "zh"
+                    ? `${tracks.length} 首声音，随时继续`
+                    : `${tracks.length} tracks, ready when you are`}
+                </p>
               </div>
-              <label className="mt-4 flex items-center gap-2.5 rounded-xl border border-line bg-paper/75 px-3.5 py-2.5 focus-within:border-accent/60">
-                <Search className="size-4 shrink-0 text-muted" />
-                <input
-                  className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted/70"
-                  onChange={(event) => setMenuQuery(event.target.value)}
-                  placeholder={locale === "zh" ? "搜索歌曲或歌手" : "Search songs or artists"}
-                  value={menuQuery}
-                />
-              </label>
+              <div className="relative mt-8">
+                <div className="mx-auto aspect-square w-[min(15rem,80%)] overflow-hidden rounded-[1.75rem] border border-line/70 bg-paper/60 shadow-[0_24px_70px_rgba(0,0,0,0.22)]">
+                  {track?.cover ? (
+                    // eslint-disable-next-line @next/next/no-img-element -- Album artwork in the catalogue feature.
+                    <img
+                      alt=""
+                      className="size-full object-cover"
+                      src={track.cover}
+                    />
+                  ) : (
+                    <span className="grid size-full place-items-center">
+                      <Disc3 className="size-14 text-accent/60" />
+                    </span>
+                  )}
+                </div>
+                <p className="mt-5 text-center font-mono text-[9px] uppercase tracking-[0.22em] text-muted">
+                  {locale === "zh"
+                    ? `正在播放 · ${String(activeIndex + 1).padStart(2, "0")}`
+                    : `NOW PLAYING · ${String(activeIndex + 1).padStart(2, "0")}`}
+                </p>
+                <h3 className="mt-2 truncate text-center font-display text-xl">
+                  {track?.title ?? "Field Radio"}
+                </h3>
+                <p className="mt-1 truncate text-center text-xs text-muted">
+                  {track?.artist ?? ""}
+                </p>
+                {track?.note ? (
+                  <p className="mt-1 truncate text-center text-[11px] text-muted/75">
+                    {track.note}
+                  </p>
+                ) : null}
+              </div>
+              <div className="relative mt-8 flex items-center justify-between border-t border-line/70 pt-4 font-mono text-[9px] tracking-[0.16em] text-muted">
+                <span>
+                  {locale === "zh"
+                    ? "点击曲目切换播放"
+                    : "SELECT A TRACK TO PLAY"}
+                </span>
+                <span>
+                  {String(filteredTracks.length).padStart(2, "0")} /{" "}
+                  {String(tracks.length).padStart(2, "0")}
+                </span>
+              </div>
             </div>
-            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-3 sm:px-4">
-              <ol className="space-y-1.5">
-                {filteredTracks.map(({ item, index }) => {
-                  const selected = activeIndex === index;
-                  return (
-                    <li key={`${item.src ?? item.href ?? item.title}-${index}`}>
-                      <button
-                        aria-current={selected ? "true" : undefined}
-                        className={`group flex w-full items-center gap-3 rounded-2xl border p-2.5 text-left transition-colors ${selected ? "border-accent/40 bg-accent/10" : "border-transparent hover:border-line hover:bg-paper/70"}`}
-                        onClick={() => {
-                          onSelectTrack(index);
-                          setMenuOpen(false);
-                        }}
-                        type="button"
+            <div className="flex min-h-0 flex-col">
+              <div className="border-b border-line/70 px-5 pb-4 pt-5 sm:px-7 sm:pt-7">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-accent">
+                      FIELD RADIO / QUEUE
+                    </p>
+                    <h2 className="mt-2 font-display text-2xl tracking-[-0.04em] md:hidden">
+                      {locale === "zh" ? "曲目目录" : "The catalogue"}
+                    </h2>
+                    <p className="mt-2 text-xs text-muted">
+                      {locale === "zh"
+                        ? `${tracks.length} 首曲目 · 选择一首继续聆听`
+                        : `${tracks.length} tracks · Choose what to hear next`}
+                    </p>
+                  </div>
+                  <button
+                    aria-label={
+                      locale === "zh" ? "关闭曲目目录" : "Close catalogue"
+                    }
+                    className="grid size-10 shrink-0 place-items-center rounded-full border border-line text-muted transition-colors hover:border-accent/50 hover:text-accent"
+                    onClick={() => setMenuOpen(false)}
+                    type="button"
+                  >
+                    <X className="size-4" />
+                  </button>
+                </div>
+                <label className="mt-4 flex items-center gap-2.5 rounded-xl border border-line bg-paper/75 px-3.5 py-2.5 focus-within:border-accent/60">
+                  <Search className="size-4 shrink-0 text-muted" />
+                  <input
+                    className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted/70"
+                    onChange={(event) => setMenuQuery(event.target.value)}
+                    placeholder={
+                      locale === "zh"
+                        ? "搜索歌曲或歌手"
+                        : "Search songs or artists"
+                    }
+                    value={menuQuery}
+                  />
+                </label>
+              </div>
+              <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3 sm:px-6 sm:py-5">
+                <ol className="grid gap-2 sm:grid-cols-2">
+                  {filteredTracks.map(({ item, index }) => {
+                    const selected = activeIndex === index;
+                    return (
+                      <li
+                        key={`${item.src ?? item.href ?? item.title}-${index}`}
                       >
-                        <span className="relative size-12 shrink-0 overflow-hidden rounded-xl border border-line bg-accent/10">
-                          {item.cover ? (
-                            // eslint-disable-next-line @next/next/no-img-element -- Local radio cover art.
-                            <img alt="" className="size-full object-cover" loading="lazy" src={item.cover} />
-                          ) : <Disc3 className="m-auto size-5 text-accent/70" />}
-                          {selected ? <span className="absolute inset-0 rounded-xl ring-2 ring-inset ring-accent/70" /> : null}
-                        </span>
-                        <span className="min-w-0 flex-1">
-                          <span className={`block truncate text-sm font-medium ${selected ? "text-accent" : "text-ink"}`}>{item.title}</span>
-                          <span className="mt-1 block truncate text-xs text-muted">{item.artist}{item.note ? ` · ${item.note}` : ""}</span>
-                        </span>
-                        {selected && playing ? (
-                          <span aria-label={locale === "zh" ? "正在播放" : "Playing"} className="flex h-5 items-end gap-0.5">
-                            {[0, 1, 2].map((bar) => <span className="w-0.5 animate-pulse rounded-full bg-accent" key={bar} style={{ height: `${7 + bar * 3}px`, animationDelay: `${bar * 100}ms` }} />)}
+                        <button
+                          aria-current={selected ? "true" : undefined}
+                          className={`group flex w-full items-center gap-3 rounded-2xl border p-2 text-left transition-[border-color,background-color,transform] hover:-translate-y-0.5 ${selected ? "border-accent/45 bg-accent/10" : "border-line/60 bg-paper/30 hover:border-accent/30 hover:bg-paper/75"}`}
+                          onClick={() => {
+                            onSelectTrack(index);
+                            setMenuOpen(false);
+                          }}
+                          type="button"
+                        >
+                          <span className="relative grid size-12 shrink-0 place-items-center overflow-hidden rounded-xl border border-line bg-accent/10 sm:size-14">
+                            {item.cover ? (
+                              // eslint-disable-next-line @next/next/no-img-element -- Local radio cover art.
+                              <img
+                                alt=""
+                                className="size-full object-cover"
+                                loading="lazy"
+                                src={item.cover}
+                              />
+                            ) : (
+                              <Disc3 className="m-auto size-5 text-accent/70" />
+                            )}
+                            {selected ? (
+                              <span className="absolute inset-0 rounded-xl ring-2 ring-inset ring-accent/70" />
+                            ) : null}
                           </span>
-                        ) : <Play className="size-4 shrink-0 text-muted opacity-0 transition-opacity group-hover:opacity-100" />}
-                      </button>
-                    </li>
-                  );
-                })}
-              </ol>
-              {filteredTracks.length === 0 ? (
-                <p className="py-12 text-center text-sm text-muted">{locale === "zh" ? "没有找到匹配的曲目" : "No matching tracks"}</p>
-              ) : null}
+                          <span className="min-w-0 flex-1">
+                            <span className="mb-1 block font-mono text-[9px] tracking-[0.15em] text-muted/70">
+                              {String(index + 1).padStart(2, "0")}
+                              {selected
+                                ? locale === "zh"
+                                  ? " / 当前曲目"
+                                  : " / NOW PLAYING"
+                                : ""}
+                            </span>
+                            <span
+                              className={`block truncate text-sm font-medium ${selected ? "text-accent" : "text-ink"}`}
+                            >
+                              {item.title}
+                            </span>
+                            <span className="mt-1 block truncate text-xs text-muted">
+                              {item.artist}
+                              {item.note ? ` · ${item.note}` : ""}
+                            </span>
+                          </span>
+                          {selected && playing ? (
+                            <span
+                              aria-label={
+                                locale === "zh" ? "正在播放" : "Playing"
+                              }
+                              className="flex h-5 items-end gap-0.5"
+                            >
+                              {[0, 1, 2].map((bar) => (
+                                <span
+                                  className="w-0.5 animate-pulse rounded-full bg-accent"
+                                  key={bar}
+                                  style={{
+                                    height: `${7 + bar * 3}px`,
+                                    animationDelay: `${bar * 100}ms`,
+                                  }}
+                                />
+                              ))}
+                            </span>
+                          ) : (
+                            <Play className="size-4 shrink-0 text-muted opacity-0 transition-opacity group-hover:opacity-100" />
+                          )}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ol>
+                {filteredTracks.length === 0 ? (
+                  <p className="py-12 text-center text-sm text-muted">
+                    {locale === "zh"
+                      ? "没有找到匹配的曲目"
+                      : "No matching tracks"}
+                  </p>
+                ) : null}
+              </div>
             </div>
           </aside>
         </>
@@ -492,7 +586,7 @@ export function RadioPureMode({
       </div>
 
       <div className="relative z-10 border-t border-line/60 bg-panel/85 px-5 py-4 backdrop-blur-xl sm:px-10">
-        <div className="mx-auto grid max-w-5xl items-center gap-x-8 gap-y-4 lg:grid-cols-[1fr_1.3fr_1fr]">
+        <div className="grid w-full items-center gap-x-8 gap-y-4 lg:grid-cols-[1fr_1.3fr_1fr]">
           <div className="flex min-w-0 items-center gap-3">
             <button
               aria-label={
@@ -510,11 +604,22 @@ export function RadioPureMode({
                     className="absolute inset-[18%] size-[64%] rounded-full object-cover"
                     src={track.cover}
                   />
-                  <span className="absolute size-2 rounded-full border border-white/70 bg-ink/80" />
                 </span>
               ) : (
                 <Disc3 className="size-12 text-accent" />
               )}
+            </button>
+            <button
+              aria-expanded={menuOpen}
+              aria-label={
+                locale === "zh" ? "打开曲目目录" : "Open track catalogue"
+              }
+              className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-xs transition-colors ${menuOpen ? "border-accent/50 bg-accent/10 text-accent" : "border-line bg-paper/60 text-muted hover:border-accent/40 hover:text-accent"}`}
+              onClick={() => setMenuOpen((open) => !open)}
+              type="button"
+            >
+              <ListMusic className="size-4" />
+              {locale === "zh" ? "曲目目录" : "Catalogue"}
             </button>
             <div className="hidden min-w-0 sm:block">
               <p className="truncate text-sm font-medium">
@@ -638,6 +743,7 @@ export function RadioPureMode({
           </div>
         </div>
       </div>
-    </section>
+    </section>,
+    document.body,
   );
 }

@@ -4,6 +4,7 @@ export type FieldBookEntry = {
   href: string;
   date: string;
   category: string;
+  tags?: { zh: string[]; en: string[] };
   title: { zh: string; en: string };
   summary: { zh: string; en: string };
   minutes: { zh: number; en: number };

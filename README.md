@@ -1,6 +1,13 @@
-# NEXTFIELD / 下一场域 · V3.1.0
+# NEXTFIELD / 下一场域 · V4.0.0
 
-[在线体验](https://nextfield.top/) · [V3.1.0 发布说明](docs/releases/V3.1.0.md) · [完整更新记录](CHANGELOG.md)
+[在线体验](https://nextfield.top/) · [V4.0.0 发布说明](docs/releases/V4.0.0.md) · [完整更新记录](CHANGELOG.md)
+
+## V4.0.0 更新
+
+- **Field Radio 音乐厅**：重做场域电台布局，歌单、封面与歌词同屏呈现；曲目列表加入封面，并整合搜索与筛选。音量和播放方式可直接在页面调整，迷你播放器与页面视觉统一。
+- **沉浸式纯净模式**：加入跟随网站日间／夜间主题的沉浸场景、封面色呼吸球体和居中歌词；保留菜单、播放控制、音量和播放方式，支持平滑切换。
+- **音乐响应场景**：方格地面按音乐信号分层起伏；纯净模式加入更克制的雨滴与方格涟漪，并降低落雨频率，避免画面嘈杂。
+- **播放体验**：优化暂停与切歌的过渡，避免黑屏闪动；切换电台与纯净模式时使用连续动画。
 
 ## V3.1.0 更新
 
@@ -35,7 +42,7 @@ FIELD SCHOOL 提供从入门到交付的课程路径。功能与验收清单见 
 - 生产使用 Cloudflare Durable Object 持久化额度；本地开发使用进程内计数。
 - 知识索引来自公开页面、Git 跟踪的非草稿与非示例文章，以及 `content/field-agent-posts.json` 明确收录的十七篇双语新文章；其他本地文件不自动进入索引，课程暂只提供入口说明。
 
-在 `.env.local` 中配置 `DEEPSEEK_API_KEY`、`DEEPSEEK_MODEL`，在本地进程启用 `FIELD_AGENT_ENABLED=true` 后运行开发服务即可体验。功能、数据去向与预览步骤见 [Field Agent 说明](docs/field-agent-plan.md)，当前部署记录见 [V3.1.0 发布说明](docs/releases/V3.1.0.md)。
+在 `.env.local` 中配置 `DEEPSEEK_API_KEY`、`DEEPSEEK_MODEL`，在本地进程启用 `FIELD_AGENT_ENABLED=true` 后运行开发服务即可体验。功能、数据去向与预览步骤见 [Field Agent 说明](docs/field-agent-plan.md)，当前部署记录见 [V4.0.0 发布说明](docs/releases/V4.0.0.md)。
 
 ## Analytics（V1.2.0）
 

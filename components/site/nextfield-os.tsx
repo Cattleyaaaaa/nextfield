@@ -77,7 +77,7 @@ export function NextfieldOS() {
 
   return (
     <>
-      <div className="fixed bottom-4 left-4 z-[68] flex items-center gap-2 sm:bottom-6 sm:left-6"><FieldAgentLauncher /><button aria-label="打开 Command Field" title="Command Field · Ctrl+K" className="grid size-10 place-items-center rounded-full border border-line bg-paper/90 text-muted shadow-lg backdrop-blur-xl hover:border-accent hover:text-accent" onClick={() => { window.dispatchEvent(new Event(FIELD_AGENT_CLOSE_EVENT)); setPanel("command"); }} type="button"><Command className="size-4" /></button></div>
+      <div data-nextfield-dock className="fixed bottom-4 left-4 z-[68] flex items-center gap-2 sm:bottom-6 sm:left-6"><FieldAgentLauncher /><button aria-label="打开 Command Field" title="Command Field · Ctrl+K" className="grid size-10 place-items-center rounded-full border border-line bg-paper/90 text-muted shadow-lg backdrop-blur-xl hover:border-accent hover:text-accent" onClick={() => { window.dispatchEvent(new Event(FIELD_AGENT_CLOSE_EVENT)); setPanel("command"); }} type="button"><Command className="size-4" /></button></div>
       <AnimatePresence>
         {panel ? <motion.div animate={{ opacity: 1 }} className="fixed inset-0 z-[100] grid place-items-center bg-ink/70 p-3 backdrop-blur-xl sm:p-6" exit={{ opacity: 0 }} initial={reducedMotion ? false : { opacity: 0 }} role="presentation">
           <motion.section aria-label="NEXTFIELD OS" aria-modal="true" className="relative max-h-[min(46rem,calc(100svh-2rem))] w-full max-w-3xl overflow-auto rounded-[2rem] border border-paper/15 bg-paper text-ink shadow-2xl" initial={reducedMotion ? false : { y: 24, scale: 0.97 }} animate={{ y: 0, scale: 1 }} exit={{ y: 18, scale: 0.98 }} role="dialog">

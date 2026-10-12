@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { RadioPageFrame } from "@/components/site/radio-library";
+import { RadioHall } from "@/components/site/radio-hall";
 
 export const metadata: Metadata = {
   title: "电台",
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function GalleryRadioPage() {
-  return <RadioPageFrame />;
+  return <RadioHall />;
 }

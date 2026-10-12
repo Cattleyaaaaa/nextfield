@@ -37,6 +37,20 @@ html {
   scroll-padding-top: 7rem;
 }
 
+html:has([data-radio-pure-mode]) [data-nextfield-dock] {
+  display: none;
+}
+
+@keyframes radio-pure-drawer-in {
+  from { opacity: 0; transform: translateX(1.25rem); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes radio-pure-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 html[data-fullpage="true"],
 html[data-fullpage="true"] body {
   height: 100%;

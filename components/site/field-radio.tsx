@@ -1,13 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { ArrowUpRight, ChevronDown, ListMusic, Pause, Play, Quote, Radio, Repeat1, Repeat2, Shuffle, SkipBack, SkipForward, Volume2, X } from "lucide-react";
 import { RadioDisc } from "@/components/site/radio-disc";
 import { RadioLyrics } from "@/components/site/radio-lyrics";
 import { TransitionLink } from "@/components/site/transition-link";
 import { lyricsPathFor } from "@/lib/lrc";
 import { RADIO_TRACKS } from "@/lib/radio-data";
-import { RADIO_AUDIO_EVENT, RADIO_STATE_EVENT, RADIO_STATE_REQUEST_EVENT, RADIO_TIME_EVENT, RADIO_VISUALIZER_BAR_COUNT, RADIO_VISUALIZER_BAR_HEIGHTS, type RadioAudioSignal, type RadioSignal, type RadioTimeSignal } from "@/lib/radio-signal";
+import { RADIO_AUDIO_EVENT, RADIO_COMMAND_EVENT, RADIO_STATE_EVENT, RADIO_STATE_REQUEST_EVENT, RADIO_TIME_EVENT, RADIO_VISUALIZER_BAR_COUNT, RADIO_VISUALIZER_BAR_HEIGHTS, type RadioAudioSignal, type RadioCommand, type RadioPlaybackMode, type RadioSignal, type RadioTimeSignal } from "@/lib/radio-signal";
 import { usePageTransition } from "@/components/site/page-transition-provider";
 
 const VOLUME_KEY = "nextfield-radio-volume-v2";
@@ -15,7 +16,6 @@ const LEGACY_VOLUME_KEY = "nextfield-radio-volume";
 const DEFAULT_VOLUME = 0.3;
 const LYRICS_KEY = "nextfield-radio-lyrics";
 const PLAYBACK_MODE_KEY = "nextfield-radio-playback-mode";
-type PlaybackMode = "single" | "list" | "random";
 /** 访客主动停过一次音乐后写 1，之后不再自动起播。 */
 const SILENCE_KEY = "nextfield-radio-silence";
 /** 能解锁浏览器音频自动播放的手势：滚动不算，必须是点击/触摸/按键这一类。 */
@@ -29,18 +29,23 @@ function formatTime(seconds: number) {
 }
 
 export function FieldRadio() {
+  const pathname = usePathname();
   const { motionEnabled } = usePageTransition();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const frequencyDataRef = useRef<Uint8Array<ArrayBuffer> | null>(null);
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (pathname === "/gallery/radio") setOpen(false);
+  }, [pathname]);
   const [playing, setPlaying] = useState(false);
   const [index, setIndex] = useState(0);
   const indexRef = useRef(0);
   const historyRef = useRef<number[]>([]);
   const [canGoBack, setCanGoBack] = useState(false);
-  const [playbackMode, setPlaybackMode] = useState<PlaybackMode>("random");
+  const [playbackMode, setPlaybackMode] = useState<RadioPlaybackMode>("random");
   const [volume, setVolume] = useState(DEFAULT_VOLUME);
   const [volumeReady, setVolumeReady] = useState(false);
   const [current, setCurrent] = useState(0);
@@ -68,23 +73,25 @@ export function FieldRadio() {
         title: track?.title ?? "Field Radio",
         artist: track?.artist ?? "",
         cover: track?.cover,
+        volume,
+        playbackMode,
       };
       window.dispatchEvent(new CustomEvent<RadioSignal>(RADIO_STATE_EVENT, { detail }));
     };
     publish();
     window.addEventListener(RADIO_STATE_REQUEST_EVENT, publish);
     return () => window.removeEventListener(RADIO_STATE_REQUEST_EVENT, publish);
-  }, [playing, index, track?.title, track?.artist, track?.cover]);
+  }, [playing, index, track?.title, track?.artist, track?.cover, volume, playbackMode]);
 
   // 同步给电台页的歌词。进度单独广播，避免每次 timeupdate 都重绘整张曲库。
   useEffect(() => {
     const publish = () => window.dispatchEvent(new CustomEvent<RadioTimeSignal>(RADIO_TIME_EVENT, {
-      detail: { index, current },
+      detail: { index, current, duration },
     }));
     publish();
     window.addEventListener(RADIO_STATE_REQUEST_EVENT, publish);
     return () => window.removeEventListener(RADIO_STATE_REQUEST_EVENT, publish);
-  }, [index, current]);
+  }, [index, current, duration]);
 
   // 播放期间持续采样，曲库可视化与播放器音符都读取这条真实音频信号。
   useEffect(() => {
@@ -250,7 +257,7 @@ export function FieldRadio() {
     randomNext();
   };
 
-  const changePlaybackMode = (mode: PlaybackMode) => {
+  const changePlaybackMode = (mode: RadioPlaybackMode) => {
     setPlaybackMode(mode);
     window.localStorage.setItem(PLAYBACK_MODE_KEY, mode);
   };
@@ -260,6 +267,26 @@ export function FieldRadio() {
     setCurrent(value);
     if (audio && Number.isFinite(value)) audio.currentTime = value;
   };
+
+  // 电台页的主控制条与悬浮播放器操作同一个 audio 元素。
+  useEffect(() => {
+    const control = (event: Event) => {
+      const command = (event as CustomEvent<RadioCommand>).detail;
+      if (!command) return;
+      if (command.action === "toggle") playing ? stopByUser() : playByUser();
+      if (command.action === "previous") previous();
+      if (command.action === "next") next();
+      if (command.action === "seek" && Number.isFinite(command.time)) seek(command.time);
+      if (command.action === "set-volume" && Number.isFinite(command.volume))
+        setVolume(Math.min(1, Math.max(0, command.volume)));
+      if (command.action === "set-playback-mode" && (command.mode === "single" || command.mode === "list" || command.mode === "random"))
+        changePlaybackMode(command.mode);
+    };
+    window.addEventListener(RADIO_COMMAND_EVENT, control);
+    return () => window.removeEventListener(RADIO_COMMAND_EVENT, control);
+    // These handlers intentionally read the current playback state on each render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playing, playbackMode, index]);
 
   // 拖动中只预览进度；松手时才真正 seek，避免连续重载音频造成滑块卡顿。
   // 松手的位置可能在滑块外面，所以收尾监听挂在 window 上。
@@ -298,7 +325,7 @@ export function FieldRadio() {
     // 曲目清单页点某一首：切到那一首并立刻开始播
     const playTrack = (event: Event) => {
       const target = (event as CustomEvent<{ index?: number }>).detail?.index;
-      setOpen(true);
+      setOpen(window.location.pathname !== "/gallery/radio");
       if (typeof target !== "number" || target < 0 || target >= RADIO_TRACKS.length) return;
       wantPlayRef.current = true;
       silentPlayRef.current = false;
@@ -390,7 +417,7 @@ export function FieldRadio() {
   }, [playRequest, index]);
 
   return (
-    <aside className="pointer-events-none fixed bottom-4 right-4 z-[70] flex flex-col items-end gap-2 sm:bottom-6 sm:right-6" aria-label="Field Radio 音乐播放器">
+    <aside className={`pointer-events-none fixed bottom-4 right-4 z-[70] flex flex-col items-end gap-2 sm:bottom-6 sm:right-6 ${pathname === "/gallery/radio" && !open && !lyricsVisible ? "hidden" : ""}`} aria-label="Field Radio 音乐播放器">
       {/* preload="none"：没点播放之前不下载音频，首屏不受影响 */}
       <audio
         className="hidden"
@@ -429,10 +456,10 @@ export function FieldRadio() {
       ) : null}
 
       {open ? (
-        <div className="pointer-events-auto w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-[1.5rem] border border-paper/15 bg-ink text-paper shadow-[0_24px_80px_rgb(0_0_0/0.3)] backdrop-blur-xl">
-          <div className="flex items-center justify-between border-b border-paper/10 px-5 py-3">
-            <span className="flex items-center gap-2 font-mono text-[10px] tracking-[0.2em] text-liquid-foam"><Radio className="size-3" /> FIELD RADIO</span>
-            <button aria-label="收起播放器" className="rounded-full p-1.5 text-paper/55 hover:bg-paper/10 hover:text-paper" onClick={() => setOpen(false)} type="button"><X className="size-4" /></button>
+        <div className="pointer-events-auto w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-[1.5rem] border border-line bg-panel text-ink shadow-[0_24px_80px_rgb(0_0_0/0.3)] backdrop-blur-xl">
+          <div className="flex items-center justify-between border-b border-line px-5 py-3">
+            <span className="flex items-center gap-2 font-mono text-[10px] tracking-[0.2em] text-accent"><Radio className="size-3" /> FIELD RADIO</span>
+            <button aria-label="收起播放器" className="rounded-full p-1.5 text-muted hover:bg-accent/10 hover:text-ink" onClick={() => setOpen(false)} type="button"><X className="size-4" /></button>
           </div>
           <div className="p-5">
             <div className="mb-5 flex items-center gap-4">
@@ -440,13 +467,13 @@ export function FieldRadio() {
               {hasTrack ? (
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-display text-2xl tracking-[-0.04em]">{track.title}</p>
-                  <p className="mt-1 truncate font-mono text-[10px] uppercase tracking-[0.16em] text-paper/50">{track.artist}{track.note ? ` · ${track.note}` : ""}</p>
+                  <p className="mt-1 truncate font-mono text-[10px] uppercase tracking-[0.16em] text-muted">{track.artist}{track.note ? ` · ${track.note}` : ""}</p>
                   <div className="mt-3 flex h-6 items-end gap-[2px]" aria-hidden="true">
-                    {RADIO_VISUALIZER_BAR_HEIGHTS.map((height, barIndex) => <span className="radio-bar flex-1 rounded-full bg-liquid-foam/70" data-radio-controller-bar key={barIndex} style={{ height: `${height}%` }} />)}
+                    {RADIO_VISUALIZER_BAR_HEIGHTS.map((height, barIndex) => <span className="radio-bar flex-1 rounded-full bg-accent/70" data-radio-controller-bar key={barIndex} style={{ height: `${height}%` }} />)}
                   </div>
                 </div>
               ) : (
-                <div className="min-w-0 flex-1 rounded-2xl border border-dashed border-paper/25 px-4 py-3 text-xs leading-5 text-paper/60">
+                <div className="min-w-0 flex-1 rounded-2xl border border-dashed border-line px-4 py-3 text-xs leading-5 text-muted">
                   还没有曲目：把音频文件放进 public/audio/，再在 lib/radio-data.ts 里登记一条。
                 </div>
               )}
@@ -471,35 +498,35 @@ export function FieldRadio() {
                     scrubbingRef.current = true;
                   }}
                   step="1"
-                  style={{ background: `linear-gradient(to right, rgb(var(--liquid-foam)) ${progressPercent}%, rgb(var(--paper) / 0.15) ${progressPercent}%)` }}
+                  style={{ background: `linear-gradient(to right, rgb(var(--liquid-mid)) ${progressPercent}%, rgb(var(--liquid-mid) / 0.16) ${progressPercent}%)` }}
                   type="range"
                   value={duration > 0 ? Math.min(current, duration) : 0}
                 />
-                <div className="mt-2 flex justify-between font-mono text-[9px] tracking-[0.1em] text-paper/45">
+                <div className="mt-2 flex justify-between font-mono text-[9px] tracking-[0.1em] text-muted">
                   <span>{formatTime(current)}</span>
                   <span>{duration > 0 ? formatTime(duration) : "--:--"}</span>
                 </div>
               </>
             ) : hasTrack ? (
-              <p className="mt-1 rounded-2xl border border-dashed border-paper/20 px-3 py-3 text-[11px] leading-5 text-paper/55">
+              <p className="mt-1 rounded-2xl border border-dashed border-line px-3 py-3 text-[11px] leading-5 text-muted">
                 {track.href ? "这首只在平台上播放，本站不存音频文件。" : "这条还没有可播放的音频，也没有收听链接。"}
               </p>
             ) : null}
 
-            {failed ? <p className="mt-3 text-[11px] leading-5 text-red-300/90">这首放不出来：文件不存在，或是加密/非标准格式（如网易云 ncm），浏览器无法解码。</p> : null}
+            {failed ? <p className="mt-3 text-[11px] leading-5 text-red-600">这首放不出来：文件不存在，或是加密/非标准格式（如网易云 ncm），浏览器无法解码。</p> : null}
 
             <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2">
-              <button aria-label="上一首" className="grid size-9 place-items-center rounded-full border border-paper/15 text-paper/70 hover:border-liquid-foam hover:text-liquid-foam disabled:cursor-not-allowed disabled:opacity-40" disabled={!canGoBack} onClick={previous} type="button"><SkipBack className="size-4" /></button>
-              <button aria-label={playing ? "暂停" : "播放"} className="grid size-11 place-items-center rounded-full bg-liquid-foam text-ink hover:scale-105 disabled:cursor-not-allowed disabled:opacity-40" disabled={!hasAudio} onClick={playing ? stopByUser : playByUser} type="button">{playing ? <Pause className="size-4" /> : <Play className="ml-0.5 size-4" />}</button>
-              <button aria-label={playbackMode === "list" ? "下一首" : "随机下一首"} className="grid size-9 place-items-center rounded-full border border-paper/15 text-paper/70 hover:border-liquid-foam hover:text-liquid-foam disabled:cursor-not-allowed disabled:opacity-40" disabled={RADIO_TRACKS.length < 2} onClick={next} type="button"><SkipForward className="size-4" /></button>
+              <button aria-label="上一首" className="grid size-9 place-items-center rounded-full border border-line text-muted hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-40" disabled={!canGoBack} onClick={previous} type="button"><SkipBack className="size-4" /></button>
+              <button aria-label={playing ? "暂停" : "播放"} className="grid size-11 place-items-center rounded-full bg-accent text-ink hover:scale-105 disabled:cursor-not-allowed disabled:opacity-40" disabled={!hasAudio} onClick={playing ? stopByUser : playByUser} type="button">{playing ? <Pause className="size-4" /> : <Play className="ml-0.5 size-4" />}</button>
+              <button aria-label={playbackMode === "list" ? "下一首" : "随机下一首"} className="grid size-9 place-items-center rounded-full border border-line text-muted hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-40" disabled={RADIO_TRACKS.length < 2} onClick={next} type="button"><SkipForward className="size-4" /></button>
               {track?.href ? (
-                <a className="inline-flex items-center gap-1.5 rounded-full border border-paper/20 px-3 py-2 text-[11px] text-paper/75 transition-colors hover:border-liquid-foam hover:text-liquid-foam" href={track.href} rel="noreferrer" target="_blank">
+                <a className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-2 text-[11px] text-muted transition-colors hover:border-accent hover:text-accent" href={track.href} rel="noreferrer" target="_blank">
                   {track.hrefLabel ?? "去平台收听"}<ArrowUpRight className="size-3" />
                 </a>
               ) : null}
               {hasAudio ? (
                 <>
-                  <Volume2 className="ml-auto size-4 text-paper/50" />
+                  <Volume2 className="ml-auto size-4 text-muted" />
                   <input aria-label="音量" className="radio-volume w-20" max="1" min="0" onChange={(event) => setVolume(Number(event.target.value))} step="0.01" type="range" value={volume} />
                 </>
               ) : null}
@@ -513,7 +540,7 @@ export function FieldRadio() {
               ] as const).map(({ value, label, Icon }) => (
                 <button
                   aria-pressed={playbackMode === value}
-                  className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-[10px] transition-colors ${playbackMode === value ? "border-liquid-foam bg-liquid-foam/15 text-liquid-foam" : "border-paper/15 text-paper/55 hover:border-liquid-foam/60 hover:text-paper"}`}
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-[10px] transition-colors ${playbackMode === value ? "border-accent bg-accent/15 text-accent" : "border-line text-muted hover:border-accent/60 hover:text-ink"}`}
                   key={value}
                   onClick={() => changePlaybackMode(value)}
                   type="button"
@@ -523,14 +550,14 @@ export function FieldRadio() {
               ))}
             </div>
 
-            <div className="mt-3 grid gap-2 border-t border-paper/10 pt-3">
-              <TransitionLink className="flex items-center justify-between gap-3 rounded-xl border border-line px-4 py-3 text-sm transition-colors hover:border-liquid-foam hover:bg-paper/5" href="/gallery/radio">
-                <span className="flex items-center gap-2.5"><ListMusic className="size-4 text-liquid-foam" />全部曲目</span>
-                <span className="flex items-center gap-2 font-mono text-[10px] text-paper/45">{RADIO_TRACKS.length} TRACKS<ArrowUpRight className="size-4" /></span>
+            <div className="mt-3 grid gap-2 border-t border-line pt-3">
+              <TransitionLink className="flex items-center justify-between gap-3 rounded-xl border border-line px-4 py-3 text-sm transition-colors hover:border-accent hover:bg-accent/5" href="/gallery/radio">
+                <span className="flex items-center gap-2.5"><ListMusic className="size-4 text-accent" />全部曲目</span>
+                <span className="flex items-center gap-2 font-mono text-[10px] text-muted">{RADIO_TRACKS.length} TRACKS<ArrowUpRight className="size-4" /></span>
               </TransitionLink>
               <button
                 aria-pressed={lyricsVisible}
-                className={`flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-sm transition-colors ${lyricsVisible ? "border-liquid-foam bg-liquid-foam/10 text-liquid-foam" : "border-line text-paper/70 hover:border-liquid-foam hover:text-liquid-foam"}`}
+                className={`flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-sm transition-colors ${lyricsVisible ? "border-accent bg-accent/10 text-accent" : "border-line text-muted hover:border-accent hover:text-accent"}`}
                 onClick={() => setLyricsVisible((value) => !value)}
                 type="button"
               >
@@ -541,18 +568,19 @@ export function FieldRadio() {
           </div>
         </div>
       ) : (
-        <button className="group pointer-events-auto flex items-center gap-3 rounded-full border border-line bg-paper/90 px-4 py-3 text-ink shadow-[0_16px_50px_rgb(var(--liquid-deep)/0.18)] backdrop-blur-xl hover:border-accent" onClick={() => setOpen(true)} type="button">
-          {/* 收起态也用同一张唱片：转不转就是「在不在放」的状态指示，不再另画一个图标 */}
-          <RadioDisc
-            artist={track?.artist}
-            className="size-11"
-            cover={track?.cover}
-            playing={playing}
-            title={track?.title ?? "Field Radio"}
-          />
-          <span className="text-left"><span className="block font-mono text-[9px] tracking-[0.18em] text-accent">FIELD RADIO</span><span className="block text-xs">{playing && track ? track.title : "Play a signal"}</span></span>
-          <ChevronDown className="ml-1 size-3.5 rotate-180 text-muted transition-transform group-hover:-translate-y-0.5" />
-        </button>
+        <div className="pointer-events-auto flex w-[min(19.5rem,calc(100vw-2rem))] items-center gap-2 rounded-[1.15rem] border border-line bg-panel/95 p-2 text-ink shadow-[0_18px_55px_rgb(var(--liquid-deep)/0.16)] backdrop-blur-xl">
+          <button aria-label="打开场域电台播放器" className="group flex min-w-0 flex-1 items-center gap-3 rounded-xl px-1 py-1 text-left hover:bg-accent/5" onClick={() => setOpen(true)} type="button">
+            <RadioDisc artist={track?.artist} className="size-10" cover={track?.cover} playing={playing} title={track?.title ?? "Field Radio"} />
+            <span className="min-w-0 flex-1">
+              <span className="block font-mono text-[9px] tracking-[0.18em] text-accent">FIELD RADIO</span>
+              <span className="mt-0.5 block truncate text-xs font-medium">{track?.title ?? "Play a signal"}</span>
+            </span>
+            <ChevronDown className="size-3.5 shrink-0 rotate-180 text-muted transition-transform group-hover:-translate-y-0.5" />
+          </button>
+          <button aria-label={playing ? "暂停" : "播放"} className="grid size-9 shrink-0 place-items-center rounded-full bg-accent text-paper transition-transform hover:scale-105 disabled:opacity-45" disabled={!hasAudio} onClick={playing ? stopByUser : playByUser} type="button">
+            {playing ? <Pause className="size-3.5" /> : <Play className="ml-0.5 size-3.5" />}
+          </button>
+        </div>
       )}
     </aside>
   );

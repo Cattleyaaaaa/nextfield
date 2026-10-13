@@ -11,6 +11,7 @@ import { MissionTracker } from "@/components/evidence/local-systems";
 import { LanguageProvider } from "@/components/site/language-provider";
 import { Header } from "@/components/site/header";
 import { PageTransitionProvider } from "@/components/site/page-transition-provider";
+import { SiteLoader } from "@/components/site/site-loader";
 import { ThemeProvider } from "@/components/site/theme-provider";
 import { Grain } from "@/components/visual/grain";
 import { WaterRipple } from "@/components/visual/water-ripple";
@@ -47,6 +48,7 @@ export default function RootLayout({
             <FieldAtmosphere />
             <StudioBadgeDropProvider>
               <PageTransitionProvider>
+                <SiteLoader />
                 <GlobalEffectsProvider>
                   <WaterRipple />
                   <InkDrift />

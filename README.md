@@ -1,6 +1,6 @@
-# NEXTFIELD / 下一场域 · V4.1.0
+# NEXTFIELD / 下一场域
 
-[在线体验](https://nextfield.top/) · [V4.1.0 发布说明](docs/releases/V4.1.0.md) · [完整更新记录](CHANGELOG.md)
+[在线体验](https://nextfield.top/) · [GitHub Releases](https://github.com/Cattleyaaaaa/nextfield/releases)
 
 ## Field Agent（当前版本）
 

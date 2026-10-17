@@ -27,10 +27,11 @@ export function FieldNotesBook({ entries }: { entries: FieldBookEntry[] }) {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get("chapter") === "essays") {
-      setChapter("essay");
-      setStage("open");
-    }
+    const params = new URLSearchParams(window.location.search);
+    const requestedChapter = params.get("chapter");
+    if (requestedChapter === "essays") setChapter("essay");
+    if (requestedChapter === "writing") setChapter("writing");
+    if (params.get("open") === "1" || requestedChapter === "essays") setStage("open");
     const updateSize = () => setPageSize(window.innerWidth < 768 ? 5 : 8);
     updateSize();
     window.addEventListener("resize", updateSize);

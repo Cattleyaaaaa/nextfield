@@ -1,0 +1,31 @@
+---
+title: "A Retry Does Not Prove the First Attempt Failed"
+date: "2026-10-17"
+category: "Engineering"
+tags: ["Idempotency", "Retries", "Requests"]
+summary: "A timeout means the client did not receive a result in time; it does not prove the server did nothing. Safe retries need a stable identity for one user intent and a result that can be returned again."
+---
+
+The user submits a form and the page remains silent. They cannot tell whether the request was never sent, is still running, or succeeded while its response was lost. Clicking again feels like repeating the same action. To the server, it may look like an entirely new request.
+
+A timeout describes communication, not the business outcome. The database may have committed before the connection broke. A payment or guestbook entry may already exist after a refresh. Treating “I did not receive confirmation” as “nothing happened” is a common path to duplicate records, charges and jobs.
+
+## Give one intent a stable identity
+
+Generate an idempotency key when a user begins an operation, then reuse it for every retry of that operation. The server first checks for a record associated with the key. If a result already exists, return it. If work is still in progress, return a clear pending state. Only the first request should perform the actual action.
+
+The key belongs to one user intent, not to each network attempt. Generating a new key on every retry makes the attempts look unrelated. When someone edits the content and submits again, that is usually a new intent and deserves a new key.
+
+## Consider the record and the action together
+
+If the business action commits but the idempotency record does not, a later request may execute it again. If the record says “success” before the action has completed, the client may receive a false result. The state record and the business change need a defined consistency boundary: a database transaction can protect changes inside one database, while calls to external services need explicit pending, completed and recovery states.
+
+Concurrent requests matter too. Two requests with the same key can arrive almost together. A unique constraint or equivalent atomic claim lets one request become the executor while the other reads its state. Both should not pass a separate “check, then write” step.
+
+## Let the interface be honest about uncertainty
+
+A pending button can reduce accidental clicks, but it cannot guarantee data safety on its own. After a timeout, the interface should say that the outcome is unconfirmed and offer a retry tied to the original operation. “Checking the result” is more accurate than “failed,” and it prevents people from submitting a second copy just to recover.
+
+An idempotency key is not authentication and should not contain a secret. It links repeated attempts; permission checks, input validation and resource ownership still need their own rules. The record also needs a retention period, and keys must not be accidentally shared across users or operations.
+
+Retries should not make a request repeat forever. They should make one intent produce one business effect even when it travels over the network more than once. Explain the uncertainty, then connect the retry to the original action. That is how reliability becomes something a visitor can feel.

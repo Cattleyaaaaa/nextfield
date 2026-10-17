@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Footer } from "@/components/site/footer";
 import { FieldRadio } from "@/components/site/field-radio";
 import { ClickFireworks } from "@/components/site/click-fireworks";
+import { FieldCursor } from "@/components/site/field-cursor";
 import { GlobalEffectsProvider } from "@/components/site/global-effects-provider";
 import { NextfieldOS } from "@/components/site/nextfield-os";
 import { FieldAgentDock } from "@/components/site/field-agent-dock";
@@ -53,6 +54,7 @@ export default function RootLayout({
                   <WaterRipple />
                   <InkDrift />
                   <ClickFireworks />
+                  <FieldCursor />
                   <FieldRadio />
                   <NextfieldOS />
                   <FieldAgentDock />

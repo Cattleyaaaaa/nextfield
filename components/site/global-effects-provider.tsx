@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 export type ClickEffectStyle = "spark" | "confetti" | "rings";
 type EffectSettings = {
+  cursorEnabled: boolean;
   rippleEnabled: boolean;
   rippleStrength: number;
   rippleDensity: number;
@@ -17,6 +18,7 @@ type EffectContextValue = EffectSettings & {
 
 const STORAGE_KEY = "nextfield-global-effects-v1";
 const defaults: EffectSettings = {
+  cursorEnabled: true,
   rippleEnabled: true,
   rippleStrength: 3,
   rippleDensity: 3,
@@ -45,6 +47,10 @@ export function GlobalEffectsProvider({
       ) as Partial<EffectSettings> | null;
       if (saved)
         setSettings({
+          cursorEnabled:
+            typeof saved.cursorEnabled === "boolean"
+              ? saved.cursorEnabled
+              : defaults.cursorEnabled,
           rippleEnabled:
             typeof saved.rippleEnabled === "boolean"
               ? saved.rippleEnabled

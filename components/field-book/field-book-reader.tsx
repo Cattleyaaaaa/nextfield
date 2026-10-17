@@ -178,6 +178,7 @@ export function FieldBookReader({ entry, entries, contentZh, contentEn }: {
   const chapterEntries = entries.filter((item) => item.kind === entry.kind);
   const entryNumber = chapterEntries.findIndex((item) => item.href === entry.href) + 1;
   const nextEntry = chapterEntries[chapterEntries.findIndex((item) => item.href === entry.href) + 1];
+  const bookDirectoryHref = `/blog?open=1&chapter=${entry.kind === "essay" ? "essays" : "writing"}`;
   const content = <article className="fieldbook-reading-content" lang={displayedLocale === "zh" ? "zh-CN" : "en"}>
     <header className="fieldbook-reading-header">
       <div className="fieldbook-reading-overline">
@@ -192,14 +193,14 @@ export function FieldBookReader({ entry, entries, contentZh, contentEn }: {
     {body}
     <nav className="fieldbook-reading-next" aria-label={locale === "zh" ? "继续阅读" : "Continue reading"}>
       <span className="fieldbook-folio">{locale === "zh" ? "下一篇" : "UP NEXT"}</span>
-      <TransitionLink href={nextEntry?.href ?? "/blog"}><span><strong>{nextEntry ? nextEntry.title[locale] : (locale === "zh" ? "回到《场域手记》" : "Back to Field Notes")}</strong>{nextEntry && <small>{nextEntry.summary[locale]}</small>}</span><ArrowRight size={18} aria-hidden="true" /></TransitionLink>
+      <TransitionLink href={nextEntry?.href ?? bookDirectoryHref}><span><strong>{nextEntry ? nextEntry.title[locale] : (locale === "zh" ? "回到《场域手记》" : "Back to Field Notes")}</strong>{nextEntry && <small>{nextEntry.summary[locale]}</small>}</span><ArrowRight size={18} aria-hidden="true" /></TransitionLink>
     </nav>
   </article>;
 
   return <div className="fieldbook-scene fieldbook-reader-scene relative isolate mx-auto max-w-[90rem] px-4 pb-24 pt-8 sm:px-8 sm:pt-14 lg:px-12" data-motion={motionEnabled ? "on" : "off"}>
     <div className="fieldbook-ambient" aria-hidden="true"><span /><span /><span /></div>
     <div className="fieldbook-reader-toolbar relative z-10">
-      <TransitionLink className="fieldbook-back" href="/blog"><ArrowLeft size={17} aria-hidden="true" />{locale === "zh" ? "场域手记" : "Field Notes"}</TransitionLink>
+      <TransitionLink className="fieldbook-back" href={bookDirectoryHref}><ArrowLeft size={17} aria-hidden="true" />{locale === "zh" ? "场域手记" : "Field Notes"}</TransitionLink>
       <div className="fieldbook-reader-actions">
         {mode === "pages" && <div className="fieldbook-reader-page-nav">
           <button type="button" disabled={spread === 0 || Boolean(direction)} onClick={() => turn(-1)} aria-label={locale === "zh" ? "上一页" : "Previous page"}><ArrowLeft size={17} aria-hidden="true" /><span>{locale === "zh" ? "上一页" : "Previous"}</span></button>

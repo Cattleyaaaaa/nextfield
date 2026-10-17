@@ -1,0 +1,29 @@
+---
+title: "Design Scroll as an Input"
+date: "2026-10-17"
+category: "Frontend"
+tags: ["Scrolling", "Keyboard", "Interaction"]
+summary: "Wheel, touch and keyboard events can all express an intent to scroll. Before taking control, account for focus, gesture boundaries and the browser's native behaviour."
+---
+
+Full-screen pages often map a wheel gesture to “go to the next section.” The implementation needs only one listener, but visitors have more than one kind of input: a trackpad can send a stream of small movements, a mouse wheel can jump a long way, touch has its own momentum, and a keyboard uses Space and arrow keys to move through a page.
+
+Treating scroll as input starts with a question: what does it mean in this context? When someone is typing, Space may be part of a sentence. When focus is inside a scrollable track list, the wheel should move that list first. Only a page designed around full-screen sections should interpret a clear vertical gesture as a section change.
+
+## Do not treat every wheel event as a step
+
+A single gesture usually produces many wheel events. Changing sections on each one can send the page flying through several chapters. A direction threshold filters tiny noise, and a short lock can make one gesture advance one section. The lock should match the transition duration while still letting visitors act again as soon as the animation ends.
+
+Trackpads tend to send smaller, more continuous events, while mouse wheels may report a large jump. The threshold need not identify the device; it should prevent accidental movement without making a clear gesture feel sluggish. Touch deserves separate start and end measurements and a sensible distance threshold so taps and short drags do not become page turns.
+
+## Let focus reveal the current task
+
+Global scrolling should yield inside inputs, textareas, editable content and containers with their own scroll areas. Checking the event target and current focus is more dependable than preventing the default behaviour across the whole page. Otherwise, convenient full-screen navigation can make forms, catalogues and lyric lists hard to use.
+
+Keyboard behaviour needs the same care. Arrow keys and PageDown may change sections, but Space should do so only when focus is not on a button, input or another control. Links and buttons must keep their own Enter and Space behaviour. A reduced-motion preference should return content to ordinary document scrolling or at least remove unnecessary movement and blur.
+
+## A gesture needs a way back
+
+After a change, the address, focus and active section should remain understandable. A fragment identifier can make a section linkable and restorable after refresh. Focus should not remain on a hidden button, and scroll navigation should not erase the visitor's expectation of browser history.
+
+Full-screen navigation exists to create rhythm, not to take control away from the browser. Taking over scroll feels helpful only when intent is clear, the focused control has no separate task and the next step is predictable. Otherwise, the browser's familiar scrolling is often the more intuitive choice.

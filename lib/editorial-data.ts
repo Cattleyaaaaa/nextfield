@@ -383,6 +383,36 @@ export const COLOPHON_ARTICLES: EditorialArticle[] = [
 
 export const ESSAY_ARTICLES: EditorialArticle[] = [
   {
+    slug: "the-cup-by-the-window", date: "2026 · 10 · 17", eyebrow: "Essay / October", tags: ["清晨", "窗边", "日常"], minutes: 2,
+    title: { zh: "窗边那杯水", en: "The Glass by the Window" },
+    summary: { zh: "早晨的一杯水被放在窗边，阳光慢慢移过桌面。没有什么特别的事发生，但一天像是因此有了一个轻一点的开头。", en: "A glass of water sat by the window as sunlight crossed the table. Nothing remarkable happened, yet the day seemed to begin a little more gently." },
+    sections: [
+      { heading: { zh: "光先落在桌上", en: "Light Reached the Table First" }, paragraphs: [
+        { zh: "起床后顺手倒了杯水，放在窗边。那时屋里还没有完全亮起来，玻璃上有一小块模糊的反光。我去收拾别的东西，回来时，光已经挪到了杯沿。", en: "After getting up, I poured a glass of water and left it by the window. The room was not fully bright yet; a small, blurred reflection rested on the glass. I went to put a few things away, and when I returned, the light had reached its rim." },
+        { zh: "我喝了几口，又把杯子放回原处。窗外有人经过，楼下传来短短的说话声。早晨没有因此变得特别，只是那些平常的声音都慢了一点，像还没急着进入各自的日程。", en: "I took a few sips and put it back. Someone passed outside, and a brief conversation rose from downstairs. The morning did not become special; ordinary sounds simply felt slower, as if they had not yet entered their schedules." },
+      ]},
+      { heading: { zh: "不用把它留住", en: "Nothing to Hold On To" }, paragraphs: [
+        { zh: "后来我带着杯子离开窗边，开始处理今天的事。那束光继续往前，落到桌上的其他地方。它没有等我，也不需要被拍下来证明曾经出现。", en: "Later I carried the glass away and began the day's work. The light continued on, reaching other parts of the table. It did not wait for me, and it did not need a photograph to prove it had been there." },
+        { zh: "有些清晨只留下很小的印象：一杯水、一点光，还有还没被填满的几分钟。想起来的时候，我仍记得那时房间很安静。", en: "Some mornings leave only a small impression: a glass of water, a little light, and a few minutes not yet filled. When I think of it now, I still remember how quiet the room was." },
+      ]},
+    ],
+  },
+  {
+    slug: "the-elevator-stopped-once", date: "2026 · 10 · 15", eyebrow: "Essay / October", tags: ["城市", "途中", "片刻"], minutes: 2,
+    title: { zh: "电梯中途停了一次", en: "The Elevator Stopped Once" },
+    summary: { zh: "电梯在两层之间短暂停住，同行的人没有说话。门重新打开后，大家各自走向原来的方向，像什么也没有发生。", en: "The elevator paused briefly between floors. No one spoke. When the doors opened again, everyone continued in their own direction as if nothing had happened." },
+    sections: [
+      { heading: { zh: "楼层数字停住了", en: "The Numbers Stopped" }, paragraphs: [
+        { zh: "电梯上行到一半时轻轻顿了一下，楼层数字停住，灯还亮着。里面有几个人，刚才各自看着手机或盯着门。那一瞬间，所有人的视线都抬了起来。", en: "Halfway up, the elevator gave a small jolt. The floor number stopped, though the lights stayed on. A few of us were inside, looking at our phones or at the doors. For a moment, every gaze lifted." },
+        { zh: "没有人问发生了什么。电梯很快重新移动，速度和平时一样。数字一层层往上跳，我听见有人把手机收进口袋，接着又恢复了安静。", en: "No one asked what had happened. The elevator soon moved again at its usual pace. The numbers climbed floor by floor. I heard someone put away a phone, and quiet returned." },
+      ]},
+      { heading: { zh: "门开之后", en: "After the Doors Opened" }, paragraphs: [
+        { zh: "到站时，前面的人先走出去，后面的人跟上。我最后一个离开，走廊里正好有人经过。那几秒钟没有改变路线，也没有留下值得讲述的结果。", en: "When we arrived, the person in front stepped out first, and the rest followed. I was last to leave; someone happened to pass in the corridor. Those few seconds changed no route and produced no story-worthy outcome." },
+        { zh: "可是刚才那一小段停顿，让陌生人短暂地共享了同一份不确定。电梯继续上行以后，这份共同经历也就散开了，像一声很轻的提示音，很快被日常盖住。", en: "Still, that brief pause let strangers share the same uncertainty. Once the elevator continued, the shared moment dispersed too, like a faint notification quickly covered by the day." },
+      ]},
+    ],
+  },
+  {
     slug: "a-song-left-playing", date: "2026 · 10 · 12", eyebrow: "Essay / October", tags: ["音乐", "夜晚", "日常"], minutes: 2,
     title: { zh: "歌还在放，房间已经安静了", en: "The Song Was Still Playing" },
     summary: { zh: "一首歌放到尾声，周围的事渐渐停了下来。没有特别的感想，只是终于听清了那些原本要被匆忙盖过去的声音。", en: "As a song reached its end, the room became quiet. There was no great realisation, only time to hear what hurry usually covers." },

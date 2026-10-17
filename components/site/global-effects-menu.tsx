@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { MousePointerClick, SlidersHorizontal, Waves, X } from "lucide-react";
+import { MousePointer2, MousePointerClick, SlidersHorizontal, Waves, X } from "lucide-react";
 import {
   useGlobalEffects,
   type ClickEffectStyle,
@@ -91,6 +91,28 @@ export function GlobalEffectsMenu() {
               type="button"
             >
               {motionEnabled
+                ? locale === "zh"
+                  ? "开启"
+                  : "On"
+                : locale === "zh"
+                  ? "关闭"
+                  : "Off"}
+            </button>
+          </div>
+          <div className="mt-5 flex items-center justify-between gap-3 border-t border-line pt-4">
+            <span className="inline-flex items-center gap-2 text-sm font-medium">
+              <MousePointer2 className="size-4 text-accent" />
+              {locale === "zh" ? "场域准星" : "Field reticle"}
+            </span>
+            <button
+              aria-pressed={effects.cursorEnabled}
+              className={toggleClass(effects.cursorEnabled)}
+              onClick={() =>
+                effects.updateEffects({ cursorEnabled: !effects.cursorEnabled })
+              }
+              type="button"
+            >
+              {effects.cursorEnabled
                 ? locale === "zh"
                   ? "开启"
                   : "On"
